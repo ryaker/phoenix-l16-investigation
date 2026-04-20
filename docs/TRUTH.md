@@ -1,11 +1,18 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 2
+**Version**: 2.1
 **Status**: Canonical truth doc for the L16 Phoenix reimplementation.
 **Git is authoritative for history.** Commit hash + log = "when was this true."
 **File has no date in its name** — versioning lives inside; the previous version is preserved at `archive/TRUTH-v1-phoenix-truth-2026-04-17.md`.
 
-**What v2 adds / changes vs v1:**
+**What v2.1 adds / changes vs v2 (2026-04-20, Session 1 LLDB closure):**
+- **#15 Q-DROPPED-CONSUMER CLOSED.** HW read-watchpoints on 4 dropped-cam RIC L0 buffers at 28mm bridge HDR captured 102,361 trips; 100% trace through IRAMP-family code. Dropped cams consumed via composite-anchor pre-fusion kernel (new VA below). See §2.1 M14.1 + §4 for evidence.
+- **NEW VA added to §2.1 IRAMP**: `libcp+0x2b3410..0x2b3448` composite-anchor 4-way SIMD weighted-blend kernel. Called from IRAMP body `0x365f50`; consumes A1-A5 RIC L0 buffers at 28mm to build `src1`/`src2` composite IGs.
+- **§4 updated**: OPEN-DROPPED-CONSUMER row removed (resolved). OPEN-DARKCURRENT row updated — Session 1 reconfirmed `0x3048b0`/`0x2f3b90` fire 0× on bridge HDR profile=3; formula extraction deferred to different render profile.
+- **Session 1 deliverables**: `/tmp/l16_open_audit/session1_findings.md`, `session1_transcript.md`, `session1/phase2_watchpoints.log` (66 MB, 102K trips), `session1/reclassified.txt` ("TRULY NOVEL: (none)").
+- **Spike gate**: 28mm bridge HDR spike is UNBLOCKED. 70/150mm spike still gated by #16 (non-blocking for 28mm).
+
+**What v2 added / changed vs v1:**
 - Integrates the 4 April-19 cleanup rounds (10 SUPERSEDED corrections + 16 Round-2 verifications + 6 Round-3 banner refutations + 34 Round-4 scope-bands across 9 files) which explicitly skipped TRUTH in v1
 - Integrates 3 post-v1 scratch files (`va_registry.md`, `hwinfo_field_18.md`, `pyramid_range_seeding.md`)
 - Applies Round-4 precision rule to v1's absolutes ("GUI-only" / "0 hits" / "NEVER fires" → scope-bound to tested LRI + focal + mode)
@@ -86,10 +93,14 @@ Confidence key: ✅ LLDB-live  📐 Static-disasm  🔤 String/RTTI  ⚠️ Cand
         │  28mm: passes [0,5,6,7,8,9] = A1+B1..B5  (6 cams) │
         │  70mm: passes [8,10,11,12,13,14]=B4+C1..C5 (6 cams)│
         │  No fallback — std::out_of_range at 0x3f6866.     │
-        │  A2-A5 (28mm) and B1/B2/B3/B5 (70mm) = depth-only.│
-        │  ⚠ D5/Q-DROPPED: Rich's scope guard — Phoenix MUST│
-        │    NOT skip per-camera ISP for dropped cams until │
-        │    consumer of their RIC L0 buffer is identified. │
+        │  A2-A5 (28mm) and B1/B2/B3/B5 (70mm) = consumed   │
+        │  via composite-anchor pre-fusion, NOT depth-only. │
+        │  ✅ D5/Q-DROPPED CLOSED 2026-04-20: dropped cams  │
+        │    consumed by IRAMP body's composite-anchor      │
+        │    kernel at libcp+0x2b3410 (4-way SIMD blend).   │
+        │    See §2.1 M14.1. Phoenix MUST run full per-cam  │
+        │    ISP for all fired cams (dropped ISP = corrupt  │
+        │    src1/src2 → corrupt merge).                    │
         └──────────────────────────────────────────────────┘
                           │
                           ▼
@@ -210,6 +221,7 @@ Stored at `PipelineCache+0x8` (embedded `vector<Vec2<int32>>`), written once by 
 | M11 | `initResAmp` at `libcp+0x3eb3c0` is src1/src2 IG construction site (two `Znwm(0x60)` allocations; vtables `0x65f668`/`0x65f6e8`). `PipelineCache::initFusion` (`libcp+0x3eb200`) is NOT a producer — FCB funcdata pointers at PC+0x238/+0x248 identical pre/post. | `anchor_prefusion_and_c6.md`, `composite_producer.md`. | ✅ |
 | M13 | No separate anchor pre-fusion N→1 stage. L16 has exactly ONE multi-camera reduce: IRAMP. src1/src2 IGs = two views over the SAME single anchor camera's pyramid cache (A1 at 28mm, B4 at 70mm), rooted at `PipelineCache+0x170` = `lt::ReferenceImageCache`. Two vtables (`0x65f668` vs `0x65f6e8`) control sibling pyramid-tier lookup paths. Per-tile op at vt[+0x30] = `0x3ecc10`/`0x3ecd80`; vt[+0x18] never fires. | `composite_anchor_n1_reducer.md`. LLDB L16_02130 28mm + L16_00010 70mm. | ✅ (2 LRIs only) |
 | M14 | Per-contributor photometric pre-norm INSIDE IRAMP at `libcp+0x3eced0`. `out = sqrt(max(0, in × IG+0x10))` per-channel SIMD (`mulps+maxps+sqrtps`). Alpha lane = 1.0 via 3× `insertps` with const from `0x5a8128`. IG+0x10 = effective-FOV ratio per C17. Dispatch chain: IRAMP body `0x366f1c` → `0x374ac0` → vt[+0x30] indirect → `0x3eced0`. Hit count: 1 per camera per pipeline invocation at 28mm L16_02130. | `ig_offset10_consumer.md`. LLDB read watchpoint on closure+0x30. | ✅ (L16_02130 28mm only) |
+| M14.1 | **Composite-anchor pre-fusion kernel at `libcp+0x2b3410..0x2b3448`** — 4-input × weight SIMD accumulator (classic `movaps + mulps + addps + movaps` 4-way weighted blend). Consumes the 5 A-cam RIC L0 buffers (A1..A5 at 28mm) to build the `src1`/`src2` composite IGs that the IRAMP body at `0x365960` takes as its first two ImageGenerator inputs. Called from IRAMP body at offset `+0x5f0` (`libcp+0x365f50`). **This is the kernel that consumes "dropped" cams** (A2-A5 at 28mm) — they are NOT depth-only; they feed the composite anchor src1/src2 pre-fusion upstream of IRAMP. Hottest PC `0x2b341e` logged 20,351 watchpoint trips on dropped-cam RIC L0 buffers in 30% of a render; 100% of the 46 unique trip PCs trace through IRAMP-family code (zero non-IRAMP consumers). Refines M13 (`composite_anchor_n1_reducer.md` said src1/src2 wrap composite anchors; this locates the assembly kernel that does the pre-fusion). | Session 1 LLDB 2026-04-20 on L16_02130 28mm bridge HDR profile=3: `/tmp/l16_open_audit/session1/phase2_watchpoints.log` (102,361 trips), `session1/reclassified.txt` ("TRULY NOVEL: (none)"). Closes §4 OPEN-DROPPED-CONSUMER. | ✅ (L16_02130 28mm only; 70mm/150mm extension optional, see §4 open items) |
 
 ### 2.2 Per-camera ISP
 
@@ -348,13 +360,13 @@ v1 carried Q5, Q7, Q9, Q10, Q11, Q12. v2 expands:
 | **OPEN-BLC** | **BLC kernel VA + formula.** v1 pipeline diagram implies `0x340b00 = LinearizeAndColorScale<uint16> = BL subtract + color-scale`. Round 1 said `0x340b00` is color-scale only, not BLC. Round 2 LATE REVISION said BLC is linear `(raw-42)/981` via `libcp+0x2cffd0` (subps+mulps; scale `1/981` computed LIVE via `subss+divss` at `0x2d051f` — which is why `0x3a85bb38 = 1/981` doesn't appear in static disasm). The intermediate Anscombe/VST hypothesis was refuted (R28). **Per-image BLC kernel VA is still TBD.** | Spike-blocker: wrong VA → wrong black subtraction → wrong everything downstream. | LLDB BP at 0x340b00 + 0x2cffd0 on bridge HDR; trace per-pixel in/out for known input. Determine: which VA reads raw pixels? Which subtracts 42? Which divides by 981 (or runs the scale factor)? Is there a per-Bayer-channel `color_scale` coefficient? |
 | **OPEN-FSCALE** | **Ceres Cauchy `f_scale` value.** v1 D3 said "verified a=1.0 at libcp 0x5c3580". Round 2 `cleanup_actions_log_round2.md` confirms verified via LLDB. BUT `legacy_doc_audit_round2.md` SUPERSEDED banner says UNVERIFIED: first 4 floats at 0x5c3580 decode as `(42.0, 1023.0, 0.000547, -0.0000204)` which is NOT standard Ceres `(a, a²)` doubles layout. **Internal conflict unresolved.** | Spike-blocker for depth: wrong f_scale → wrong Cauchy robustness → wrong depth refinement. | LLDB dump 16 bytes at 0x5c3580; interpret as 2 doubles vs 4 floats; correlate with Ceres Evaluate body observed behavior. |
 | **OPEN-PATH-B2** | **Depth cost Path B2 at `libcp+0x2732f0`** — Round 3 says it fires on L16 (0x2730c0 is a count==4 spec that never fires). v2 §2.6 D9-D11 only covers Path A. Fire rate + relationship to Path A + flag semantics unknown. | Spike-blocker for depth: incomplete depth cost path → wrong disparity. | LLDB BP at 0x2732f0 on bridge profile=3; tally hits; inspect arguments + closure. |
-| **OPEN-DARKCURRENT** | **Dark-current correction stage at `libcp+0x66d670` (28-record per-ISO table)** — identified by Round 2 as SEPARATE from BLC. Whether it fires on bridge HDR + its kernel VA is unverified. | If fires, Phoenix needs it; if GUI-only, Phoenix omits. | RTTI scan for "dark current" / "DarkCurrent" / related; LLDB around 0x66d670 readers. |
+| **OPEN-DARKCURRENT** | **Dark-current correction stage at `libcp+0x66d670` (28-record per-ISO table)** — identified by Round 2 as SEPARATE from BLC. **Session 1 2026-04-20 RECONFIRMED INACTIVE on bridge HDR profile=3**: BPs at `0x3048b0` (VST applier) and `0x2f3b90` (F1 wrapper) fire **0×** on full L16_02130 28mm render. The 28-record table is loaded once at dyld init (`0xe1210`) and is dead during render. `f2_worker 0x2f4470` + `f3_top 0x2f53d0` fire 648× each (live YCoCg variance projection per `vst_per_pixel_lldb.md`). **Does NOT block 28mm bridge HDR spike.** Formula extraction requires different render profile (e.g. `--direct-renderer --dr-profile 2`). | Deferred — not spike-blocking. | For formula extraction (outside bridge HDR spike scope): switch invocation to `--direct-renderer` or `--export-fmt 4`; BP `0x3048b0` once live; capture α/β/γ register loads. |
 | **OPEN-NLM4** | **NLM-4 denoiser** (4 novel modifications per `nlm_bm3d_denoiser.md`) — bridge activation + kernel VA + formula unverified. | If fires on bridge, Phoenix needs it; if GUI-only, Phoenix omits. | NLM RTTI scan; LLDB on tentative VA. |
 | **OPEN-DEMOSAIC-KERNEL** | **DemosaicV1 inner kernel body at `libcp+0x2eef80`** is static SSE2 per Round 2 — but full taps + interpolation formula not decoded. | For byte-parity demosaic, Phoenix needs the exact taps; for algorithm-class parity, published Hamilton-Adams suffices. Decide based on quality target. | Static disasm of 0x2eef80 inner kernel body (4-5 per-pixel-block instructions for the phase-specific interpolations). |
 | **OPEN-LAPLACIAN-TAPS** | **Laplacian pyramid kernel taps** — 4 verified VAs (`libcp+0x2e4cf0, 0x12c50, 0x133d0, 0x134d0`) per legacy audit Round 2, but tap coefficients + down/upsample formula not extracted. | Directly drives output sharpness/halo; needed for tone/color blend fidelity. | Static disasm of the 4 VAs. |
 | **OPEN-IRAMP-BODY** | **IRAMP SAD→WTA→SubPixel→Accumulate→Hann body** — v1 M7 characterizes sub-stages as "CDF 9/7 wavelet + 5-band LUT" but the per-tile SAD/WTA/SubPixel math is not decoded. Round 2 confirmed 70mm L16_03434 fires the full chain 25+ times at each VA. | Core merge fidelity gated on this. | Static disasm of 0x3661b0..0x36ae41 inner bodies at identified sub-stage VAs. |
-| **OPEN-DROPPED-CONSUMER** (D5) | Where do dropped cams' RIC L0 buffers get consumed? (A2-A5 at 28mm, B1/B2/B3/B5 at 70mm, C6 at all tele zooms.) Light Inc marketed all 16 cams as contributing — there MUST be a consumer. | Phoenix MUST NOT skip per-camera ISP for dropped cams until closed (Rich's directive). | Hardware watchpoint on dropped-cam RIC L0 buffer pointer; log every PC that touches during full render. |
-| **OPEN-SCOPE-VERIFY** | v1 absolutes now scope-banded in §2 and §3 R32 — but actual verification at untested axes (35mm, 150mm, profile=2, other 28mm LRIs, GUI path) is not done. If any "0 hits at tested LRIs" claim reverses at 35mm or 150mm, Phoenix architecture may need revision. | Spike-blocker if any reversal changes pipeline topology. | Run each 0-hits probe at the untested axes for L1-L6, M9-M10, D1. |
+| ~~**OPEN-DROPPED-CONSUMER** (D5)~~ | **CLOSED 2026-04-20 Session 1.** HW read-watchpoints on A2/A3/A4/A5 RIC L0 buffers at 28mm bridge HDR profile=3 captured 102,361 trips; all 46 unique trip PCs trace through IRAMP-family code. Dropped cams consumed via composite-anchor kernel at `libcp+0x2b3410` (see §2.1 M14.1). 28mm spike UNBLOCKED. Non-blocking optional: re-run script at 70mm (B1/B2/B3/B5/C6 dropped) and 150mm to confirm universal across zoom tiers. | — | — |
+| **OPEN-SCOPE-VERIFY** | v1 absolutes now scope-banded in §2 and §3 R32 — but actual verification at untested axes (35mm, 150mm, profile=2, other 28mm LRIs, GUI path) is not done. If any "0 hits at tested LRIs" claim reverses at 35mm or 150mm, Phoenix architecture may need revision. | Spike-blocker if any reversal changes pipeline topology. Non-blocking for 28mm. | Run each 0-hits probe at the untested axes for L1-L6, M9-M10, D1. |
 | **OPEN-TRIAGE-99-SCRATCH** | 99 of 136 scratch md files are NOT cited by v1 TRUTH (73% coverage gap). v2 integrated cleanup-log findings + 3 post-TRUTH files but did NOT audit the full 99. Unknown what findings remain. | Unknown-unknowns risk. | Structured diff: for each uncited scratch file, classify as (agrees, fills gap, contradicts, irrelevant) vs v2 claims. |
 
 ---
@@ -445,3 +457,14 @@ New recipes needed for OPEN-* items in §4 — left as investigation tickets onc
 | Coverage gap (99 uncited scratch) | v1 cited 48 of 136 scratch files | **Flagged OPEN-TRIAGE-99-SCRATCH** — not closed in v2; next work item |
 | v1 Refuted rows R1-R19 | Preserved | Carried forward via archive reference; added R20-R32 for cleanup-round refutations |
 | Post-v1 scratch (hwinfo, pyramid_seeding, va_registry) | Not integrated | **Integrated as K6, §4 OPEN-*, §7.3 authoritative VA index** |
+
+## 8.1 v2 → v2.1 changelog (2026-04-20 Session 1)
+
+| Category | v2 state | v2.1 action |
+|---|---|---|
+| OPEN-DROPPED-CONSUMER (spike blocker) | Open — "consumer of dropped-cam RIC L0 buffers unknown; Phoenix MUST NOT skip per-cam ISP" | **CLOSED** via HW read-watchpoints on A2/A3/A4/A5 at 28mm bridge HDR. 102,361 trips; 100% IRAMP-family. Dropped cams consumed via composite-anchor pre-fusion. 28mm spike UNBLOCKED. |
+| Composite-anchor kernel VA | Hypothesized in `iramp_camera_identity.md`/`composite_anchor_n1_reducer.md` ("src1/src2 wrap composite anchors") but assembly kernel not located | **NEW §2.1 M14.1**: kernel at `libcp+0x2b3410..0x2b3448` (4-way SIMD weighted blend), called from IRAMP body `0x365f50`. Cited to Session 1 artifact `/tmp/l16_open_audit/session1/phase2_watchpoints.log`. |
+| OPEN-DARKCURRENT | "Whether it fires on bridge HDR + its kernel VA is unverified" | Reconfirmed: `0x3048b0` / `0x2f3b90` fire **0×** on bridge HDR profile=3 (Session 1 Phase 1). 28-record table dead during render. Formula extraction moved out of bridge HDR spike scope. Row in §4 updated. |
+| Phoenix dropped-cam posture | Conservative ("run ISP for all 16 until closed") | Positive-evidence-grounded ("must run ISP for all fired cams because dropped cams feed composite anchor; skipping = corrupt src1/src2 = corrupt merge"). Same behavior, different justification. |
+| Session artifacts | — | Added `/tmp/l16_open_audit/session1/` (10 files, incl. 66 MB watchpoint log, 552-line unique-PC dedup, reclassifier script, 2 render outputs). `/tmp/l16_open_audit/_FINDINGS.md` SYNTHESIS block count bumped 13→14 RESOLVED, #15 status flipped TRULY-OPEN → RESOLVED. |
+| Open items state | 13 RESOLVED / 3 PARTIAL / 1 TRULY OPEN | **14 RESOLVED / 3 PARTIAL / 0 TRULY OPEN.** 28mm bridge HDR spike is UNBLOCKED per Rich's gate. 70/150mm spike still gated by #16 (non-blocking for 28mm). |

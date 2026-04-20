@@ -9,15 +9,19 @@
 2. `/tmp/l16_open_audit/_FINDINGS.md` — 2026-04-20 OPEN-items audit register (841 lines, 17 items, verdict per item)
 3. `~/.claude/projects/-Users-ryaker-Dev-L16-Lumen-ReverseEngineering/memory/open_items_plan.md` — closure plan for remaining 4 non-resolved items
 
-## Current state (2026-04-20)
+## Current state (2026-04-20 post-Session-1)
 
-- **13 of 17 OPEN items RESOLVED**
-- **3 PARTIAL** (non-blocking for bridge HDR 28mm spike): #06 Q12 ZOOM_CCM (70/150mm partial), #10 OPEN-DARKCURRENT (formula hypothesis), #16 OPEN-SCOPE-VERIFY (150mm kernel untested)
-- **1 TRULY OPEN** (spike blocker): **#15 Q-DROPPED-CONSUMER**
+- **14 of 17 OPEN items RESOLVED** (#15 Q-DROPPED-CONSUMER closed 2026-04-20 via Session 1 LLDB)
+- **3 PARTIAL** (non-blocking for bridge HDR 28mm spike): #06 Q12 ZOOM_CCM (70/150mm partial), #10 OPEN-DARKCURRENT (reconfirmed inactive on bridge HDR path — formula extraction deferred to non-HDR profile), #16 OPEN-SCOPE-VERIFY (150mm kernel untested)
+- **0 TRULY OPEN.** **28mm bridge HDR spike is UNBLOCKED.**
+
+**#15 closure summary:** HW read-watchpoints on 4 dropped-cam RIC L0 buffers (A2/A3/A4/A5) at 28mm bridge HDR captured 102,361 trips over 480s — 100% of unique trip PCs trace through IRAMP-family code. Dropped cams ARE consumed via IRAMP body's composite-anchor pre-fusion kernel at `libcp+0x2b3410` (4-way SIMD weighted blend, new VA). "Skip dropped-cam ISP" optimization REFUTED. Rich's D5 directive ("run ISP for all 16") now satisfied by positive evidence. Details: `/tmp/l16_open_audit/session1_findings.md`.
 
 ## Next action
 
-Single LLDB session on `L16_02130` (28mm) closes #15 + #10. After that, bridge HDR 28mm spike is UNBLOCKED.
+28mm bridge HDR spike is UNBLOCKED — proceed to SPIKE (validation-only per Rich's rule). Remaining optional work (non-spike-blocking):
+- **#16 70mm/150mm verification** — 2 LLDB sessions on L16_03434 + L16_02285. Gates 70/150mm spike only.
+- **#10 formula extraction** — requires non-HDR render profile (DirectRenderer or DPC); outside bridge HDR scope.
 
 See `~/.claude/projects/-Users-ryaker-Dev-L16-Lumen-ReverseEngineering/memory/open_items_plan.md` for LLDB BP/watchpoint list.
 
