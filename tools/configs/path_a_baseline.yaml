@@ -1,0 +1,10 @@
+binary: /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/lri_process
+dylib: /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+breakpoints:
+  - { va: 0x30b9f0, label: PathA_baseline }
+  - { va: 0x30b770, label: PathA_dispatcher }
+  - { va: 0x3f0b90, label: DOFCache_render }
+  - { va: 0x2732f0, label: PathB2_plane_sweep }
+  - { va: 0x3bcf20, label: fusion_JT_case4 }
+  - { va: 0x3bd360, label: fusion_JT_case12 }
+  - { va: 0x3d9e00, label: fusion_combiner }

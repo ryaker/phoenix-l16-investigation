@@ -1,0 +1,9 @@
+# Stage 1: Break at LinearizeAndColorScale to get ctx pointer
+# libcp base = 0x108c7a000
+# LinearizeAndColorScale offset = 0x352ce0
+# Breakpoint addr = 0x108fccce0
+
+settings set target.disable-aslr true
+settings set target.run-args /Volumes/Base\ Photos/Light/2018-07-23/L16_02130.lri /tmp/test_wb_trace2.tiff
+breakpoint set -a 0x108fccce0
+run

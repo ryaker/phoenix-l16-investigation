@@ -1,0 +1,5 @@
+# Multi-focal-length LRI test list
+# 28mm
+/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri
+# 70mm (Buffalo Bill capture)
+/Volumes/Base Photos/Light/2018-07-23/L16_03434.lri

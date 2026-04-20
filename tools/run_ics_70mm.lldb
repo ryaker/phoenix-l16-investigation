@@ -1,0 +1,51 @@
+# LLDB session: ICS kernel probe at 70mm
+# Usage: arch -x86_64 lldb -s run_ics_70mm.lldb lri_process
+
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/lri_process
+
+# Set environment so lri_process can find libcp
+settings set target.env-vars DYLD_LIBRARY_PATH=/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/Lumen/Lumen.app/Contents/Frameworks
+
+process launch --stop-at-entry -- /Volumes/Base\ Photos/Light/2019-05-18/L16_03434.lri /tmp/test_70mm_ics_out.tiff
+
+# Wait for initial stop at entry
+# Load probe script
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/lldb_ics_70mm.py
+
+# Set BP on libcp+0xbf4a0
+# First get libcp load address
+script
+import lldb
+target = lldb.debugger.GetSelectedTarget()
+proc = target.GetProcess()
+
+# Find libcp module
+libcp_module = None
+for i in range(target.GetNumModules()):
+    m = target.GetModuleAtIndex(i)
+    if 'libcp' in m.GetFileSpec().GetFilename():
+        libcp_module = m
+        break
+
+if libcp_module is None:
+    print("ERROR: libcp module not found")
+else:
+    base = libcp_module.GetObjectFileHeaderAddress().GetLoadAddress(target)
+    bp_addr = base + 0xbf4a0
+    print(f"libcp base: 0x{base:016x}")
+    print(f"BP address: 0x{bp_addr:016x}")
+    bp = target.BreakpointCreateByAddress(bp_addr)
+    bp.SetCallback(lldb_ics_70mm.ics_callback)
+    print(f"BP set: {bp}")
+
+exit
+
+process continue
+
+# After completion, print summary
+script
+import lldb_ics_70mm
+lldb_ics_70mm.print_summary()
+exit
+
+quit

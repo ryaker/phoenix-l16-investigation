@@ -1,0 +1,114 @@
+=== FusionCacheBayer / PackedBayerFusion LLDB Analysis ===
+Date: 2026-04-12
+LRI: /Volumes/Base Photos/Light/2018-10-23/L16_02586.lri
+Scene: Bridge scene, 28mm equivalent (10 cameras in Light L16)
+Canvas: 10432x7824 px, tile: 256x256, canvas_tiles: 1271 (41x31)
+libcp.dylib: 6.9MB x86_64 (Halide-compiled), Oct 8 2019
+
+=== INSTRUMENT RESULTS (3 LLDB runs) ===
+
+Run 1 (lldb_fusion_cmd.py, slide=0x10b5d8000):
+  FusionCacheBayer::process (vfunc3 @ 0x406a10):  132 hits
+  FusionCacheBayer::setColor (vfunc2 @ 0x406970):   1 hit
+  PackedBayerFusion::process (@ 0x1aab40):          48 hits
+  PyramidWorker (@ 0x1ab2d0):                        1 hit  (init only)
+  LaplacianPyramid lambda (@ 0x1ab010):              0 hits  << NEVER HIT
+
+Run 2 (lldb_count_fusion.py, slide=0x10dc11000):
+  PackedBayerFusion init gate (+0x199) = 1 (initialized)
+  img_vec at object+0x118 = 0x600002318120
+  ev_min=42.0 (L16 black level), ev_max=1023.0 (10-bit white level)
+
+Run 3 (lldb_cam_count3.py, slide=0x10cd93000):
+  FusionCacheBayer cmp $0x2 check path1 (0x406c77): 132 hits, ALL eax=1
+  FusionCacheBayer cmp $0x2 check path2 (0x406d6a):   0 hits
+  PackedBayerFusion::process (0x1aab40):              48 hits
+  Camera count distribution: {1: 132}   -- N=1 at EVERY tile
+  Tiles with N>=2 (multi-camera blend path triggered): 0/132 = 0%
+
+=== STATIC DISASSEMBLY FINDINGS ===
+
+--- Camera Count Gate: FusionCacheBayer::process (0x406a10) ---
+
+  Code path (relevant excerpt):
+    0x406c6f: movq 0x8(%r15), %rdi      ; r15=FCB this; load img_vec ptr from +0x8
+    0x406c6f: callq 0x1bdfa0            ; identity fn: rax = rdi (noop)
+    0x406c6f: movq (%rax), %rdi         ; deref: rdi = img_vec->data()[0] object
+    0x406c72: callq 0xe78e0             ; getter: eax = *(rdi+0x28) as int32
+    0x406c77: cmpl $0x2, %eax           ; is N >= 2?
+    0x406c7a: jb 0x406e4c               ; N<2: jump to single-camera path
+
+  0xe78e0 body: pushq %rbp; movl 0x28(%rdi),%eax; popq %rbp; retq
+               (trivial 3-instruction getter for a sub-object field at +0x28)
+
+  N < 2 (all observed cases: N=1):
+    0x406e4c: movss 0xcc(%r15), %xmm0  ; load tile exposure from FCB+0xcc
+    0x406e55: sqrtss %xmm0, %xmm0      ; weight = sqrt(exposure)
+    callq 0x1bcf90 or 0x1bce50         ; single-camera copy (no blend calculation)
+
+  N >= 2 (NEVER triggered in L16_02586 render):
+    mul xmm0 by width, height, exposure; sqrtss
+    callq 0x1bd0a0                      ; per-pixel weighted blend
+    weight formula: sqrt(tile_width * tile_height * tile_exposure)
+
+--- PackedBayerFusion::process (0x1aab40) ---
+  Stack frame: 0x198 bytes
+  Init gate: cmpb $0x0, 0x199(%rdi); je 0x1aaed7 (skip if uninit)
+  Object layout (confirmed):
+    +0x30, +0x34: range floats (xmm3, xmm1)
+    +0x60: optional blend object pointer
+    +0x80, +0x84: tile dimensions (int32)
+    +0xcc: tile exposure weight (float)
+    +0x118: img_vec pointer (std::vector<ImageObj*>)
+    +0x140: channel/color selector (int32)
+    +0x199: init gate (byte)
+  Pixel kernel:
+    @ 0x1aad5d: callq 0x19c790          ; inner SSE Halide kernel
+
+--- Inner Kernel 0x19c790 ---
+  Stack frame: 0x53e8 bytes (21,480 bytes -- massive Halide tile kernel)
+  Processes 256-pixel blocks via SSE intrinsics in loop (step=0x100)
+  No secondary per-camera loop visible (single straight-line vectorized path)
+  Function size: 0x19d6ed - 0x19c790 = ~5.6KB of code
+
+=== ANSWERS TO 4 INVESTIGATIVE QUESTIONS ===
+
+Q1: How many input Bayer planes are fused (camera count N)?
+    ANSWER: N=1 for ALL 132 tiles measured in this render.
+    The multi-camera blend path (N>=2 -> 0x1bd0a0) was NEVER triggered.
+    The code supports N>=2 (it exists in the binary) but was not exercised.
+    INTERPRETATION: FusionCacheBayer receives pre-merged Bayer data. The 10
+    L16 cameras are fused at an earlier pipeline stage before FusionCacheBayer.
+    img_vec[0] holds one pre-assembled panoramic Bayer strip per tile.
+
+Q2: Are weight/confidence maps passed alongside pixel data?
+    ANSWER: No per-pixel weight map. A per-tile scalar weight is used:
+    xmm0 at PackedBayerFusion entry = sqrt(tile_exposure).
+    When N>=2: xmm0 = sqrt(width * height * exposure) / N.
+    No separate confidence map pointer observed in any object dump.
+
+Q3: Is blending linear/seam/pyramid?
+    ANSWER: LINEAR WEIGHTED AVERAGE (not Laplacian pyramid).
+    LaplacianPyramid blend lambda at 0x1ab010: 0 hits across all runs.
+    PyramidWorker at 0x1ab2d0: 1 hit (initialization only, not blending).
+    When N>=2: blend = weighted_sum(pixels) / N using sqrt exposure weights.
+    Blend is performed in Bayer domain (pre-demosaic).
+
+Q4: Are per-pixel decisions made?
+    ANSWER: YES -- inner kernel 0x19c790 is a per-pixel vectorized loop.
+    Decisions (clamping, black-level subtraction) happen inside the 21KB kernel.
+    No per-pixel confidence threshold was observed at the FusionCacheBayer level.
+
+=== BETA-2 SEAM ANALYSIS (B4 warp vs canvas) ===
+  Result: NO DETECTABLE SEAM at B4/A1 telephoto/wide boundary
+  Pearson r=0.376 (pixel), r=0.44 (16x16 block) B4_raw vs canvas_green
+  Canvas 5.7x dimmer than B4 raw (median_ratio=0.174) -- tone curve applied
+  595 seam measurements, median step=2.0 raw units = pure scene variation
+  Authoritative: "Boundary is seamless" across all measured rows
+
+=== OPEN QUESTIONS ===
+1. Where does the multi-camera Bayer fusion happen upstream of FusionCacheBayer?
+   (The 10 L16 cameras must merge somewhere; not in FCB for this LRI)
+2. What triggers N>=2 in FCB? Only overlapping telephoto/wide tile footprints?
+3. Does the N>=2 path (0x1bd0a0) use per-pixel HDR exposure metering?
+4. Is there a separate warp/registration pass that precedes FusionCacheBayer?

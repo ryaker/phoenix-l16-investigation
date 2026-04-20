@@ -1,0 +1,14 @@
+# LLDB init file for ICS 70mm probe
+# Run as: arch -x86_64 lldb -s /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/ics_70mm.lldb
+
+settings set target.env-vars DYLD_LIBRARY_PATH=/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/Lumen/Lumen.app/Contents/Frameworks
+
+file /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/lri_process
+
+# Import the probe module
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/ics_probe_70mm_module.py
+
+# Set a dummy initial BP to get process running then set real BPs after modules load
+# Use __dyld_start or dyld`_dyld_start to pause early enough for module enumeration
+breakpoint set --name __dyld_start
+run "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" /tmp/test_70mm_ics_out.tiff

@@ -1,0 +1,9 @@
+# LLDB script to find WB gain write site
+# Sets up a watchpoint on ISP ctx[0] to catch the 1/R_gain write
+
+# Break at LinearizeAndColorScale setup to get ctx pointer
+breakpoint set --address 0x352ce0
+
+# When we hit it, we'll manually get the ctx address and set watchpoint
+# Run the process first
+process launch -- /Volumes/Base\ Photos/Light/2018-07-23/L16_02130.lri /tmp/test_out_wb.tiff

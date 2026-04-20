@@ -1,0 +1,27 @@
+# LLDB commands to find WB gain write site
+# Run with: lldb /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/lri_process
+
+# Target the binary
+file /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/lri_process
+
+# Set args
+settings set target.run-args /Volumes/Base\ Photos/Light/2018-07-23/L16_02130.lri /tmp/test_wb_watchpoint.tiff
+
+# Break at LinearizeAndColorScale setup (libcp+0x352ce0)
+# We need to get the libcp load address first, so break at main
+breakpoint set -n main
+run
+
+# After hitting main, get libcp base:
+# image lookup -r -n "LinearizeAndColorScale" --address
+# Then: breakpoint set -a <computed address>
+
+# Manual steps after first break:
+# 1. p (void*)dlopen("libcp.dylib", 0)
+# 2. image list libcp
+# 3. Set breakpoint at libcp_base + 0x352ce0
+# 4. continue
+# 5. At 0x352ce0: rdi = filter_obj
+# 6. p/x *(uint64_t*)$rdi  # = ctx pointer
+# 7. watchpoint set expression -w write -- <ctx_ptr>
+# 8. continue -> catch write site

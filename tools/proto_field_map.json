@@ -1,0 +1,277 @@
+{
+  "LightHeader.1": [
+    "capture_id",
+    "bytes",
+    null
+  ],
+  "LightHeader.2": [
+    "timestamp_ns",
+    "uint64",
+    null
+  ],
+  "LightHeader.3": [
+    "scene_brightness",
+    "float",
+    null
+  ],
+  "LightHeader.4": [
+    "image_focal_length",
+    "uint32",
+    null
+  ],
+  "LightHeader.5": [
+    "image_reference_camera",
+    "uint32",
+    null
+  ],
+  "LightHeader.6": [
+    "capture_mode",
+    "uint32",
+    null
+  ],
+  "LightHeader.7": [
+    "pipeline_version",
+    "string",
+    null
+  ],
+  "LightHeader.8": [
+    "software_version",
+    "string",
+    null
+  ],
+  "LightHeader.9": [
+    "awb_mode",
+    "uint32",
+    null
+  ],
+  "LightHeader.10": [
+    "flash_mode",
+    "uint32",
+    null
+  ],
+  "LightHeader.11": [
+    "zoom_factor",
+    "float",
+    null
+  ],
+  "LightHeader.12": [
+    "modules",
+    "repeated CameraModule",
+    "CameraModule"
+  ],
+  "LightHeader.13": [
+    "depth_config",
+    "DepthConfig",
+    "DepthConfig"
+  ],
+  "LightHeader.14": [
+    "ev_bias",
+    "float",
+    null
+  ],
+  "LightHeader.15": [
+    "orientation",
+    "uint32",
+    null
+  ],
+  "LightHeader.16": [
+    "sensor_data",
+    "repeated SensorData",
+    "SensorData"
+  ],
+  "LightHeader.17": [
+    "tof_range",
+    "ToFRange",
+    "ToFRange"
+  ],
+  "LightHeader.18": [
+    "hw_info",
+    "HwInfo",
+    "HwInfo"
+  ],
+  "LightHeader.19": [
+    "gps_metadata",
+    "GPSMetadata",
+    "GPSMetadata"
+  ],
+  "LightHeader.20": [
+    "auto_white_balance",
+    "AWBData",
+    "AWBData"
+  ],
+  "LightHeader.21": [
+    "scene_detection",
+    "SceneDetection",
+    "SceneDetection"
+  ],
+  "LightHeader.22": [
+    "imu_data",
+    "IMUData",
+    "IMUData"
+  ],
+  "LightHeader.23": [
+    "af_debug_info",
+    "AFDebugInfo",
+    "AFDebugInfo"
+  ],
+  "LightHeader.24": [
+    "gps_data",
+    "GPSData",
+    "GPSData"
+  ],
+  "LightHeader.25": [
+    "hdr_params",
+    "HDRParams",
+    "HDRParams"
+  ],
+  "CameraModule.1": [
+    "camera_id",
+    "uint32",
+    null
+  ],
+  "CameraModule.2": [
+    "exposure_time_ns",
+    "uint64",
+    null
+  ],
+  "CameraModule.3": [
+    "analog_gain",
+    "float",
+    null
+  ],
+  "CameraModule.4": [
+    "digital_gain",
+    "float",
+    null
+  ],
+  "CameraModule.5": [
+    "focus_distance",
+    "float",
+    null
+  ],
+  "CameraModule.6": [
+    "lens_position",
+    "uint32",
+    null
+  ],
+  "CameraModule.7": [
+    "temperature",
+    "float",
+    null
+  ],
+  "CameraModule.8": [
+    "vcm_dac",
+    "uint32",
+    null
+  ],
+  "CameraModule.9": [
+    "enabled",
+    "bool",
+    null
+  ],
+  "CameraModule.10": [
+    "iso_speed",
+    "uint32",
+    null
+  ],
+  "CameraModule.11": [
+    "frame_duration_ns",
+    "uint64",
+    null
+  ],
+  "CameraModule.12": [
+    "awb_gains",
+    "AWBGains",
+    "AWBGains"
+  ],
+  "HwInfo.1": [
+    "camera",
+    "repeated CameraModuleHwInfo",
+    "CameraModuleHwInfo"
+  ],
+  "HwInfo.2": [
+    "body_serial",
+    "string",
+    null
+  ],
+  "HwInfo.3": [
+    "tof",
+    "ToFType",
+    null
+  ],
+  "HwInfo.4": [
+    "firmware_version",
+    "string",
+    null
+  ],
+  "HwInfo.5": [
+    "pcb_rev",
+    "string",
+    null
+  ],
+  "CameraModuleHwInfo.1": [
+    "camera_id",
+    "uint32",
+    null
+  ],
+  "CameraModuleHwInfo.2": [
+    "module_serial",
+    "string",
+    null
+  ],
+  "CameraModuleHwInfo.3": [
+    "lens_type",
+    "uint32",
+    null
+  ],
+  "CameraModuleHwInfo.4": [
+    "calibration_date",
+    "string",
+    null
+  ],
+  "IMUData.1": [
+    "samples",
+    "repeated IMUData_Sample",
+    "IMUData_Sample"
+  ],
+  "IMUData.2": [
+    "timestamp_ns",
+    "uint64",
+    null
+  ],
+  "IMUData_Sample.1": [
+    "timestamp_ns",
+    "uint64",
+    null
+  ],
+  "IMUData_Sample.2": [
+    "accel_x",
+    "float",
+    null
+  ],
+  "IMUData_Sample.3": [
+    "accel_y",
+    "float",
+    null
+  ],
+  "IMUData_Sample.4": [
+    "accel_z",
+    "float",
+    null
+  ],
+  "IMUData_Sample.5": [
+    "gyro_x",
+    "float",
+    null
+  ],
+  "IMUData_Sample.6": [
+    "gyro_y",
+    "float",
+    null
+  ],
+  "IMUData_Sample.7": [
+    "gyro_z",
+    "float",
+    null
+  ]
+}

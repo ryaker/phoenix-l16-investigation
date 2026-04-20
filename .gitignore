@@ -1,0 +1,70 @@
+# Large binaries (kept on disk, never committed)
+libcp_disasm_*.txt
+libcp_all_symbols.txt
+libcp_strings_scratch.txt
+--profile
+*.tiff
+*.tif
+*.npy
+*.npz
+*.lri
+*.lris
+*.dpc
+
+# Bulk RE metadata extracts derived from libcp.dylib — grey-zone legal risk
+# for public OSS distribution; kept on disk but never committed. Contributors
+# re-extract from their own copy of libcp using tools/disasm_callgraph.py
+# (or similar) against their own Lumen install.
+tools/libcp_callgraph.db
+tools/libcp_isp_symbols.txt
+
+# Old investigation log with dense disassembly excerpts (superseded by
+# docs/TRUTH.md). Kept on disk as audit trail but not shipped publicly.
+archive/lumen-phoenix-investigation.md
+
+# Compiled lri_process binary
+lri_process
+
+# Python / tool artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+*.cmd
+
+# LLDB per-run output
+*.lldb.out
+/tmp/
+
+# macOS
+.DS_Store
+.Spotlight-V100
+.Trashes
+
+# SQLite transient files (WAL/SHM regenerate from .db on open)
+*.db-shm
+*.db-wal
+
+# Broken/private-pointing symlinks that shouldn't ship in OSS
+Lumen
+
+# Claude / agent tool artifacts
+.claude/
+.mcp.json
+.agent-bus/
+
+# Editor
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Large reference dumps kept externally
+reference/ground_truth.tiff
+reference/depth_map.npy
+
+# NOTE on evidence/:
+# The canonical evidence tree lives at /Volumes/Dev/lumen-phoenix-scratch/
+# (NOT in this repo — see evidence/README.md for why). Repo-local evidence
+# files (e.g., evidence/phoenix-handoff_traceability/*.md, 23 session
+# reports kept in-repo for audit) ARE tracked. No blanket exclusion.

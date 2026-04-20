@@ -1,0 +1,51 @@
+#!/bin/bash
+# L16 Phoenix pre-commit hook: freeze archive/ directory
+#
+# Enforces the contamination rule from CONTAMINATION_RULES.md:
+# archive/ contains DEPRECATED content that must never be edited or
+# reintroduced. It exists purely for audit trail / history.
+#
+# To bypass (emergency only): git commit --no-verify
+# To install: ln -sf ../../hooks/pre-commit .git/hooks/pre-commit
+
+set -e
+
+# Reject MODIFICATIONS and DELETIONS under archive/. Additions (moving new
+# historical snapshots into archive/ when they're retired) are allowed — that
+# is the normal flow for freezing content. Once in archive, content must not
+# change further.
+archive_mods=$(git diff --cached --name-only --diff-filter=MD | grep -E '^archive/' || true)
+
+if [ -n "$archive_mods" ]; then
+  echo "REJECTED: attempted to modify or delete frozen archive/ content." >&2
+  echo >&2
+  echo "Files flagged:" >&2
+  echo "$archive_mods" | sed 's/^/  /' >&2
+  echo >&2
+  echo "archive/ is deprecated content kept for audit trail only. You may" >&2
+  echo "ADD new historical snapshots, but existing archive content must not" >&2
+  echo "be edited, deleted, or moved. See CONTAMINATION_RULES.md." >&2
+  echo >&2
+  echo "If you really need to alter archive content (e.g., mistakenly" >&2
+  echo "archived a file that wasn't deprecated), use:" >&2
+  echo "  git commit --no-verify" >&2
+  echo "and explain in the commit message why the audit trail is being altered." >&2
+  exit 1
+fi
+
+# Guard against re-introducing stale phoenix-pipeline-facts.md copies
+# outside archive/. The canonical version is docs/TRUTH.md only.
+stale_copies=$(git diff --cached --name-only --diff-filter=A | grep -E '(^|/)phoenix-pipeline-facts\.md$' | grep -vE '^archive/' | grep -vE '^phoenix-pipeline-facts\.md$' || true)
+if [ -n "$stale_copies" ]; then
+  echo "REJECTED: attempted to add phoenix-pipeline-facts.md outside archive/." >&2
+  echo >&2
+  echo "Files flagged:" >&2
+  echo "$stale_copies" | sed 's/^/  /' >&2
+  echo >&2
+  echo "The canonical truth doc is docs/TRUTH.md. Sub-folder copies of" >&2
+  echo "phoenix-pipeline-facts.md were the original contamination vector" >&2
+  echo "(see repo README.md). Do not re-introduce them." >&2
+  exit 1
+fi
+
+exit 0

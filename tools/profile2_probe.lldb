@@ -1,0 +1,111 @@
+# profile=2 (CAMERA) characterization probe @ 28mm L16_02130.lri
+# libcp slide: 0x108c7a000 (verified consistent)
+# All absolute VAs = slide + offset
+#
+# Absolute VAs:
+#   IRAMP_body           0x108fe01b0  (libcp+0x3661b0)
+#   SIC_init             0x10905a330  (libcp+0x3e0330)
+#   DepthCache_ctor      0x109064f00  (libcp+0x3eaf00)
+#   StereoAsyncAPI_C1    0x10906e6d0  (libcp+0x3f46d0)
+#   StereoAsyncAPI_C2    0x10906cc40  (libcp+0x3f2c40)
+#   Triangulator_refine  0x108e86a00  (libcp+0x20ca00)
+#   CCMInterp            0x108fcabc0  (libcp+0x350bc0)
+#   IRAMP_dispatcher     0x109070170  (libcp+0x3f6170)
+#
+# cam_id field at [per_cam+0x60]; at SIC_init entry rdi=self, rsi=per_cam ptr
+# At IRAMP_dispatcher entry rdi=self, rsi=cam_id value (integer, not pointer)
+# — verify by checking what worked in prior session for 0x3f6170
+
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/profile2_counts.py
+
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/lri_process
+settings set -- target.run-args "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" /tmp/p2_probe.hdr --profile 2
+
+# --- IRAMP body: pure hit count ---
+b -a 0x108fe01b0
+breakpoint command add -s python -o "
+import profile2_counts as pc
+pc.hit('IRAMP_body')
+return False
+"
+
+# --- SIC init: hit count + read cam_id from [rdi+0x60] (self=SIC, but cam_id embedded) ---
+# Based on prior sessions: at SIC init entry, rdi = newly constructed SIC object
+# which gets cam_id stored at offset 0x60 (verified via cam_id getter 0xf2720)
+# Actually per_cam ptr may be rsi; try both, take the one that gives 0-15
+b -a 0x10905a330
+breakpoint command add -s python -o "
+import profile2_counts as pc
+pc.hit('SIC_init')
+thread = frame.GetThread()
+regs = {r.GetName(): r.GetValueAsUnsigned() for r in frame.GetRegisters()[0]}
+rdi = regs.get('rdi', 0)
+rsi = regs.get('rsi', 0)
+proc = thread.GetProcess()
+err = __import__('lldb').SBError()
+cid_rdi = proc.ReadUnsignedFromMemory(rdi + 0x60, 4, err) if rdi else 999
+err2 = __import__('lldb').SBError()
+cid_rsi = proc.ReadUnsignedFromMemory(rsi + 0x60, 4, err2) if rsi else 999
+pc.sic_cam_ids_rdi.append(cid_rdi)
+pc.sic_cam_ids_rsi.append(cid_rsi)
+return False
+"
+
+# --- DepthCache ctor: pure hit count ---
+b -a 0x109064f00
+breakpoint command add -s python -o "
+import profile2_counts as pc
+pc.hit('DepthCache_ctor')
+return False
+"
+
+# --- StereoAsyncAPI C1 ctor: pure hit count ---
+b -a 0x10906e6d0
+breakpoint command add -s python -o "
+import profile2_counts as pc
+pc.hit('StereoAsyncAPI_C1')
+return False
+"
+
+# --- StereoAsyncAPI C2 ctor: pure hit count ---
+b -a 0x10906cc40
+breakpoint command add -s python -o "
+import profile2_counts as pc
+pc.hit('StereoAsyncAPI_C2')
+return False
+"
+
+# --- Triangulator::refine3dPoints: pure hit count ---
+b -a 0x108e86a00
+breakpoint command add -s python -o "
+import profile2_counts as pc
+pc.hit('Triangulator_refine3d')
+return False
+"
+
+# --- CCMInterp: hit count + try to read cam_id from rdi (dest buffer ptr) and rsi ---
+b -a 0x108fcabc0
+breakpoint command add -s python -o "
+import profile2_counts as pc
+pc.hit('CCMInterp')
+thread = frame.GetThread()
+regs = {r.GetName(): r.GetValueAsUnsigned() for r in frame.GetRegisters()[0]}
+pc.ccm_rdi_vals.append(regs.get('rdi', 0))
+pc.ccm_rsi_vals.append(regs.get('rsi', 0))
+return False
+"
+
+# --- IRAMP dispatcher: hit count + cam_id ---
+# Per prior sessions (Q10): dispatcher reads cam_id and filters by CCM table presence
+# At entry rdi = self (filter object), rsi = cam_id integer directly (not pointer)
+b -a 0x109070170
+breakpoint command add -s python -o "
+import profile2_counts as pc
+pc.hit('IRAMP_dispatcher')
+regs = {r.GetName(): r.GetValueAsUnsigned() for r in frame.GetRegisters()[0]}
+cam_id = regs.get('rsi', 999)
+pc.dispatcher_cam_ids.append(cam_id)
+return False
+"
+
+run

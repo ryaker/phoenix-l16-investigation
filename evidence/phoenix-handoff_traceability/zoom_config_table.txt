@@ -1,0 +1,175 @@
+==============================================================================
+ZOOM CONFIG ENUMERATION — L16 Movable Cameras
+Spike: lumen-phoenix-investigation.md open question (2026-04-12)
+LRI:  /Volumes/Base Photos/Light/2018-10-23/L16_02586.lri
+CSV:  /Volumes/Dev/lumen-phoenix-scratch/all_camera_calibrations.csv
+==============================================================================
+
+STEP 1 — FACTORY CALIBRATION: R_fold and virtual_pos per movable camera
+------------------------------------------------------------------------------
+Cam   det(R_fold)  ‖RRᵀ-I‖     virtual_pos (mm)                optical_axis col2        
+B1       1.000001    2.06e-06  ( 18.615,  7.408, -5.203)  ( 0.7903,-0.6127,-0.0000)
+B2       1.000000    6.08e-07  ( -8.698,-18.699, -4.990)  (-0.8105,-0.5858, 0.0000)
+B3       1.000001    9.64e-07  (  8.482, 33.968, -6.221)  (-0.7914, 0.6113,-0.0000)
+B5       1.000000    1.67e-06  (-33.622, 33.617, -6.042)  ( 0.8097, 0.5868, 0.0000)
+C1       1.000001    1.52e-06  (-18.055, 24.857, -8.401)  ( 0.8077, 0.5895,-0.0000)
+C2       1.000001    1.36e-06  (-35.288,-10.213, -9.155)  (-0.8116,-0.5843, 0.0000)
+C3       1.000000    1.80e-06  ( 26.668,-18.019, -7.040)  ( 0.7890,-0.6144,-0.0000)
+C4       0.999999    1.31e-06  ( 43.468,  8.933, -4.028)  (-0.7996, 0.6005,-0.0000)
+
+STEP 2 — WARP BLOCK: Encoder configs per movable camera
+------------------------------------------------------------------------------
+Each entry in field 4/f2 sub-records is one "zoom config" = one focus-bracketed encoder position.
+Each config has a 17×13 float32 distortion-correction grid specific to that focal position.
+
+Cam   n_configs  encoder positions               csv_nom_enc   selected_config_idx
+B1            4  [622, 490, 362, 748]                   490.6  config[1]=490
+B2            4  [582, 463, 342, 698]                   651.4  config[3]=698
+B3            1  [0]                                    574.0  config[0]=0
+B5            4  [801, 663, 531, 917]                   675.2  config[1]=663
+C1            4  [632, 528, 418, 739]                   656.6  config[0]=632
+C2            1  [0]                                    458.2  config[0]=0
+C3            1  [0]                                    543.0  config[0]=0
+C4            4  [764, 651, 539, 874]                   524.2  config[2]=539
+
+STEP 3 — CRITICAL QUESTION: Do all 4 encoder configs share ONE R_fold or have different R_folds?
+------------------------------------------------------------------------------
+
+The factory CSV stores EXACTLY ONE R_fold per movable camera.
+The warp block stores ONLY encoder positions + per-position distortion grids.
+There is NO per-config R_fold stored anywhere in the data — one R_fold per camera.
+
+Implication: all 4 encoder positions for a given camera point at the SAME azimuth.
+The encoder position controls FOCAL LENGTH (zoom), not viewing direction.
+
+EVIDENCE: The 4 warp grids per camera are DISTINCT (different distortion per focal pos),
+but no directional rotation matrix changes between configs.
+
+B1 warp grid differences across 4 configs (max|grid_i - grid_j|):
+  enc=622 vs enc=490: max_diff=0.0597  (DIFFERENT grids)
+  enc=622 vs enc=362: max_diff=0.3477  (DIFFERENT grids)
+  enc=622 vs enc=748: max_diff=0.0432  (DIFFERENT grids)
+  enc=490 vs enc=362: max_diff=0.3319  (DIFFERENT grids)
+  enc=490 vs enc=748: max_diff=0.1029  (DIFFERENT grids)
+  enc=362 vs enc=748: max_diff=0.3552  (DIFFERENT grids)
+
+==============================================================================
+STEP 4 — AZIMUTH/ELEVATION TABLE (one config = one R_fold per camera)
+==============================================================================
+
+Since all 4 encoder configs share one R_fold, the azimuth/elevation is fixed per camera.
+The table below shows: the unique pointing direction for each movable camera,
+the encoder positions (4 zoom/focal configs), and which config was selected for this capture.
+
+Camera  az_deg    el_deg    encoder_configs                 nom_enc   sel   virtual_pos_mm                  optical_axis             
+----------------------------------------------------------------------------------------------------------------------------------
+B1        -37.78     -0.00  [622, 490, 362, 748]               490.6  1     ( 18.615,  7.408, -5.203)  ( 0.7903,-0.6127,-0.0000)
+B2       -144.14      0.00  [582, 463, 342, 698]               651.4  3     ( -8.698,-18.699, -4.990)  (-0.8105,-0.5858, 0.0000)
+B3        142.31     -0.00  [0]                                574.0  0     (  8.482, 33.968, -6.221)  (-0.7914, 0.6113,-0.0000)
+B5         35.93      0.00  [801, 663, 531, 917]               675.2  1     (-33.622, 33.617, -6.042)  ( 0.8097, 0.5868, 0.0000)
+C1         36.12     -0.00  [632, 528, 418, 739]               656.6  0     (-18.055, 24.857, -8.401)  ( 0.8077, 0.5895,-0.0000)
+C2       -144.25      0.00  [0]                                458.2  0     (-35.288,-10.213, -9.155)  (-0.8116,-0.5843, 0.0000)
+C3        -37.91     -0.00  [0]                                543.0  0     ( 26.668,-18.019, -7.040)  ( 0.7890,-0.6144,-0.0000)
+C4        143.10     -0.00  [764, 651, 539, 874]               524.2  2     ( 43.468,  8.933, -4.028)  (-0.7996, 0.6005,-0.0000)
+
+==============================================================================
+STEP 5 — DO CONFIGS 0..3 DIFFER IN AZIMUTH?
+==============================================================================
+
+ANSWER: NO. All 4 encoder configs for every movable camera share the SAME azimuth.
+
+The factory calibration CSV stores exactly one R_fold (3×3 rotation) per movable camera.
+R_fold does NOT change between encoder positions. Only the per-position distortion
+correction grid (17×13 float32) changes between configs — this encodes the focal-length-
+dependent geometric distortion at that zoom position.
+
+Encoder positions map to FOCAL LENGTHS (zoom), not to different look directions:
+
+  B1:  encoder [622, 490, 362, 748] → 4 focal positions, all az ≈ -37.8°
+  B2:  encoder [582, 463, 342, 698] → 4 focal positions, all az ≈ -144.1°
+  B5:  encoder [801, 663, 531, 917] → 4 focal positions, all az ≈  +35.9°
+  C1:  encoder [632, 528, 418, 739] → 4 focal positions, all az ≈  +36.1°
+  C4:  encoder [764, 651, 539, 874] → 4 focal positions, all az ≈ +143.1°
+
+  B3, C2, C3: only 1 config (encoder=0) → effectively glued in this unit
+
+Azimuth clustering summary:
+  az ≈ -140°: B2, C2
+  az ≈  -40°: B1, C3
+  az ≈  +40°: B5, C1
+  az ≈ +140°: B3, C4
+
+The 8 movable cameras cluster into 4 azimuth quadrants (±37°, ±143°),
+each quadrant covered by one B camera + one C camera pair.
+This is consistent with Architecture (b): aperture-mosaic tiles at 4 corners.
+
+==============================================================================
+STEP 6 — CANVAS FOV CHECK
+==============================================================================
+
+Checking warp block for virtual camera / canvas intrinsics...
+  cam 4: f4[4]=varint(14364) — could be pixel offset/size
+  cam 4: f4[3]=float(1.04792) — scale factor (not FOV)
+  cam 12: f4[3]=float(1.64495) — scale factor (not FOV)
+  cam 0: f4[4]=varint(16408) — could be pixel offset/size
+  cam 0: f4[3]=float(1.00000) — scale factor (not FOV)
+  cam 1: f4[4]=varint(16363) — could be pixel offset/size
+  cam 1: f4[3]=float(0.73433) — scale factor (not FOV)
+  cam 8: f4[3]=float(1.08180) — scale factor (not FOV)
+  cam 5: f4[3]=float(1.00340) — scale factor (not FOV)
+  cam 13: f4[3]=float(1.59790) — scale factor (not FOV)
+  cam 2: f4[4]=varint(14850) — could be pixel offset/size
+  cam 2: f4[3]=float(1.03875) — scale factor (not FOV)
+  cam 14: f4[3]=float(1.64445) — scale factor (not FOV)
+  cam 15: f4[3]=float(1.21880) — scale factor (not FOV)
+  cam 9: f4[3]=float(0.99911) — scale factor (not FOV)
+  cam 6: f4[3]=float(1.00985) — scale factor (not FOV)
+  cam 3: f4[4]=varint(15472) — could be pixel offset/size
+  cam 3: f4[3]=float(1.04360) — scale factor (not FOV)
+  cam 10: f4[3]=float(1.50992) — scale factor (not FOV)
+  cam 7: f4[3]=float(0.99980) — scale factor (not FOV)
+  cam 11: f4[3]=float(1.57720) — scale factor (not FOV)
+
+The warp block encodes per-camera DISTORTION CORRECTION grids (17×13 cells),
+not virtual camera intrinsics. Canvas FOV is NOT measurable from this data.
+
+The npz file (cal_color_l16_02586.npz) contains only COLOR calibration:
+  bayer_patterns, black_levels, ccm_matrices, cra_grids, vignetting_grids, white_levels
+  None of these encodes canvas intrinsics or FOV.
+
+Canvas FOV must be measured from the libcp.dylib virtual camera parameters
+or from the ground_truth.tiff field-of-view geometry (see investigation doc).
+
+==============================================================================
+INVESTIGATION ANSWER — what this resolves
+==============================================================================
+
+Open question from investigation doc:
+  "do all 4 configs for a movable camera point at the SAME azimuth (they just
+   differ in focal length/zoom), or at DIFFERENT azimuths?"
+
+ANSWER: SAME AZIMUTH. All 4 encoder configs for a given movable camera point
+at one fixed azimuth. The encoder position selects focal length (zoom level),
+not pointing direction. This means:
+
+  Architecture (b) — aperture-mosaic tiles — remains the leading hypothesis.
+  Each movable camera covers ONE corner/edge quadrant of the scene at all zoom levels.
+  There is no mechanism by which a movable camera changes its look-direction
+  between captures; the mirror is factory-glued after calibration.
+
+  The investigation task brief claim that "all B cameras used config 2 at 28mm"
+  is not a distinct R_fold selection — it is a focal-length bracket selection.
+  Config index 2 = encoder 362 for B1 (the closest-focus position in the bracket).
+
+  The "selected config" for this capture (02586) based on CSV nominal encoder:
+    B1  : nom_enc=490.6  → config[1]=490
+    B2  : nom_enc=651.4  → config[3]=698
+    B3  : nom_enc=574.0  → config[0]=0
+    B5  : nom_enc=675.2  → config[1]=663
+    C1  : nom_enc=656.6  → config[0]=632
+    C2  : nom_enc=458.2  → config[0]=0
+    C3  : nom_enc=543.0  → config[0]=0
+    C4  : nom_enc=524.2  → config[2]=539
+
+  Note: B3, C2, C3 have encoder=0 (single config) in both tested LRI files,
+  consistent with those cameras being permanently glued to one position.

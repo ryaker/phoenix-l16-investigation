@@ -1,0 +1,29 @@
+# Full LLDB session for ICS kernel probe at 70mm
+# Run: arch -x86_64 lldb -s /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/ics_70mm_full.lldb
+
+# Set env
+settings set target.env-vars DYLD_LIBRARY_PATH=/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/Lumen/Lumen.app/Contents/Frameworks
+
+# Create target
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/lri_process
+
+# Import probe module
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/ics_probe_70mm_module.py
+
+# Launch and stop at entry point
+process launch --stop-at-entry -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" /tmp/test_70mm_ics_out.tiff
+
+# Now set the BP by module offset (libcp not yet loaded; use deferred by name approach)
+# Use breakpoint set with module and offset
+breakpoint set --shlib libcp.dylib --address 0xbf4a0
+
+# Add Python callback to this BP
+breakpoint command add --python-function ics_probe_70mm_module.ics_callback 1
+
+# Continue (all subsequent stops at BP will fire callback which returns False=continue)
+process continue
+
+# When process exits, print summary
+script ics_probe_70mm_module.print_summary()
+
+quit
