@@ -1,4 +1,12 @@
-# L16 Phoenix Reverse-Engineering Repo
+# phoenix-l16-investigation
+
+Reverse-engineering investigation for **Phoenix**, a planned clean-room replacement for Lumen — the desktop renderer for the (now-discontinued) Light L16 camera.
+
+This repo holds the **investigation only**: docs, evidence, probe scripts, and a throwaway validation spike. The actual Phoenix application code will live in a separate repo when it is written.
+
+License: **CC0-1.0** (public-domain dedication — no attribution required, do whatever you want with it).
+
+Legal posture: reverse-engineering of `libcp.dylib` for interoperability under 17 USC §1201(f), supported by Sega v. Accolade and Sony v. Connectix. Same posture as dcraw / LibRaw / RawTherapee. Phoenix will not link against, bundle bytes from, or otherwise depend on any Light Inc. proprietary binary — see `docs/CLEAN_ROOM_RULE.md`.
 
 ## ONE rule for all agents and humans
 
