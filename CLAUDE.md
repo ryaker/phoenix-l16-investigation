@@ -9,19 +9,27 @@
 2. `/tmp/l16_open_audit/_FINDINGS.md` — 2026-04-20 OPEN-items audit register (841 lines, 17 items, verdict per item)
 3. `~/.claude/projects/-Users-ryaker-Dev-L16-Lumen-ReverseEngineering/memory/open_items_plan.md` — closure plan for remaining 4 non-resolved items
 
-## Current state (2026-04-20 post-Session-1)
+## Current state (2026-04-20 post-Sessions-1+2+3)
 
-- **14 of 17 OPEN items RESOLVED** (#15 Q-DROPPED-CONSUMER closed 2026-04-20 via Session 1 LLDB)
-- **3 PARTIAL** (non-blocking for bridge HDR 28mm spike): #06 Q12 ZOOM_CCM (70/150mm partial), #10 OPEN-DARKCURRENT (reconfirmed inactive on bridge HDR path — formula extraction deferred to non-HDR profile), #16 OPEN-SCOPE-VERIFY (150mm kernel untested)
-- **0 TRULY OPEN.** **28mm bridge HDR spike is UNBLOCKED.**
+- **16 of 17 OPEN items RESOLVED.** Sessions 1+2+3 closed #15, #06 Q12, and #16 on 2026-04-20. Doc-hygiene v2.1.1 closed #17.
+- **1 PARTIAL** (non-blocking): #10 OPEN-DARKCURRENT — reconfirmed inactive on bridge HDR; formula extraction deferred to non-HDR profile.
+- **0 TRULY OPEN.** **28mm + 70mm + 150mm bridge HDR spikes all architecturally UNBLOCKED.**
 
-**#15 closure summary:** HW read-watchpoints on 4 dropped-cam RIC L0 buffers (A2/A3/A4/A5) at 28mm bridge HDR captured 102,361 trips over 480s — 100% of unique trip PCs trace through IRAMP-family code. Dropped cams ARE consumed via IRAMP body's composite-anchor pre-fusion kernel at `libcp+0x2b3410` (4-way SIMD weighted blend, new VA). "Skip dropped-cam ISP" optimization REFUTED. Rich's D5 directive ("run ISP for all 16") now satisfied by positive evidence. Details: `/tmp/l16_open_audit/session1_findings.md`.
+**Session closure summary:**
+- **Session 1 (28mm L16_02130):** HW read-watchpoints on 4 dropped-cam RIC L0 buffers captured 102K trips; 100% IRAMP-family. New VA found: composite-anchor kernel at `libcp+0x2b3410` (4-way SIMD weighted blend). Closes #15.
+- **Session 2 (70mm L16_03434):** Full Phase 1 clean render. Dispatcher cam_ids `[8,10..14]`=B4+C1..C5 match TRUTH M4. CCMInterp 12 hits with 3 distinct dest-rdis (vs 28mm's 1). All 4 #16 kernels fire consistently with 28mm. Closes #06/70mm + #16/70mm.
+- **Session 3 (150mm L16_02285):** Partial Phase 1 (render crashed at `libcp+0x2e945d` under instrumentation — Rich verdict: crash is ours, Lumen.app ships working 150mm). Pre-crash data captured dispatcher cam_ids + IRAMP body first-hits matching 70mm exactly — confirms 150mm takes 70mm tier via `outer_enum=1`. Closes #16/150mm architecturally.
+- **Doc-hygiene:** 12 load-bearing scratch files + external tech-doc cited in TRUTH v2.1.1. Closes #17.
+
+## Instrumentation gotcha (save future sessions)
+
+**Do NOT set a regular BP at `libcp+0x2b3410` (composite-anchor kernel).** It crashes the HDR render deterministically at both 70mm and 150mm — likely a Halide-JIT hot-loop that doesn't tolerate software-BP timing perturbation. Use HW read-watchpoints on dropped-cam pixel buffers (Session 1 approach) to observe 0x2b3410 in backtraces instead.
 
 ## Next action
 
-28mm bridge HDR spike is UNBLOCKED — proceed to SPIKE (validation-only per Rich's rule). Remaining optional work (non-spike-blocking):
-- **#16 70mm/150mm verification** — 2 LLDB sessions on L16_03434 + L16_02285. Gates 70/150mm spike only.
-- **#10 formula extraction** — requires non-HDR render profile (DirectRenderer or DPC); outside bridge HDR scope.
+All bridge HDR spikes architecturally UNBLOCKED. Per Rich's rule ("spike is validation, not investigation"), proceed to SPIKE.
+- **#10 formula extraction** — optional future work, requires non-HDR render profile (DirectRenderer or DPC); outside bridge HDR scope.
+- **#15 cross-zoom HW-watchpoint confirmation** — optional non-blocking future work: re-run Session 1's watchpoint script against 70mm/150mm dropped-cam buffers to directly observe 0x2b3410 at those tiers (infeasible via BP).
 
 See `~/.claude/projects/-Users-ryaker-Dev-L16-Lumen-ReverseEngineering/memory/open_items_plan.md` for LLDB BP/watchpoint list.
 
