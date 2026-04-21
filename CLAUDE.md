@@ -21,9 +21,13 @@
 - **Session 3 (150mm L16_02285):** Partial Phase 1 (render crashed at `libcp+0x2e945d` under instrumentation — Rich verdict: crash is ours, Lumen.app ships working 150mm). Pre-crash data captured dispatcher cam_ids + IRAMP body first-hits matching 70mm exactly — confirms 150mm takes 70mm tier via `outer_enum=1`. Closes #16/150mm architecturally.
 - **Doc-hygiene:** 12 load-bearing scratch files + external tech-doc cited in TRUTH v2.1.1. Closes #17.
 
-## Instrumentation gotcha (save future sessions)
+## Instrumentation gotcha (revised v2.1.3)
 
-**Do NOT set a regular BP at `libcp+0x2b3410` (composite-anchor kernel).** It crashes the HDR render deterministically at both 70mm and 150mm — likely a Halide-JIT hot-loop that doesn't tolerate software-BP timing perturbation. Use HW read-watchpoints on dropped-cam pixel buffers (Session 1 approach) to observe 0x2b3410 in backtraces instead.
+BP at `libcp+0x2b3410` (composite-anchor kernel) DOES work for hit-counting — captured 1.7M hits at 70mm and 1.5M at 150mm before SIGABRT killed the render. LLDB retains BP counters past target termination, so the quit-script still prints counts. **Earlier v2.1.2 claim "BP crashes render" was a verify-before-trust failure** — I declared impossibility from incomplete log-tail polling without checking the `HIT COUNTS` line at the very end.
+
+Takeaway: BP-based hit-counting on hot Halide-JIT kernels (1-2M hits/render) works for counts but not for producing completed output. If a render needs to complete AND be instrumented, use HW read-watchpoints on data (Session 1 approach). If only a hit count is needed, BP auto-continue is fine — SIGABRT-mid-render is acceptable if the quit script executes after.
+
+At 150mm, BPs elsewhere (e.g. S2's proven 70mm probe re-run against 150mm) still trigger `EXC_BAD_ACCESS` at `libcp+0x2e945d`. Per Rich (2026-04-20): "Lumen ships working 150mm renders — crash has to be ours." Our probes perturb thread timing in a way that surfaces a race; not a libcp bug.
 
 ## Next action
 
