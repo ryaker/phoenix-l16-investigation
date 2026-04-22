@@ -50,6 +50,7 @@ For the spike's visual smoke test the critical things are:
 import numpy as np
 
 from utils import apply_ccm_chromaticity, finite
+from warp_field import apply_warp
 
 
 # TRUTH §2.1 M7: JPEG2000 CDF 9/7 lifting constants (bit-exact public values)
@@ -75,7 +76,9 @@ def merge_iramp(anchor_rgb: np.ndarray,
                 contributor_ccms,
                 anchor_ccm,
                 fov_ratio: float,
-                include_contributors: bool = False) -> np.ndarray:
+                include_contributors: bool = False,
+                aux: np.ndarray = None,
+                warps: list = None) -> np.ndarray:
     """
     Simplified IRAMP merge: anchor composite + photometric-normed contributors
     post-CCM (applied in chromaticity space).
@@ -111,20 +114,30 @@ def merge_iramp(anchor_rgb: np.ndarray,
     if not include_contributors:
         return finite(anchor_ccm_applied).astype(np.float32)
 
-    merged_acc = anchor_ccm_applied.copy()
+    # TRUTH §2.3 C18: per-tile CCM INSIDE IRAMP is a SINGLE consolidated M per
+    # pass. Apply ONE CCM (anchor's) to the merged output, not per-contributor.
+    # So we accumulate in linear pre-CCM space, then CCM once at the end.
+    merged_acc = anchor_rgb.copy().astype(np.float32)  # no CCM yet
     weight_acc = np.float32(1.0)
-    for c_rgb, c_ccm in zip(contributor_rgbs, contributor_ccms):
-        if c_rgb is None:
+
+    use_warp = (aux is not None) and (warps is not None) and (len(warps) >= len(contributor_rgbs))
+
+    for idx, c_rgb in enumerate(contributor_rgbs):
+        if c_rgb is None or c_rgb.shape[:2] != (H, W):
             continue
-        if c_rgb.shape[:2] != (H, W):
-            continue
-        normed = per_contributor_prenorm(c_rgb, fov_ratio)
-        normed = normed * normed
-        M = c_ccm if c_ccm is not None else anchor_ccm
-        c_applied = (apply_ccm_chromaticity(normed, M)
-                     if M is not None else normed)
-        merged_acc = merged_acc + c_applied
+        if use_warp:
+            projected = apply_warp(c_rgb, warps[idx], aux)
+            # TRUTH M14: per-contributor pre-norm `out = sqrt(max(0, in × FOV))`.
+            # Apply once (do NOT square-back — kernel preserves sqrt space for
+            # accumulation).
+            normed = per_contributor_prenorm(projected, fov_ratio)
+        else:
+            normed = per_contributor_prenorm(c_rgb, fov_ratio)
+        merged_acc = merged_acc + normed
         weight_acc += np.float32(fov_ratio)
 
     merged = merged_acc / weight_acc
+    # Single consolidated CCM on merged output (TRUTH C18)
+    if anchor_ccm is not None:
+        merged = apply_ccm_chromaticity(merged, anchor_ccm)
     return finite(merged).astype(np.float32)

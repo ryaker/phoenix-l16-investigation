@@ -30,6 +30,7 @@ from per_cam_isp import run_per_cam_isp, DEFAULT_CCT
 from composite_anchor import build_composite_anchor
 from iramp_merge import merge_iramp, FOV_RATIO_28MM_B, FOV_RATIO_70MM_C
 from post_merge import post_merge_pipeline, OUT_W, OUT_H
+from warp_field import find_dumps, load_aux, load_warps
 
 
 # Zoom-tier dispatch: (anchor_ids, contributor_ids, fov_ratio)
@@ -143,11 +144,33 @@ def run(lri_path: str, output_tiff: str):
                 contrib_ccms.append(ccm)
         print(f"  [iramp] using {len(contrib_rgbs)}/{len(contrib_ids)} "
               f"contributor cams", file=sys.stderr)
-        # Spike v2.0 known limit: WarpField for contributor registration
-        # not decoded. Using anchor-only for smoke test.
+
+        # Load runtime aux + WarpField dumps if present (per-zoom-tier);
+        # enables vectorized contributor merge. Spec-bound: the dumps are
+        # spike reference captures from libcp at render time; Phoenix
+        # production must COMPUTE these from first principles (see TRUTH
+        # §4 OPEN-AUX-WRITER).
+        import os as _os
+        ref_dir = _os.path.join(_os.path.dirname(_os.path.dirname(
+            _os.path.abspath(__file__))), 'reference')
+        aux = warps = None
+        dumps = find_dumps(ref_dir, zoom) if _os.path.isdir(ref_dir) else None
+        if dumps:
+            aux_path, wf_path = dumps
+            aux = load_aux(aux_path)
+            warps = load_warps(wf_path)
+            print(f"  [iramp] loaded aux {aux.shape} + {len(warps)} warps "
+                  f"from {ref_dir}", file=sys.stderr)
+            merge_on = True
+        else:
+            print(f"  [iramp] no aux/warpfield dumps for {zoom}mm in {ref_dir} "
+                  f"— contributor merge OFF (anchor-only output)",
+                  file=sys.stderr)
+            merge_on = False
         merged = merge_iramp(src1, contrib_rgbs, contrib_ccms,
                              anchor_ccm, fov_ratio,
-                             include_contributors=False)
+                             include_contributors=merge_on,
+                             aux=aux, warps=warps)
         print(f"  [iramp] merged shape={merged.shape} min={merged.min():.3f} "
               f"max={merged.max():.3f} mean={merged.mean():.3f}",
               file=sys.stderr)
