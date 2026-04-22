@@ -68,3 +68,8 @@ reference/depth_map.npy
 # (NOT in this repo — see evidence/README.md for why). Repo-local evidence
 # files (e.g., evidence/phoenix-handoff_traceability/*.md, 23 session
 # reports kept in-repo for audit) ARE tracked. No blanket exclusion.
+
+# Phoenix spike v2 — validation workspace (2026-04-20)
+spike_v2/outputs/
+spike_v2/logs/
+spike_v2/reference/
