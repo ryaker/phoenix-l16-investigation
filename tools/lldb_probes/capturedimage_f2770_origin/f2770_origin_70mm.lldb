@@ -1,0 +1,13 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/capturedimage_f2770_origin/f2770_origin_probe.py
+script f2770_origin_probe.reset("70mm CapturedImage f2770 origin L16_03434 2019-05-18")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/capturedimage_f2770_origin
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+
+breakpoint set --shlib libcp.dylib --address 0xe59a4
+breakpoint set --shlib libcp.dylib --address 0xe59a9
+
+script f2770_origin_probe.install_callbacks(lldb.debugger, {"pre": 1, "post": 2})
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/capturedimage_f2770_origin/f2770_origin_70mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script f2770_origin_probe.report_to_file("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/capturedimage_f2770_origin/f2770_origin_70mm.json")
+quit

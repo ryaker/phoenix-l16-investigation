@@ -160,6 +160,11 @@ predicate.
 | `9` | `13` | `1` | `(1, 1)` | no | not tested | no |
 | `10` | `15` | `0` | `(-1, -1)` | no | not tested | no |
 
+Later evidence in [lldb_capturedimage_f2770_origin_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_capturedimage_f2770_origin_four_zoom.md)
+and [lldb_c6_active_byte_mutation_watch_tele.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_c6_active_byte_mutation_watch_tele.md)
+proves this `object+0x30 = 0` value is post-constructor state: tele key `15`
+is constructed with item `+0x30 = 1` and later cleared at `libcp+0x3c90a5`.
+
 ## Proven Facts
 
 - The wide-tier canonical seeds scan `10` records and preserve the same key
@@ -172,8 +177,9 @@ predicate.
 - At `70mm` and `150mm`, no key in the target-normalized bucket has sign-bit
   fields; final `r15d` remains sentinel `16`, and byte `+0x18` is written as
   `0`.
-- Tele key `15` has fields `(-1, -1)` and `object+0x30 = 0`, but it does not
-  match the target-normalized bucket in this `0x402d20` predicate, so
+- Tele key `15` has fields `(-1, -1)` and post-constructor-mutated
+  `object+0x30 = 0`, but it does not match the target-normalized bucket in this
+  `0x402d20` predicate, so
   `0x402d20` does not call `0xf2750` on it in the observed branch.
 - Static proof identifies the normalization bucket as the `0xf6c60` camera-ID
   group ordinal: IDs `0..4`, `5..9`, and `10..15` map to ordinals `0`, `1`,
@@ -205,7 +211,8 @@ that becomes item `+0x60`, or optional `FusionCacheBayer+0x20`.
 - Public semantic meaning and LRI origin of item fields `+0x58/+0x5c`.
 - Public LRI origin of the input field that becomes item key field `+0x60`.
 - Why tele key `15` carries `(-1, -1)` while not matching this predicate's
-  normalized bucket and having `object+0x30 = 0`.
+  normalized bucket. The later `object+0x30 = 0` state is now explained as a
+  post-constructor mutation at `libcp+0x3c90a5`, but terminality remains open.
 - Public semantic name of optional `FusionCacheBayer+0x20`.
 - Whether this constructor selector contributes only to source-descriptor
   adaptation or also to later merge-quality / acceptance policy.

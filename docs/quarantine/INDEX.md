@@ -20,6 +20,15 @@ Anything listed here may not be used:
 
 ## External Quarantine Targets
 
+### AI-generated patent research intake
+
+- `docs/quarantine/PATENT_RESEARCH_HANDOFF.md`
+  User-provided, AI-generated patent research handoff. Generation provenance
+  stated by the user: Google Gemini 3.1 Pro performed patent search; Claude
+  Sonnet 4.6 analyzed the research report. Use only for claim discovery,
+  verification planning, and contradiction tracking. It admits zero claims and
+  may not be cited as project truth.
+
 ### Transient artifact references
 
 - `/tmp/*` and `/private/tmp/*` references are never canonical evidence

@@ -142,6 +142,10 @@ The pointer values are process-local evidence samples, not algorithm constants.
 
 ## Non-Conclusions
 
+- Later constructor/watchpoint proof establishes the tele key `15`
+  `object+0x30 = 0` value observed here as post-constructor mutated state:
+  key `15` is constructed with item `+0x30 = 1` and later cleared at
+  `libcp+0x3c90a5`.
 - This does not prove C6 is unused globally.
 - This does not prove no alternate C6 path exists outside this tested
   stereo-side keyed-record loop.
