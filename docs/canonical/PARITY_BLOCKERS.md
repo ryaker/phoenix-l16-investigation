@@ -101,10 +101,11 @@ then it is a parity blocker.
   Hardware write-watchpoint proof then captures the same key's active byte changing to `0` at `libcp+0x3c90a5` inside body `0x3c8f90`; static local gate shows this writer clears key `15` when the grouped context `+0x44` value is not group ordinal `2`.
   A focused 24-site direct `0xf2720` route census under complete `70mm` and `150mm` bridge HDR runs observes key `15` active at `0x1bdbab` / `0x1bdbdd` key-list helper sites and at mutation-body sites, then inactive at later selected key-query sites.
   Follow-up mutation-identity proof ties those active helper/mutation observations, the `0x3c90a5` store, immediate inactive state at `0x3c90a9`, and later inactive `0x3b2143` observation to the same tracked key-15 item pointer per tele run; static context classifies helper `0x1bdb60` itself as key-list construction bookkeeping, not image-buffer work.
+  A candidate downstream context-consumer probe of `0x3c9540 -> 0xe6c30` re-hits the constructor/mutation custody path but records zero hits at the candidate consumer and helper sites in complete canonical `70mm` and `150mm` bridge HDR renders; this excludes only that candidate route under the tested tele conditions.
   The direct payload candidate loop immediately upstream of the dispatcher does see key `15` at `70mm` and `150mm`, but runtime proof shows post-mutation `object+0x30 = 0`; key `15` skips before class compare and before the `0x3e05f5 -> 0x3f6170` dispatcher call.
   The stereo-side keyed-record loop inside `0x3f2c40` also sees key `15` at `70mm` and `150mm`, but runtime proof shows post-mutation `object+0x30 = 0`; key `15` skips before the post-gate path and before both tested `0xf2720` getter callsites.
 - What is still needed:
-  proof of whether the constructed key-list/context object has downstream consumers that affect image/merge behavior, whether the `0x3c90a5` mutation is terminal for canonical bridge HDR, and whether C6 has any non-focused direct `0xf2720` or non-`0xf2720` downstream route outside the tested direct and stereo-side loops.
+  proof of whether the constructed key-list/context object has downstream consumers that affect image/merge behavior outside the zero-hit `0x3c9540 -> 0xe6c30` candidate route, whether the `0x3c90a5` mutation is terminal for canonical bridge HDR, and whether C6 has any non-focused direct `0xf2720` or non-`0xf2720` downstream route outside the tested direct and stereo-side loops.
 
 ### 5. Final merge acceptance / rejection logic beyond the proven accumulator
 
