@@ -90,6 +90,12 @@ C6 context path. The zero-hit candidate sites therefore mean only this scoped
 fact: the `0x3c9540 -> 0xe6c30` route was not reached in these two complete
 canonical tele bridge HDR renders.
 
+Follow-up note: later evidence in
+[lldb_c6_postmutation_state_consumer_tele.md](/Volumes/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_c6_postmutation_state_consumer_tele.md)
+does prove a different immediate post-mutation state-classification consumer of
+the constructed `ctx+0xa0` object. This document remains only a negative for
+the `0x3c9540 -> 0xe6c30` candidate route.
+
 The re-captured context object shape matched across the two tele seeds:
 
 | Captured field | `70mm` | `150mm` |
