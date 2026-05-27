@@ -68,12 +68,13 @@ These are the currently proven blockers in the canonical system.
   The tested visible-`src1` projection field-pack dispatcher boundary is also not the positive route: tele dispatcher keys there are `8,10..14`, with no key `15`.
   The direct `0xe59a4 -> 0xf2770` constructor callsite constructs tele key `15` / C6 with active byte `+0x30 = 1`.
   Hardware write-watchpoint proof captures tele key `15` / C6 changing from item `+0x30 = 1` to `0` at writer `libcp+0x3c90a5` inside body `0x3c8f90` in both canonical tele seeds; static local gate shows this writer clears key `15` when the grouped context `+0x44` value is not group ordinal `2`.
+  A focused 24-site direct `0xf2720` callsite census under complete `70mm` and `150mm` bridge HDR runs observes key `15` active at `0x1bdbab` / `0x1bdbdd` key-list helper sites and at mutation-body sites `0x3c9043` / `0x3c9098`, then inactive at later selected key-query sites `0x3b2143`, `0x402df7`, and `0x40d219`; this proves focused key-query participation, not image-buffer contribution or terminal filtering.
   The direct payload candidate loop immediately upstream of that dispatcher does see key `15` at both tele tiers, but runtime proof shows post-mutation `object+0x30 = 0`; key `15` skips before class compare and before the dispatcher call.
   The stereo-side keyed-record loop inside `0x3f2c40` also sees key `15` at both tele tiers, but runtime proof shows post-mutation `object+0x30 = 0`; key `15` skips before both tested `0xf2720` getter callsites.
   Block 6 CCM coverage is missing A2 and C6, and the tested dispatcher filters missing-CCM cameras.
   The stale `150mm = 6C only` story is not viable.
 - What is unknown:
-  whether the `0x3c90a5` mutation is terminal for canonical bridge HDR, or whether C6 has any alternate downstream route before or outside the tested direct and stereo-side loops.
+  whether the active `0x1bdbab` / `0x1bdbdd` key-list helper path is bookkeeping-only or feeds an image/merge consumer, whether the `0x3c90a5` mutation is terminal for canonical bridge HDR, and whether C6 has any non-focused direct `0xf2720` or non-`0xf2720` downstream route outside the tested direct and stereo-side loops.
 - Why it blocks the end goal:
   tele routing mistakes can silently produce the wrong contributor set even when the output still looks superficially sharp.
 
@@ -183,7 +184,7 @@ If the question is "what still stands between us and a trustworthy replacement?"
 1. We still do not know exactly what `src1` / `src2` already contain, beyond the gated lower-source-producer dispatch census, capped target-family visible-body classification, first captured source-producer region-adapter callback, and visible-`src2` gate/dispatch/worker target binding as scoped, or how the upstream merge/reduction behavior is distributed.
 2. We still do not know the exact producer-side row/map calibration semantics over the ROI-derived pair lattice.
 3. We still do not have full four-zoom closure on remaining merge topology beyond the accumulator and entry signature.
-4. We know C6 is constructed active and later cleared at `0x3c90a5` before two canonical tele filter points, but still do not know whether that mutation is terminal or whether C6 has any alternate downstream route before/outside those tested loops.
+4. We know C6 is constructed active, queried while active by a focused key-list helper path, and later cleared at `0x3c90a5` before two canonical tele filter points, but still do not know whether the active helper path is bookkeeping-only, whether that mutation is terminal, or whether C6 has any non-focused / non-`0xf2720` downstream route.
 5. We still do not know the last merge-quality decision layer beyond the proven accumulator, now narrowed past the owner `+0xf0` expansion handoff, first selected-cache route into `0x36f800`, first-owner branch census, first direct-branch post-route handoff, global parent-chain/helper-surface/selected-cache/direct-caller/selected-cache-caller/`0x3e5720`-caller/`0x3d4e10`-caller/`0x3d5400`-executor-route classification, first weighted `0x36f800` store, row-cache helper formula, and first-dispatch row-plan segment coverage.
 
 Everything else should be treated as either:

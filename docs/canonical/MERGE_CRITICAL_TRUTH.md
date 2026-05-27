@@ -185,9 +185,10 @@ These facts are usable only with their explicit limits.
 - The tested visible-`src1` projection field-pack dispatcher boundary at `0x3f6170` / `0x3f6200` / `0x3f6940` is also not a positive C6 route under complete canonical bridge HDR runs; tele keys observed there were `8,10..14`, with no key `15`.
 - The direct `0xe59a4 -> 0xf2770` constructor callsite constructs tele key `15` / C6 with item `+0x30 = 1`.
 - Hardware write-watchpoint proof captures tele key `15` / C6 changing from item `+0x30 = 1` to `0` at writer `libcp+0x3c90a5` inside body `0x3c8f90` in both canonical tele seeds; static local gate shows this writer clears key `15` when the grouped context `+0x44` value is not group ordinal `2`.
+- A focused 24-site direct `0xf2720` callsite census under complete `70mm` and `150mm` bridge HDR runs observes key `15` active at `0x1bdbab` / `0x1bdbdd` key-list helper sites and at mutation-body sites `0x3c9043` / `0x3c9098`, then inactive at later selected key-query sites `0x3b2143`, `0x402df7`, and `0x40d219`; this is key-query participation, not image contribution or route closure.
 - The direct payload candidate loop immediately upstream of the dispatcher sees key `15` at both tele tiers, but runtime proof shows post-mutation `object+0x30 = 0`; key `15` skips before class compare and before the `0x3e05f5 -> 0x3f6170` dispatcher call.
 - The stereo-side keyed-record loop inside `0x3f2c40` also sees key `15` at both tele tiers, but runtime proof shows post-mutation `object+0x30 = 0`; key `15` skips before both tested `0xf2720` getter callsites.
-- Exact alternate routing outside these tested direct and stereo-side loops remains unresolved.
+- Exact consumer semantics for the active key-list helper path, terminality of the mutation, and alternate routing outside the focused/tested sites remain unresolved.
 
 ### 3. 150mm tele behavior is not yet canonical enough
 
@@ -220,6 +221,7 @@ This table is the quick gate for whether parity work may safely generalize a mer
 | `0x3f6170` projection field dispatcher key boundary | keys `0,5..9`; no C6 scope | keys `0,5..9`; no C6 scope | keys `8,10..14`; no `15` | keys `8,10..14`; no `15` | Complete bridge HDR runs, `.lris` auto-load disabled |
 | `0xe59a4 -> 0xf2770` item constructor callsite | keys `0,4,6,8,9,1,2,3,5,7`; all item `+0x30 = 1` | keys `0,4,6,8,9,1,2,3,5,7`; all item `+0x30 = 1` | keys `6,8,9,14,5,7,11,10,12,13,15`; all item `+0x30 = 1` | keys `6,8,9,14,5,7,11,10,12,13,15`; all item `+0x30 = 1` | Complete bridge HDR runs; constructor-state proof |
 | C6 active-byte mutation watchpoint | `N/A` | `N/A` | key `15` changes `+0x30` from `1` to `0` at `0x3c90a5` | key `15` changes `+0x30` from `1` to `0` at `0x3c90a5` | Watchpoint stops at mutation; not output-completion evidence |
+| focused C6 direct `0xf2720` route census | `N/A` | `N/A` | active key-list helper hits at `0x1bdbab` / `0x1bdbdd`; later selected inactive hits | active key-list helper hits at `0x1bdbab` / `0x1bdbdd`; later selected inactive hits | Focused 24-site census only; key-query participation, not image contribution or terminality |
 | direct payload candidate gate before `0x3e05f5 -> 0x3f6170` | keys `0..9`; all `object+0x30 = 1`; dispatcher keys `5..9` | keys `0..9`; all `object+0x30 = 1`; dispatcher keys `5..9` | keys `5..15`; key `15` has post-mutation `object+0x30 = 0`; dispatcher keys `10..14` | keys `5..15`; key `15` has post-mutation `object+0x30 = 0`; dispatcher keys `10..14` | Tested C6 filter point only; not global C6 non-use |
 | stereo-side keyed-record gate inside `0x3f2c40` | keys `0..9`; all `object+0x30 = 1`; getter keys `0..9` | keys `0..9`; all `object+0x30 = 1`; getter keys `0..9` | keys `5..15`; key `15` has post-mutation `object+0x30 = 0`; getter keys `5..14` | keys `5..15`; key `15` has post-mutation `object+0x30 = 0`; getter keys `5..14` | Tested C6 filter point only; not global C6 non-use |
 | visible `src1` source-image producer topology beneath `0x3e2e90` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | Structural/dispatch only |
@@ -247,7 +249,7 @@ This table is the quick gate for whether parity work may safely generalize a mer
 | first owner `+0xf0` `0x36f800` weighted store | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | First captured store only; helper store covered separately |
 | first owner `+0xf0` `0x36f800` helper row-cache / row-plan coverage | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Captured helper formula plus first-dispatch row-plan coverage; full-render leading/trailing live at `28mm`/`70mm`, zero-hit at `35mm`/`150mm`; final policy open |
 | exact `src1` / `src2` pre-fusion reducer | `OPEN` | `OPEN` | `OPEN` | `OPEN` | No |
-| exact C6 routing | `N/A` | `N/A` | `PARTIAL` | `PARTIAL` | No |
+| exact C6 routing | `N/A` | `N/A` | `PARTIAL`; focused active key-query participation observed | `PARTIAL`; focused active key-query participation observed | No; key-list helper consumer semantics and terminality still unresolved |
 
 ## Current Rule For Implementation
 
