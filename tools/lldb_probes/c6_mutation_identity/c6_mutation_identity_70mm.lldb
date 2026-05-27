@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/c6_mutation_identity/c6_mutation_identity_probe.py
+script c6_mutation_identity_probe.reset("70mm C6 mutation identity L16_03434 2019-05-18", 256, 4096)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/c6_mutation_identity
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script c6_mutation_identity_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/c6_mutation_identity/c6_mutation_identity_70mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script c6_mutation_identity_probe.report_to_file("/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/c6_mutation_identity/c6_mutation_identity_70mm.json")
+quit
