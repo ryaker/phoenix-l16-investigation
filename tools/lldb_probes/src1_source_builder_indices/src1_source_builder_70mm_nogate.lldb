@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/src1_source_builder_indices/src1_source_builder_indices_probe.py
+script src1_source_builder_indices_probe.reset("70mm L16_03434 source-builder indices, no gate", 512, 128)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_source_builder_indices
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x1be270
+breakpoint set --shlib libcp.dylib --address 0x1be291
+breakpoint set --shlib libcp.dylib --address 0x1be2fb
+breakpoint set --shlib libcp.dylib --address 0x1be306
+script src1_source_builder_indices_probe.attach_no_gate(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_source_builder_indices/src1_source_builder_70mm_nogate.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script src1_source_builder_indices_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script src1_source_builder_indices_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_source_builder_indices/src1_source_builder_70mm_nogate.json")
+quit

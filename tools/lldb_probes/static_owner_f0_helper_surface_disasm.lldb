@@ -1,0 +1,46 @@
+target create /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+
+image lookup --address 0x31b110
+disassemble --start-address 0x31b110 --end-address 0x31b650
+disassemble --start-address 0x31b650 --end-address 0x31baa0
+
+image lookup --address 0xfe720
+disassemble --start-address 0xfe720 --end-address 0xfeb40
+
+image lookup --address 0x106cb0
+disassemble --start-address 0x106cb0 --end-address 0x107e40
+
+image lookup --address 0x33fb30
+disassemble --start-address 0x33fb30 --end-address 0x33fe00
+
+image lookup --address 0x340160
+disassemble --start-address 0x340160 --end-address 0x340420
+
+image lookup --address 0x3403f0
+disassemble --start-address 0x3403f0 --end-address 0x340650
+
+image lookup --address 0x2e20
+disassemble --start-address 0x2e20 --end-address 0x2f40
+
+image lookup --address 0xf3570
+disassemble --start-address 0xf3570 --end-address 0xf36f0
+
+image lookup --address 0x3b9660
+disassemble --start-address 0x3b9660 --end-address 0x3b9770
+
+image lookup --address 0x3c6ac0
+disassemble --start-address 0x3c6ac0 --end-address 0x3c6c20
+
+image lookup --address 0x1bea20
+disassemble --start-address 0x1bea20 --end-address 0x1beaa0
+
+image lookup --address 0x1bea00
+disassemble --start-address 0x1bea00 --end-address 0x1bea20
+
+image lookup --address 0x1be970
+disassemble --start-address 0x1be970 --end-address 0x1bea00
+
+image lookup --address 0xf540
+disassemble --start-address 0xf540 --end-address 0xf620
+
+quit

@@ -1,0 +1,12 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/src2_executor_target/src2_executor_target_probe.py
+script src2_executor_target_probe.reset("150mm visible src2 executor gate target L16_02285 2018-07-29", capture_worker=False, enable_dispatch=False, stop_after_gate=True)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src2_executor_target
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+
+breakpoint set -H --shlib libcp.dylib --address 0x3ec462
+
+script src2_executor_target_probe.install_callbacks(lldb.debugger, {"gate": 1})
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src2_executor_target/src2_executor_target_150mm.hdr" --profile 3 --export-fmt 3
+script src2_executor_target_probe.report()
+quit

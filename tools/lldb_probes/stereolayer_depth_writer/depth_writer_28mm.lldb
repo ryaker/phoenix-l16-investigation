@@ -1,0 +1,19 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/stereolayer_depth_writer/stereolayer_depth_writer_probe.py
+script stereolayer_depth_writer_probe.reset("28mm L16_02130 StereoLayer depth writer probe", 160)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_depth_writer
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26fb70
+breakpoint set --shlib libcp.dylib --address 0x26fba4
+breakpoint set --shlib libcp.dylib --address 0x26fbb0
+breakpoint set --shlib libcp.dylib --address 0x26fbb7
+breakpoint set --shlib libcp.dylib --address 0x26fbc9
+breakpoint set --shlib libcp.dylib --address 0x26fbd2
+breakpoint set --shlib libcp.dylib --address 0x26fbdd
+script stereolayer_depth_writer_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_depth_writer/depth_writer_28mm.hdr" --profile 3 --export-fmt 3
+script stereolayer_depth_writer_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script stereolayer_depth_writer_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_depth_writer/depth_writer_28mm.json")
+script stereolayer_depth_writer_probe.report(lldb.debugger)
+quit

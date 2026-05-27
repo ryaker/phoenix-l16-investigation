@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/src1_indirect_callable_targets/src1_indirect_callable_targets_probe.py
+script src1_indirect_callable_targets_probe.reset("35mm L16_03041 visible-src1 indirect callable targets", 256, 32)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_indirect_callable_targets
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3e4b09
+breakpoint set --shlib libcp.dylib --address 0x342d99
+breakpoint set --shlib libcp.dylib --address 0x3449f0
+script src1_indirect_callable_targets_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_indirect_callable_targets/src1_indirect_35mm.hdr" --profile 3 --export-fmt 3
+script src1_indirect_callable_targets_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script src1_indirect_callable_targets_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_indirect_callable_targets/src1_indirect_35mm.json")
+script src1_indirect_callable_targets_probe.report(lldb.debugger)
+quit

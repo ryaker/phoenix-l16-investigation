@@ -1,0 +1,10 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/iramp_row_callback_38a30_conversion/row_callback_conversion_probe.py
+script row_callback_conversion_probe.reset()
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_row_callback_38a30_conversion
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x38c39
+breakpoint command add 1 -s python -o "row_callback_conversion_probe.hit_return(frame, bp_loc, internal_dict)"
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_row_callback_38a30_conversion/row_callback_28mm.hdr" --profile 3 --export-fmt 3
+script row_callback_conversion_probe.report("28mm row callback 0x38a30 conversion L16_02130 2018-07-23")
+quit

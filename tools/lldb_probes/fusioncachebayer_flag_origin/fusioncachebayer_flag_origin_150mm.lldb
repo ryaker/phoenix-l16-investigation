@@ -1,0 +1,21 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/fusioncachebayer_flag_origin/fusioncachebayer_flag_origin_probe.py
+script fusioncachebayer_flag_origin_probe.reset("150mm FusionCacheBayer flag origin L16_02285 2018-07-29", stop_after_store=False)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/fusioncachebayer_flag_origin
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+
+breakpoint set --shlib libcp.dylib --address 0x3eab4c
+breakpoint set --shlib libcp.dylib --address 0x402d89
+breakpoint set --shlib libcp.dylib --address 0x402d90
+breakpoint set --shlib libcp.dylib --address 0x402e6e
+breakpoint set --shlib libcp.dylib --address 0x402e78
+breakpoint set --shlib libcp.dylib --address 0x402e7c
+breakpoint set --shlib libcp.dylib --address 0x4066fc
+breakpoint set --shlib libcp.dylib --address 0x406774
+breakpoint set --shlib libcp.dylib --address 0x3eab58
+breakpoint set --shlib libcp.dylib --address 0x3eab5e
+
+script fusioncachebayer_flag_origin_probe.install_callbacks(lldb.debugger, {"constructor_call": 1, "direct_zero": 2, "loop_entry": 3, "loop_finalize": 4, "write": 5, "after_write": 6, "constructor_branch": 7, "field20_store": 8, "store_before": 9, "store_after": 10})
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/fusioncachebayer_flag_origin/fusioncachebayer_flag_origin_150mm.hdr" --profile 3 --export-fmt 3
+script fusioncachebayer_flag_origin_probe.report_to_file("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/fusioncachebayer_flag_origin/fusioncachebayer_flag_origin_150mm.json")
+quit

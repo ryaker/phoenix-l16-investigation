@@ -1,0 +1,17 @@
+target create /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+
+image lookup --address 0x3d0408
+image lookup --address 0x3d042b
+image lookup --address 0x3d53c0
+image lookup --address 0x3d5400
+image lookup --address 0x3d5468
+image lookup --address 0x66a728
+
+disassemble --start-address 0x3d03f0 --end-address 0x3d0438
+disassemble --start-address 0x3d5350 --end-address 0x3d549e
+
+memory read --format x --size 8 --count 12 0x66a690
+memory read --format x --size 8 --count 12 0x66a728
+memory read --format x --size 8 --count 12 0x66a788
+
+quit

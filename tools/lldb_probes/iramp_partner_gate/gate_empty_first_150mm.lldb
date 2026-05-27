@@ -1,0 +1,10 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/iramp_partner_gate/gate_first_probe.py
+script gate_first_probe.reset()
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_partner_gate
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x3692dc --condition "$r9 == $rdi"
+breakpoint command add 1 -s python -o "gate_first_probe.hit(frame, bp_loc, internal_dict)"
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_partner_gate/gate_empty_first_150mm.hdr" --profile 3 --export-fmt 3
+script gate_first_probe.report("150mm empty gate L16_02285 2018-07-29")
+quit

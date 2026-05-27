@@ -1,0 +1,24 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/src2_executor_target/src2_executor_target_probe.py
+script src2_executor_target_probe.reset("28mm visible src2 executor target L16_02130 2018-07-23")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src2_executor_target
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+
+breakpoint set --shlib libcp.dylib --address 0x3ec462
+
+breakpoint set --shlib libcp.dylib --address 0x5506
+breakpoint disable 2
+
+breakpoint set --shlib libcp.dylib --address 0x2d8f
+breakpoint disable 3
+
+breakpoint set --shlib libcp.dylib --address 0x2dcc
+breakpoint disable 4
+
+breakpoint set --shlib libcp.dylib --address 0x5d94
+breakpoint disable 5
+
+script src2_executor_target_probe.install_callbacks(lldb.debugger, {"gate": 1, "executor_0x5440_single_tile_call": 2, "executor_0x2d30_range_call": 3, "executor_0x2d30_loop_call": 4, "executor_0x5cd0_tile_forward_call": 5})
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src2_executor_target/src2_executor_target_28mm.hdr" --profile 3 --export-fmt 3
+script src2_executor_target_probe.report()
+quit

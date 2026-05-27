@@ -1,0 +1,20 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/direct_payload_candidate_gate/direct_payload_candidate_gate_probe.py
+script direct_payload_candidate_gate_probe.reset("150mm L16_02285 direct payload candidate gate", 640)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/direct_payload_candidate_gate
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3e0330
+breakpoint set --shlib libcp.dylib --address 0x3e03e3
+breakpoint set --shlib libcp.dylib --address 0x3e0406
+breakpoint set --shlib libcp.dylib --address 0x3e0410
+breakpoint set --shlib libcp.dylib --address 0x3e0418
+breakpoint set --shlib libcp.dylib --address 0x3e0450
+breakpoint set --shlib libcp.dylib --address 0x3e0456
+breakpoint set --shlib libcp.dylib --address 0x3e05f5
+breakpoint set --shlib libcp.dylib --address 0x3e05fa
+script direct_payload_candidate_gate_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/direct_payload_candidate_gate/direct_payload_candidate_gate_150mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script direct_payload_candidate_gate_probe.drive_until_exit_or_step_cap(lldb.debugger, 30000)
+script direct_payload_candidate_gate_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/direct_payload_candidate_gate/direct_payload_candidate_gate_150mm.json")
+quit

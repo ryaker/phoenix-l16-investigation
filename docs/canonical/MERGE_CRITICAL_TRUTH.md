@@ -1,0 +1,264 @@
+# Merge-Critical Truth
+
+This document contains only the facts that currently matter most for achieving a ghost-free L16 merge on modern hardware.
+
+It is intentionally narrower than `docs/TRUTH.md`.
+
+Every statement here must trace back to `CLAIM_LEDGER.md`.
+
+## Success Standard
+
+The target outcome is:
+
+- no ghosting
+- no trailers
+- no contributor misregistration
+- stable merge behavior across `28mm`, `35mm`, `70mm`, and `150mm`
+
+If a claim does not change that outcome, it does not belong here.
+
+## Verified Core
+
+### 1. IRAMP is real and merge-critical
+
+- `CLM-MERGE-002`
+- `ImageResolutionAmp` / IRAMP contains a real multi-source weighted accumulator inside `libcp`.
+- The accumulator at `0x369fa1..0x369fa8` is now runtime-observed across the canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR seed files.
+
+### 1a. The local IRAMP partner gate is now bounded, but not closed end-to-end
+
+- `CLM-MERGE-005`
+- Static installed-bundle proof shows `0x3692dc` compares a local partner-record vector begin/end pair and `0x3692e4` jumps to `0x369f2a` when the vector is empty.
+- Static installed-bundle proof shows non-empty partner vectors fall through toward first SAD at `0x3694b1`.
+- Partner records are `0x280` bytes.
+- Runtime non-empty partner-vector states and first SAD hits are observed at `28mm`, `35mm`, `70mm`, and `150mm`.
+- Runtime empty partner-vector states are observed at `28mm` and `70mm`; `35mm` and `150mm` empty-gate runtime hits are not proven.
+- Static plus runtime proof now shows the first-hit partner-record append/population path reaches `0x368b02` at `28mm`, `35mm`, `70mm`, and `150mm`.
+- A populated `0x280` record is physically four int32 scalar fields followed by thirteen contiguous `0x30` descriptor-like blocks.
+- Static plus runtime proof now also bounds the live non-empty consumer path through coarse SIMD SAD / `phminposuw` winner selection, local absolute-difference refinement, guarded float refinement, 16x16 bilinear vec4 resampling, `0x36cde0`, and a three-float scratch write at `0x369e7e..0x369e91` across all four canonical zooms.
+- Follow-up proof narrows `0x36cde0`: it consumes the two prepared 16x16 `vec4` patches, computes patch-statistics / fixed-transform / weighted-reduction work, returns `sqrt(xmm0 * xmm1)`, and the caller stores that live `xmm0` scalar as the tuple's third float.
+- Follow-up proof bounds `0x36e530`: it receives `rbp-0x4240`, performs reciprocal/selector normalization plus fixed SIMD transform/reduction work, returns `scratch+0x1580` in `rax`, and the accumulator consumes that source block with a 16-by-16 outer product of captured scalar weights.
+- Follow-up proof bounds the first downstream tuple consumer: it reads the third tuple scalar at `0x36a7d8`, reads the first two tuple floats at `0x36a803` / `0x36a814`, passes an adjusted coordinate pair to `0x372a00`, forms multiplier `(t + 2 * max(0, t - 0.5), t, t, t)`, reaches multiply-add loop `0x36a8c0..0x36a8cb` across all four canonical zooms, and adds the third scalar into a running scalar sum initialized from `0x5df904 = 0.200000003`.
+- Follow-up proof bounds the immediate post-reciprocal weighted-add path: `0x19e7d0` copies/scales descriptor-backed `vec4` buffers by the reciprocal vector, and `0x36aa30..0x36aa57` blends `reciprocal * 0.2` into lane 3, applies `weight[inner] * weight[outer]`, adds into the destination `vec4`, and is reached across all four canonical zooms.
+- Follow-up proof bounds the immediate post-weighted-add shaping path: `0x36abf0..0x36ac15` applies a lane-3-weighted clamped vector update with first-hit scale `(2,0,0,0)` and clamp bounds `[-0.1,0.1]`, and `0x36ad50..0x36adac` applies a fixed 3-vector transform with lane 3 forced to `1.0`; both sites are reached across all four canonical zooms.
+- Follow-up proof bounds the caller-side handoff after IRAMP returns: the caller validates the `rbp-0x60` descriptor dimensions against ROI, wraps it at `rbp-0x88`, calls helper `0xd76a0`, and static helper inspection shows source `vec4` lanes are squared into the destination descriptor; the handoff is reached across all four canonical zooms.
+- Follow-up proof bounds the caller-side vector-scale handoff after square-copy: the caller builds a wrapper over the `rbp-0x70` descriptor with a vector at wrapper `+0x10`, calls helper `0x2d7320`, and static helper inspection shows source `vec4` lanes are multiplied by that vector into the destination descriptor; the handoff is reached across all four canonical zooms.
+- Follow-up proof bounds the caller-side `0x3e5720` executor setup after vector-scale: it allocates/resizes a 6-byte-element destination descriptor, builds callback vtable `0x66b020`, dispatches generic executor `0x5670`, and its visible worker maps source 16-byte `vec4` rows to destination 6-byte rows before calling row callback `0x38a30`; the setup is reached across all four canonical zooms.
+- Follow-up proof bounds row callback `0x38a30`: for the observed `512`-wide rows, it repacks source `vec4` lanes 0..2 into float triples, calls `0xbfef0` with `ecx = 0` and count `3 * width`, and the used `0xbfef0` branch converts float channels to 16-bit binary16 bit patterns; first captured callback rows match the static conversion formula across all four canonical zooms.
+- Follow-up proof bounds the immediate caller-side storage sink for the `0x3e5720` conversion output: body `0x3ec960` is vtable slot `0x65f5e0+0x30`, computes destination descriptor `(*rsi)+0xf0`, allocates/resizes it with element size `6`, passes it to `0x3e5720`, then destroys only the temporary descriptor and returns; runtime packets across all four canonical zooms show the owner-backed descriptor populated as `512x512`, stride `512`.
+- Follow-up proof bounds the first proven downstream consumer family for owner `+0xf0`: `0x3d50f0` allocates a `16`-byte-element destination, dispatches executor `0x5670` with row worker `0x3d5290`, and the selected converter path reaches `0x2ff00 -> 0xc0410`; runtime packets across all four canonical zooms show live `rsi` at `0xc0410` inside the exact owner `+0xf0` data range with `ecx/cl = 0`.
+- Follow-up proof bounds the immediate handoff after that owner `+0xf0` expansion family: `0x3d4e10` calls `0x3d50f0`, and runtime packets at `0x3d502e` across all four canonical zooms show the local source descriptor at `rbp-0x60` points inside the exact owner `+0xf0` data range while the local expanded descriptor at `rbp-0x90` has `16`-byte elements and a first `vec4` sample with lane 3 = `1.0`.
+- Follow-up proof bounds the destination backing store for that expansion handoff: `0x3d4e10` receives a caller-provided context whose `+0x10` field points to the persistent 16-byte destination descriptor, and runtime packets across all four canonical zooms show local destination descriptor `rbp-0x90` is a clipped view into that context descriptor with matching `qword_28`, in-range data pointer, and 16-byte alignment.
+- Follow-up proof bounds the first captured route after that expansion destination context: the accepted first route uses active callable branch `0x3d4842`, active callable slot `0x3ec960`, parent `0x3d01b0` output descriptor `rbp-0x148` as `context+0x10`, caller return `0x3d084d`, and passes the same temporary descriptor to `0x36f800` at `0x3d08ce` across all four canonical zooms.
+- Follow-up first-owner census proves sibling direct branch `0x3d4864` is live for the first captured owner `+0xf0` descriptor at `28mm`, `70mm`, and `150mm`; `35mm` accepted only `0x3d4842`. Every accepted census packet still uses active callable slot `0x3ec960`, returns to selected-cache caller `0x3d084d`, and preserves the parent/context destination equality checks.
+- Follow-up direct-branch post-route proof shows the first owner-matching direct branch at `28mm`, `70mm`, and `150mm` reaches `0x3d08ce -> 0x36f800` with `rsi` equal to the same temporary descriptor captured as `context+0x10`; `35mm` has no owner-matching direct branch under that first-owner probe.
+- Follow-up global branch-site census removes the first-owner gate and counts every hit at `0x3d4842` / `0x3d4864` during complete bridge HDR renders. Across the canonical quartet, all hits preserve the same parent/context equality checks and fall into caller set `{0x3d0732, 0x3d084d, 0x3ecc5a}` plus active callable slot set `{0x3ec960, 0x3e4a80}`.
+- Follow-up post-route family proof classifies those caller families across the canonical quartet: `0x3d0732` is exact-size cleanup with no post call, `0x3d084d` reaches `0x3d08ce -> 0x36f800`, and `0x3ecc5a` reaches `0x3ecc74 -> 0x3edb80` visible-`src1` one-image normalization.
+- Follow-up parent-chain ancestry proof shows `0x3d0732` returns through `0x3b07a9 -> 0x41a8d3 -> 0x3adfce -> 0x280e`, `0x3d084d` returns through `0x3bb822 -> 0x3adfce -> 0x280e`, and visible-`src1` `0x3ecc5a` returns through `0x374cf3 -> 0x3665da -> 0x365f50 -> 0x3ec7df -> 0x3eca4b -> 0x3d4842` with some nested read-context continuations. Exact hot direct-branch hit totals are evidence-run counts, not algorithm constants.
+- Follow-up static parent-chain body classification separates callback/iteration glue (`0x280e`, `0x3adfce`) from selected owner-cache/direct-render tile surfaces (`0x3b0740`, `0x41a7d0`, `0x3b9770`, `0xfbda0`, `0x3bb2b0`) and visible-`src1` / IRAMP nested wrapper plus owner `+0xf0` sink surfaces (`0x374ac0`, `0x3661b0`, `0x365960`, `0x3ec770`, `0x3ec960`). This narrows the downstream policy search, but does not identify the final file/display sink or final contributor acceptance/rejection.
+- Follow-up static helper-surface classification bounds helper surfaces exposed by that route: `0x31b110` is source/RAW/STD adapter into `0x33fb30`; `0xfe720` builds/clamps 16-byte rectangle records; `0x106cb0` constructs/interpolates vignetting data; `0x2e20` dispatches callbacks; `0xf3570`, `0x3b9660`, `0x3c6ac0`, `0x1bea20`, `0x1bea00`, and `0x1be970` are owner/tile/map/field helpers. This is route plumbing, not final file/display sink, final contributor acceptance/rejection, or `src1` / `src2` semantic closure.
+- Follow-up static selected-cache/post-route classification bounds the visible selected-cache bodies exposed by that route: `0x3d01b0` is level/ROI tile-read executor; `0x3d0650` is exact-size read or read-then-`0x36f800` rescale; `0x3d47d0` is read-context branch routing; `0x3d4e10`, `0x3d50f0`, `0x3d5290`, `0x2ff00`, and `0xc0410` are clipped-view / 6-byte-to-vec4 / 16-bit-to-float conversion plumbing; and `0x3edb80` is one-image `sqrt(max())` normalization. This is selected-cache/post-route plumbing, not final file/display sink, final contributor acceptance/rejection, or `src1` / `src2` semantic closure.
+- Follow-up static downstream direct-caller census bounds direct callers of selected downstream helpers in the repo-local static callgraph: `0x36f800` direct callers are selected-cache read/rescale, TileCache-like read/rescale, and IRAMP-internal resample handoff; `0x3d01b0` direct callers are selected-cache reads, visible-`src1` read, source-adapter caller, and DOFCache render caller; `0x3edb80` direct callers are visible-`src1` and visible-`src2` one-image normalization wrappers; and `0x3d50f0` has only the already classified `0x3d4e10` direct caller. This is direct-callgraph coverage only, not indirect/vtable caller closure, final file/display sink, final contributor acceptance/rejection, or `src1` / `src2` semantic closure.
+- Follow-up static selected-cache caller census bounds direct callers of `0x3d0650` in the repo-local static callgraph. The 14 direct callers fall into source-adapter-style caller windows, small owner-cache selector `0x3b0740`, multi-branch owner/tile-cache surface `0x3bb2b0`, owner `+0xf0` output-sink branch body `0x3ec960`, and later helper/adaptor caller surfaces around `0x42fb40` and `0x42fd30`. This is direct-callgraph coverage only, not runtime liveness for every static caller, indirect/vtable caller closure, final file/display sink, final contributor acceptance/rejection, or `src1` / `src2` semantic closure.
+- Follow-up static `0x3e5720` caller census bounds direct callers of the row-conversion executor setup in the repo-local static callgraph. The only direct callers are active-callable-slot / owner `+0xf0` writer body `0x3e4a80`, owner `+0xf0` output-sink body `0x3ec960`, and DOFCache render body `0x3f0b90`; ancillary `0x432db0` coverage bounds the later selected-cache caller surface `0x42fb40 -> 0x3d0650 -> 0x432db0`. This is direct-callgraph coverage only, not runtime liveness for every static caller, indirect/vtable caller closure, final file/display sink, final contributor acceptance/rejection, or `src1` / `src2` semantic closure.
+- Follow-up static `0x3d4e10` caller census bounds direct callers of the owner `+0xf0` expansion handoff in the repo-local static callgraph. The only direct callers are the two already bounded branch-router post-branch handoffs at `0x3d484a` and `0x3d486c`, plus separate indexed-entry loop caller `0x3d5468` inside body `0x3d5400`; `0x3d50f0` has only direct caller `0x3d5029` inside `0x3d4e10`, and `0x3d5290` has no direct callers because it is worker-dispatch plumbing. Follow-up static/runtime proof binds that separate loop caller to vtable route `0x66a728/+0x30 -> 0x3d53c0 -> 0x3d5400 -> 0x3d5468 -> 0x3d4e10`, and first-hit probes prove liveness at `28mm`, `35mm`, `70mm`, and `150mm`. This is direct-callgraph plus first-hit executor-route coverage only, not full-render counts, indirect/vtable caller closure outside the bounded route, final file/display sink, final contributor acceptance/rejection, or public semantic closure.
+- Follow-up proof bounds the first gated `0x36f800` worker path after that owner `+0xf0` route: callback slot `0x3721d0` enters static worker body `0x372210`, runtime packets reach after-prologue worker-entry probe `0x372224`, and the first captured store at `0x372488` equals four captured source `vec4`s multiplied by four captured weight `vec4`s across all four canonical zooms.
+- Follow-up proof bounds row-plan/cache helper activity inside that same route: `0x372210` converts offset/scale doubles to signed 16.16 fixed-point, `0x372500` builds the row-plan/cache struct, captured `0x372760` row-cache stores match the reconstructed 4-tap horizontal `vec4` formula across all four canonical zooms, and fresh first-dispatch row-plan packets capture all four unique worker regions per zoom with only the middle row-cache segment predicted/live in that dispatch.
+- Follow-up full-render row-cache segment census proves leading/trailing `0x372760` store sites are live at `28mm` and `70mm`, while `35mm` and `150mm` have zero leading/trailing hits under the tested canonical bridge HDR runs.
+- This refutes absolute "28mm never runs SAD" language, "`0x3d4842` only" owner-route generalizations, any assumption that exact hot direct-branch / first-hit probe totals are algorithm constants, and any global-dead claim for the installed leading/trailing row-cache loops. It does not close public semantic names for partner-record fields, tuple fields, weights, shaping vectors, the post-square scale vector, row-callback channels / pixel format, owner-cache/direct-render tile surfaces, downstream row-image/final policy after the classified caller/helper/post-route/direct-caller/selected-cache-caller/`0x3e5720`-caller/`0x3d4e10`-caller/`0x3d5400`-executor-route families, the complete candidate predicate, or final acceptance/rejection.
+
+### 2. IRAMP is not a single-anchor function
+
+- `CLM-MERGE-003`
+- On the tested bridge HDR path, IRAMP receives two anchor-side IGs plus a 5-element contributor vector.
+- Static bundle proof ties that live call shape to `PipelineCache+0x238`, `+0x248`, `+0x270`, `+0x258`, `+0x1e8`, and the ROI passed into `processLevel0`.
+- LLDB runtime proof now directly verifies that same `src1`, `src2`, `srcs[5]`, `warps[5]`, scale, and ROI signature on the canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR seed files.
+- That input shape matters because a parity renderer that collapses IRAMP to one anchor plus ad-hoc extras will target the wrong merge topology.
+
+### 3. The direct IRAMP contributor vector identity is known
+
+- `CLM-MERGE-004`
+- On the corrected canonical bridge HDR quartet, the five direct IRAMP contributor source-vector items are `B1..B5` at `28mm` and `35mm`.
+- On the corrected canonical bridge HDR quartet, the five direct IRAMP contributor source-vector items are `C1..C5` at `70mm` and `150mm`.
+- This matters because contributor identity is no longer a free variable for the direct IRAMP vector.
+- This does not close `src1` / `src2` composition or C6 routing.
+
+### 4. The warp-grid is ROI-derived and transformed before block handling
+
+- `CLM-WARP-001`
+- `CLM-WARP-002`
+- `CLM-WARP-003`
+- `0xf540` does allocation/setup, not pair writing.
+- The backing store holds packed int32 `(x, y)` pairs written later at `0x366520..0x366523`.
+- Installed-bundle proof now also shows the first grid is derived from the ROI rect on the 8-pixel lattice, then a second same-sized transformed pair grid is produced before bbox / clipping handling.
+- Installed-bundle proof now also ties the second-grid transform records to the live `PipelineCache+0x258` vector passed into IRAMP and consumed per matching source-vector index.
+- Installed-bundle proof now also gives the consumer-side transform formula: sampled-map-modulated vec4 projection, divide by component 2, `[-8, dim + 7)` acceptance, add `0.5`, and int32 pair write.
+- Installed-bundle proof now also bounds the producer side: `0x3f7040` dispatches same-category and cross-category paths, both converge on `0x25e500`, `0x25e500` writes row fields through `0x25e0c0` and stores the caller-supplied map pointer at `+0x40`, the post-wrapper `initResAmp` insertion path normalizes `+0x48/+0x4c` to `(1.0, 1.0)`, the row producer computes `source_b_product * inverse(source_a_product)`, the immediate source-record constructor / map-provider topology is bounded, `0x23faf0` is bounded as source-record composition, `0x264980` as a two-axis field-shift helper, `0x264460` as a positive two-axis scale helper, `state+0xe0` object resolution is bounded through `0x1be970` / `0xe6ba0`, `0x264270` helper access is bounded through `0xf34e0` CalibStage banks, `0xf3350`, and `0xf3360`, and `state+0x448` is bounded as a keyed tree/control object with a first visible byte-gated insertion loop, first payload-field copies, and later direct payload writes through `+0x80`. Four-zoom runtime proof now binds the tracked post-wrapper map-provider path to cross-category `0x3f72f0`, `UpsampleLayer` vtable address point `0x658eb0`, slot `+0x90 = 0x26b590`, `0x26b590` returning `UpsampleLayer+0x90`, and that return written to `record+0x40`; accepted `28mm`, `35mm`, and `70mm` writer-core probes additionally bind `0x26ac13 -> 0xf340` to the populated `UpsampleLayer+0x90` descriptor copied before provider use. Four-zoom builder probes bind `0x26aa10 -> 0x29ed90 -> 0x2673a0 -> 0x26ac13` as the depth-path builder that turns a previous-layer `+0x90` `2080 x 1560` descriptor into the `4160 x 3120` `UpsampleLayer+0x90` descriptor consumed through `record+0x40`; installed debug strings label that descriptor as `depth_... .dp`.
+- Follow-up four-zoom custody proof binds that previous-layer `2080 x 1560` low-resolution float source descriptor to `StereoLayer<false>` index `5`, mode `8`, tile `1`, descriptor `+0x2a8`, and vtable slot `+0x90 = 0x26fb50` returning `this+0x2a8`; public LRI origin and public semantic name remain open.
+- Installed-bundle proof now also shows the row producer is a structured 4x4 double matrix chain: `0x25ec70` is matrix multiply, and `0x25e0c0` writes output row fields from the final chain result.
+
+### 5. `FusionCacheBayer` is not the bridge HDR merge entry point
+
+- `CLM-MERGE-001`
+- This is a negative fact but still important because it prevents implementation from targeting the wrong subsystem.
+
+### 6. Camera participation follows two archive-validated firing regimes
+
+- `CLM-FIRING-001`
+- Wide tiers (`28mm`, `35mm`) are dominated by `5A+5B`.
+- Tele tiers (`70mm`, `150mm`) are dominated by `5B+6C`.
+- No zoom tier's dominant firing set is `C-only`.
+
+### 7. Focal framing is tiered, not globally 28mm-based
+
+- `CLM-ZOOM-003`
+- `28mm` and `35mm` live on a `28mm` reference tier.
+- `70mm` and `150mm` live on a `70mm` reference tier.
+- Centered internal crop happens before final output rasterization.
+
+### 8. 35mm bridge behavior is not "computational synthesis"
+
+- `CLM-ZOOM-001`
+- The tested bridge behavior is crop-plus-upsample, not the stale synthesis story.
+
+## Merge-Critical Partial Truth
+
+These facts are usable only with their explicit limits.
+
+### 1. `src1` / `src2` are not simple single-camera anchors
+
+- `CLM-PREFUSION-001`
+- They behave like wrappers over a shared upstream callable.
+- Installed-bundle proof now shows the first visible wrapper bodies at `0x3ecc10` and `0x3ecd80` are exclusion anchors, not reducer closure, and already resolve to concrete `PipelineCache` backing fields.
+- LLDB runtime proof now shows the canonical four-zoom bridge HDR quartet all hit the visible `src1`, `src2`, and contributor wrapper bodies at `0x3ecc10`, `0x3ecd80`, and `0x3eced0`.
+- LLDB runtime proof now identifies `PipelineCache+0x8` as a five-entry packed `(int32 width, int32 height)` level-vector header, not an image/composite pointer. `28mm` / `35mm` entry `0` is `10432x7824`; `70mm` / `150mm` entry `0` is `8896x6672`; all four runs use entry `1 = 4160x3120` for the visible `src1` / `src2` wrapper dimension fields.
+- Installed-bundle proof now also bounds the post-wrapper `initResAmp` branch at `0x3eb3c0` to per-key map/vector/record/wrapper construction at `PipelineCache+0x258` and `PipelineCache+0x270`, not exposed merge/reduction math.
+- Installed-bundle proof now also bounds the visible `PipelineCache+0x270` per-key wrapper read path to single-payload ROI/tile processing plus square-root normalization, not exposed merge/reduction math.
+- Installed-bundle proof now also bounds the visible `src1` read path (`0x3ecc10`, `0x3e0af0`, `0x3d01b0`, `0x3edb80`) to map/tree lookup, checked single-source level/ROI tile read, and one-image square-root normalization.
+- Installed-bundle proof now also bounds visible `src1` payload provenance: `PipelineCache+0x170/+0x178` is copied from the caller's `+0x6a8/+0x6b0` shared-ptr-like pair, `0x3dfcc0` builds the first map/tree, and `0x3e2db0 -> 0x3e27a0` constructs the `0x490`-byte payload returned by `0x3e0af0`.
+- LLDB runtime proof now confirms the visible `src1` payload constructor path across the corrected canonical quartet: `0x3dfcc0 -> 0x3e2db0 -> 0x3e27a0` is live, the constructor key is `0` at `28mm` / `35mm` and `8` at `70mm` / `150mm`, the level vector is `(4160,3120)`, `(2080,1560)`, `(1040,780)`, `(520,390)` in all four runs, and the success packet produces the same `0x490` payload family with vtable `0x65f140`, secondary address point `0x65f388`, and payload self-pointer at `+0x68`.
+- LLDB runtime proof now bounds the visible `src1` lookup key across the corrected canonical quartet: key `0` at `28mm` / `35mm`, and key `8` at `70mm` / `150mm`. This is a lookup-key fact, not payload-composition closure.
+- LLDB runtime proof now also bounds the visible `src1` payload family across the corrected canonical quartet: the visible `src1` lookup returns a `0x490` payload family with vtable address point `0x65f140`, while adjacent direct contributor lookups return `0x1f0` payloads with vtable address point `0x65f490`. This proves a payload-family split, not payload-composition closure.
+- Bundle plus LLDB proof now also bounds the payload-internal secondary callable split at `+0x60`: visible `src1` uses address point `0x65f388` with substantive slot `0x3e4a80`, while direct contributors use address point `0x65f4d8` with substantive slot `0x3e78d0`. This proves a secondary-callable split, not payload-composition closure.
+- LLDB runtime proof now confirms the visible `src1` secondary callable body at `0x3e4a80` is live across the corrected canonical quartet; the first captured call-site packet at `0x3e4b09` passed the same `0x490` payload to `0x3e2e90` with `level = 0` in all four runs. This proves live participation and handoff for the first captured tile only, not payload-composition closure.
+- LLDB runtime proof now also ties the first captured worker/projection-record path beneath that handoff to visible `src1` across the corrected canonical quartet: worker and projection packets share the backtrace through `0x3e4b0e <- 0x3d4842`, the worker callback fields are source image / output image / default vector / projection record / weight table, and the first captured projection record loads `payload+0x150` from visible-payload field `+0x170` with callable address point `0x65f188` and slot `+0x30 = 0x3e42e0`. This proves runtime topology for the first captured worker packet, not payload-composition closure; the projection-record index `0` is payload-internal and is not a physical camera id.
+- Installed-bundle proof now decodes `0x3e42e0` as a coordinate-transform body: it reads transform state through callable `+0x8`, computes three row equations over input `(x, y)`, divides by the third row, subtracts center fields, applies a radius-indexed scale table, and writes two output floats. This is projection math, not reducer closure; public field names and LRI calibration origins remain unproven.
+- Installed-bundle proof now also bounds the producer for the fields consumed by `0x3e42e0`: constructor `0x3e27a0` calls dispatcher `0x3f6170`, same-category work routes through `0x3f6200`, cross-category work routes through `0x3f6940`, both converge on `0x145580` / `0x144f50`, and `0x144a70` forces the radius table to `4096` floats. This proves field-pack topology, not `src1` semantic contents or reducer closure.
+- LLDB runtime proof now also bounds that projection field-pack dispatcher boundary across complete canonical bridge HDR runs with `.lris` auto-loading disabled: `0x3f6170`, `0x3f61b8`, `0x3f61ca -> 0x3f6200`, and `0x3f61e1 -> 0x3f6940` are live; observed keys are `0,5..9` at `28mm` / `35mm` and `8,10..14` at `70mm` / `150mm`; tele key `15` is not observed at this boundary. This excludes the tested dispatcher boundary as a positive C6 route, not C6 globally.
+- LLDB runtime proof now bounds the direct payload candidate loop immediately upstream of `0x3e05f5 -> 0x3f6170`: under complete bridge HDR runs with `.lris` auto-loading disabled, the loop visits keys `0..9` at `28mm` / `35mm`, all with `object+0x30 = 1`; it visits keys `5..15` at `70mm` / `150mm`; tele key `15` / C6 has `object+0x30 = 0` and skips before active-pass, class-compare, cross-category, and dispatcher-call sites. This proves one tested C6 filter point, not global C6 non-use or alternate-route closure.
+- LLDB runtime proof now also bounds the stereo-side keyed-record loop inside the `0x3f2c40` constructor branch: under complete bridge HDR runs with `.lris` auto-loading disabled, the loop visits keys `0..9` at `28mm` / `35mm`, all with `object+0x30 = 1`; it visits keys `5..15` at `70mm` / `150mm`; tele key `15` / C6 has `object+0x30 = 0` and skips before the post-gate path and before both tested `0xf2720` getter callsites. This proves a second tested C6 filter point, not global C6 non-use or alternate-route closure.
+- Installed-bundle proof now also bounds the source-image producer topology beneath the visible `src1` `0x3e2e90` worker handoff: keyed helpers `0x1bdc80` / `0x1be750`, vector builder/updater `0x1be270`, ROI/source validator `0x31abd0`, wrappers `0x31af30` / `0x31acf0`, lower producers `0x33ede0` / `0x33f480`, and shared per-source iterator `0x33f180`. This proves source-producer topology and per-source virtual dispatch, not semantic `src1` contents or reducer closure.
+- LLDB runtime proof now bounds that keyed-helper/vector-builder boundary under complete bridge HDR runs with `.lris` auto-loading disabled: `0x1bdc80` and count site `0x1bdcfb` are live across `28mm`, `35mm`, `70mm`, and `150mm`; every summarized invocation saw count `1`; `0x1be750`, helper lazy callsites into `0x1be270`, and direct builder sites `0x1be270` / `0x1be291` / `0x1be2fb` / `0x1be306` had zero hits under the same quartet. Observed tele helper keys were `5..14`, with no key `15`.
+- Gated LLDB runtime proof now bounds the first captured per-source virtual target beneath that visible `src1` source-producer topology across the corrected canonical quartet: the first captured descendant path is `0x3e3279 -> 0x31af30 -> 0x33ede0 -> 0x33f180 -> 0x33f3e8`, with vtable address point `0x65b3c8` and slot `+0x30 = 0x341770`. Static inspection bounds `0x341770` to per-source region-adapter / record-update work, not reducer closure.
+- Follow-up gated LLDB runtime census broadens that lower producer view: after the first visible-`src1` `0x3e4b09` gate, complete bridge HDR runs observed `0x3e3279 -> 0x31af30` at all four zooms, observed `0x33f3e8` and `0x33f94f` at all four zooms, and observed `0x33ffd4` at `28mm` / `35mm` with zero `0x33ffd4` hits at `70mm` / `150mm` under the same tested gated runs. Nonzero virtual-site counts hit a `512` cap, so they are lower bounds and target-family lists are capped-window observations, not exhaustive full-render totals.
+- Installed-bundle static classification now bounds the inspected visible bodies from that capped lower target-family set to thunk / descriptor / region / materialization / cache / executor surfaces. Follow-up runtime/static proof binds the two prior indirect target gaps under the first visible-`src1` gate: `0x342d99` resolves `0x65b948/+0x30 = 0x342b80 -> 0x2eb560`, and `0x3449f0` resolves `0x65c798/+0x30 = 0x345920 -> 0x2f53d0` across the canonical quartet. A further gated runtime/static proof bounds the immediate `0x2f53d0` helper chain to validation, descriptor/vector setup, bilateral-kernel-size dispatch, callback-object dispatch through `0x5440`, and one row-executor dispatch through `0x5670`; `0x3048b0` has zero hits under the accepted gated probes. Follow-up static classification bounds the executor callback bodies under that chain to local descriptor transform / filtering / interpolation / normalization / accumulation surfaces. This does not expose reducer closure, final contributor acceptance/rejection, or public helper-field semantics.
+- Installed-bundle proof now bounds the helper called by `0x341770`: `0x2e8680` validates one source-domain / Bayer-image descriptor, prepares one destination descriptor through `0xf540`, installs callback vtable `0x659fc0`, and dispatches substantive callback slot `0x2e8cc0` through `0x5440`. Static inspection bounds `0x2e8cc0` to one-source 16-bit SIMD region/pixel work, not reducer, final blend, C6 routing, or acceptance closure.
+- LLDB runtime proof now bounds the visible `src2` hot path across the corrected canonical quartet to a tiered `PipelineCache+0x1e0` resample-state object. Repo-local static proof further bounds `0x3ecd80 -> 0x3ebb80 -> 0x3edb80` to descriptor/state/executor orchestration plus one-image normalization. Follow-up runtime/static proof binds the accepted visible-`src2` executor gate callback slot across the quartet as address point `0x65f7e8`, slot `+0x30 = 0x3ed2e0`; static inspection classifies `0x3ed2e0` as one-source descriptor resampling/materialization using projection/radial state, radial and coefficient tables, 4x4 SIMD sampling/clamping, and 16-byte vector output. All four canonical seeds now prove accepted gate, accepted dispatch through `0x5d94`, worker entry at `0x3ed2e0`, and completed `10432x7824` HDR output. Follow-up runtime/static proof also bounds callback `+0x08` source-descriptor custody across the canonical quartet: `rbp-0x2200` is installed into callback `+0x08`, and the accepted producer is `PipelineCache+0x1d8` vtable slot `+0x18 = 0x406a10`. Complete-render runtime proof further bounds the branch/helper inside `0x406a10`: `28mm` / `35mm` use object byte `+0x18 = 1` and `0x40721b -> 0x31b110`, while `70mm` / `150mm` use object byte `+0x18 = 0` and `0x407458 -> 0x31acf0`; prior classifications make those source adapter / validation-wrapper surfaces. Follow-up constructor-origin and scan-loop proofs now bind that byte to `PipelineCache` construction through `0x3eab4c -> 0x406960 -> 0x4064c0 -> 0x402d20`: `28mm` / `35mm` accept key `1` as the first target-normalized record with sign-bit fields `+0x58/+0x5c = (-1,-1)`, while `70mm` / `150mm` preserve sentinel `16` because no target-normalized record has a sign-bit pair. Static follow-up proves `0xf6c60` maps camera IDs `0..4`, `5..9`, and `10..15` to group ordinals, and `0xf2770` constructs item `+0x60` plus the two-int `+0x58/+0x5c` pair. Tele key `15` carries `(-1,-1)` and `object+0x30 = 0`, but is not target-normalized for this predicate. This is visible wrapper/state/executor/source-descriptor/constructor-flag plumbing, not payload-composition or merge/reducer closure.
+- Installed-bundle proof now also bounds the first visible payload runtime surfaces beneath that constructor: `0x3e53a0` / `0x3e54c0` are destructors, `0x3d0120` / `0x3e55f0` are callable-slot helpers, `0x3e2dc0` / `0x40b370` / `0x40b330` are setup/config work, and `0x3e2e90` / `0x3e3f90` are single-level ROI/process helpers rather than exposed merge/reduction math.
+- Follow-up installed-bundle proof bounds the deeper `0x3e2e90` callback worker too: address point `0x65f408` has slot `+0x30 = 0x3e4c50`, and `0x3e4c50` is a row/range worker that projects each output sample through one callable, samples one source image/cache buffer through a 4x4 SIMD neighborhood and 64-entry cubic table, then writes one `vec4f` output per sample.
+- Follow-up installed-bundle proof also bounds the owner cache-selection layer: the owner builds `+0x6a8/+0x6b0`, constructs `+0x688/+0x690` through `0x3eaf00 -> 0x3ea7d0` using `&owner+0x6a8` and `&owner+0x678`, selects `owner+0x688` or `owner+0x6b8` at `0x3b0740`, and dispatches the selected cache through `0x3d0650` one-cache level/ROI read and rescale work rather than exposed merge/reduction math.
+- Follow-up installed-bundle proof also bounds the owner alternate-cache/setup surface: optional `+0x698/+0x6a0` is constructed through `0x3d8b70 -> 0x3d8780` from `+0x6a8` and `+0x678`, `+0x6b8/+0x6c0` is constructed through `0x3f06f0 -> 0x3f04d0` from `+0x688`, `+0x698`, and a `0x18`-byte state block, and the inspected bodies are setup/callback/cache-construction surfaces rather than exposed merge/reduction math.
+- Follow-up installed-bundle proof also bounds the visible `+0x678/+0x680` constructor and immediate runtime surfaces: `0x3f2c40` completes through keyed-record construction, six descriptor/layer seeds, `this+0x280` helper construction, and bitset storage; `0x3f75e0`, `0x3f7a40`, `0x3f7b20`, `0x3f7c00`, and `0x3f7ec0` are stop/cleanup, level-gate, callable-slot, byte-count, and record/buffer-materialization surfaces rather than closure of the exact pre-fusion merge/reduction mechanism.
+- Follow-up installed-bundle proof also bounds the selected `+0x40` and `+0x90` layer virtual targets reached from that branch to direct setters/accessors, bounds `0x3f8b30` as a consumer/writer of `0x3f7ec0` materialized record/buffer output, and previously located the `StereoLayer<false>::runPass(int)` action path at `0x276790 -> 0x276860 / 0x277e70`.
+- Follow-up installed-bundle plus LLDB runtime proof now bounds that `StereoLayer<false>::runPass(int)` action path further: `0x276790` dispatches on `layer+0xc`; both worker bodies route through `0x275630` into `0x2730c0` / `0x2732f0`; `0x275630` is a per-tile state builder; `0x2732f0` is a projection/sampling cost body; and the canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR quartet all reached `0x276790 -> 0x276860 -> 0x275630 -> 0x2732f0` with sampled `layer+0xc == 8`. The scoped zero-hit result for `0x277e70` and `0x2730c0` applies only to those tested full renders.
+- Follow-up installed-bundle plus LLDB runtime proof also bounds the sampled prefusion callable gate: `state+0x220` is an inline `state+0x200` callable; constructor vtable `0x6673f0` slot `+0x30` is false-return `0x230220`; and four-zoom bridge HDR runtime samples at the gate sites used vtable `0x66b0f0`, false-return slot `0x230640`.
+- Installed-bundle proof also now exposes a concrete upstream `CalibDataProcessor::State()` `operator()` family above that wrapper layer; the last higher-group `operator()` slot is `0x247390`, not `0x247380`.
+- The representative inspected `State()` bodies in that family are state-materializers over lookup / pair-list / bitset helpers, not direct reducer closure.
+- Installed-bundle proof now also bounds the first post-`State()` helper chain (`0x224cc0`, `0x224d70`, `0x242a80`, `0x258ea0`, `0x258f00`, `0x242d00`, `0x242dc0`, `0x243770`, `0x243870`) to setup/copy/reset work, and pushes the next deeper candidate boundary to the first heavier downstream consumers `0x244560` and `0x245a40`.
+- Installed-bundle proof now further shows those two heavy consumers are still feature / pyramid / candidate state surfaces with explicit pyramid and feature-size guards, not exposed direct multi-camera pixel-blend loops.
+- Installed-bundle proof now further bounds the next deeper dispatcher / selector layer too: `0x248580`, `0x248960`, and `0x2481a0` all feed a shared gate at `0x2439b0`, and `0x2439b0` plus `0x241fd0` / `0x2416d0` still only count and relabel 0x2c-stride records while gating installed blocks.
+- Installed-bundle proof now further bounds the next selector-helper tranche too: `0x249020` is only selection-index permutation, `0x247900` is only 32-bit vector copy / growth, `0x249410` only materializes repeated 24-byte bitset entries, and the visible continuation of `0x2416d0` after those helpers is still bitset-driven record promotion rather than exposed reducer math.
+- Follow-up bundle proof now also shows the callback object that `0x2416d0` installs before executor dispatch is not a fresh unknown worker: it uses vtable address point `0x6589e0`, i.e. the already-verified `runHigherGroupCams::$_12` family whose substantive `+0x30` slot is `0x247390`, already bounded as thresholded coordinate/bitset state.
+- Installed-bundle proof now also bounds the candidate block-geometry helper family (`0x25c990`, `0x25ca70`, `0x25d090`, `0x25d2a0`, `0x25d4d0`) to coordinate delta/scale, geometry predicate, active-block coordinate-pair propagation/validation, descriptor build, and int-pair vector copy work.
+- Installed-bundle proof now also bounds the visible feature-selection lane (`0x258fe0`, `0x2598a0`, `0x259b40`, `0x25a010`, `0x25a360`, `0x25ab50`) to feature / pyramid / candidate-record generation, candidate suppression, and scaled coordinate-output support.
+- Installed-bundle plus LLDB runtime proof now also bounds the downstream candidate-scoring family: under the corrected canonical four-zoom bridge HDR quartet, `28mm` and true-`35mm` hit the `0x24c320` entry and not `0x24d610`, while `70mm` and `150mm` hit the `0x24d610` entry and not `0x24c320`. Static proof shows both entry bodies consume `0x24`-stride candidate records, perform bounds / projection / local SIMD patch scoring, and write `0x2c`-stride candidate-result or sentinel records; helpers `0x24cf90`, `0x24e070`, and `0x24e350` are local patch/search scorers.
+- This matters because the exact behavior behind `src1` / `src2` is still unresolved before IRAMP sees the contributor vector.
+
+### 2. Tele-tier odd-camera routing is still incomplete
+
+- `CLM-C6-001`
+- C6 fires in the tested `70mm` and `150mm` tele LRIs.
+- C6 is absent from the directly observed five-item IRAMP contributor vector at `70mm` and `150mm`.
+- The tested visible-`src1` keyed helper / vector-builder boundary at `0x1bdc80` / `0x1be750` / `0x1be270` is not a positive C6 route under complete canonical bridge HDR runs; tele keys observed there were `5..14`, with no key `15`.
+- The tested visible-`src1` projection field-pack dispatcher boundary at `0x3f6170` / `0x3f6200` / `0x3f6940` is also not a positive C6 route under complete canonical bridge HDR runs; tele keys observed there were `8,10..14`, with no key `15`.
+- The direct payload candidate loop immediately upstream of the dispatcher sees key `15` at both tele tiers, but runtime proof shows `object+0x30 = 0`; key `15` skips before class compare and before the `0x3e05f5 -> 0x3f6170` dispatcher call.
+- The stereo-side keyed-record loop inside `0x3f2c40` also sees key `15` at both tele tiers, but runtime proof shows `object+0x30 = 0`; key `15` skips before both tested `0xf2720` getter callsites.
+- Exact alternate routing outside these tested direct and stereo-side loops remains unresolved.
+
+### 3. 150mm tele behavior is not yet canonical enough
+
+- `CLM-ZOOM-002`
+- The corpus currently sides with `5B + 6C`, but the claim still needs a dedicated canonical proof path, not only rescue from contradiction audits.
+
+### 4. Missing-CCM cameras are real, but their exact routing is still incomplete
+
+- `CLM-CCM-001`
+- A2 and C6 are missing from Block 6 CCM coverage and the dispatcher filters missing-CCM cameras on the tested paths.
+- That is safe as a negative fact.
+- It is not yet enough to close where those cameras ultimately contribute downstream.
+
+## Zoom Coverage Matrix
+
+This table is the quick gate for whether parity work may safely generalize a merge-critical claim.
+
+| Topic | 28mm | 35mm | 70mm | 150mm | Use In Spec? |
+|---|---|---|---|---|---|
+| IRAMP weighted accumulator exists | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Yes |
+| IRAMP tested signature = 2 anchor IGs + 5 contributor IGs | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Yes |
+| direct IRAMP contributor identity | `B1..B5` | `B1..B5` | `C1..C5` | `C1..C5` | Yes, direct vector only |
+| visible `src1` payload constructor path and level vector | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Structural only |
+| visible `src1` payload family vs direct contributor payload family | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Structural only |
+| visible `src1` secondary callable vs direct contributor secondary callable | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Structural only |
+| visible `src1` secondary callable live handoff to `0x3e2e90` | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | First captured tile only |
+| visible `src1` worker/projection-record handoff to `0x3e4c50` / `0x3e42e0` | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | First captured worker packet only |
+| `0x3e42e0` projection callable coordinate-transform formula | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | Structural/math only |
+| `0x3e42e0` projection field-pack producer | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | Structural/source-topology only |
+| `0x3f6170` projection field dispatcher key boundary | keys `0,5..9`; no C6 scope | keys `0,5..9`; no C6 scope | keys `8,10..14`; no `15` | keys `8,10..14`; no `15` | Complete bridge HDR runs, `.lris` auto-load disabled |
+| direct payload candidate gate before `0x3e05f5 -> 0x3f6170` | keys `0..9`; all `object+0x30 = 1`; dispatcher keys `5..9` | keys `0..9`; all `object+0x30 = 1`; dispatcher keys `5..9` | keys `5..15`; key `15` has `object+0x30 = 0`; dispatcher keys `10..14` | keys `5..15`; key `15` has `object+0x30 = 0`; dispatcher keys `10..14` | Tested C6 filter point only; not global C6 non-use |
+| stereo-side keyed-record gate inside `0x3f2c40` | keys `0..9`; all `object+0x30 = 1`; getter keys `0..9` | keys `0..9`; all `object+0x30 = 1`; getter keys `0..9` | keys `5..15`; key `15` has `object+0x30 = 0`; getter keys `5..14` | keys `5..15`; key `15` has `object+0x30 = 0`; getter keys `5..14` | Tested C6 filter point only; not global C6 non-use |
+| visible `src1` source-image producer topology beneath `0x3e2e90` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | Structural/dispatch only |
+| visible `src1` keyed helper / vector-builder boundary | `0x1bdc80 live; 0x1be750/0x1be270 zero-hit` | `0x1bdc80 live; 0x1be750/0x1be270 zero-hit` | `0x1bdc80 live; 0x1be750/0x1be270 zero-hit; keys 5..14 no 15` | `0x1bdc80 live; 0x1be750/0x1be270 zero-hit; keys 5..14 no 15` | Complete bridge HDR runs, `.lris` auto-load disabled |
+| visible `src1` source-producer first per-source virtual target `0x65b3c8/+0x30 = 0x341770` | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | First captured gated descendant; record-update only |
+| visible `src1` gated lower virtual census: `0x33f3e8` / `0x33f94f` | `>=512 capped hits each` | `>=512 capped hits each` | `>=512 capped hits each` | `>=512 capped hits each` | Capped lower-bound dispatch only |
+| visible `src1` gated lower virtual census: `0x33ffd4` | `>=512 capped hits` | `>=512 capped hits` | `0 hits under tested gated run` | `0 hits under tested gated run` | Scoped runtime census only |
+| visible `src1` capped target-family visible-body classification plus bound `0x342ca0` / `0x344470` indirect targets | `STATIC/RUNTIME_BOUND` | `STATIC/RUNTIME_BOUND` | `STATIC/RUNTIME_BOUND` | `STATIC/RUNTIME_BOUND` | Prep/materialization and helper-dispatch exclusion only; not reducer closure |
+| `0x341770` helper `0x2e8680` / callback `0x2e8cc0` | `STATIC_BOUND` | `STATIC_BOUND` | `STATIC_BOUND` | `STATIC_BOUND` | One-source Bayer/RAW region helper only |
+| `0xf540` is alloc/setup, not pair writer | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | Yes |
+| int32 pair-grid writer at `0x366520..0x366523` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | Yes |
+| ROI-derived first pair grid -> transformed second pair grid | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | `VERIFIED_SAME_MECHANISM` | Yes, structural only |
+| `FusionCacheBayer` is not the bridge merge entry | `VERIFIED` | `OPEN` | `PARTIAL` | `OPEN` | Negative-only, scope-bound |
+| Wide/tele firing regimes | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Yes |
+| Tiered focal reference and internal crop | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Yes |
+| 35mm bridge crop-plus-upsample | `VERIFIED` | `VERIFIED` | `OPEN` | `OPEN` | Yes, bridge-path only |
+| Missing-CCM coverage / dispatcher filter | `VERIFIED` | `OPEN` | `VERIFIED` | `OPEN` | Negative-only, routing caveat |
+| owner `+0xf0` expansion handoff at `0x3d502e` | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Structural only; next route covered separately |
+| owner `+0xf0` expansion destination context | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Structural only; first selected-cache route covered separately |
+| first owner `+0xf0` read/rescale route to `0x36f800` | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | First captured route only; first weighted store covered separately |
+| first-owner `+0xf0` branch census | `0x3d4842 + 0x3d4864` | `0x3d4842 only` | `0x3d4842 + 0x3d4864` | `0x3d4842 + 0x3d4864` | First captured owner only; all accepted packets still return to `0x3d084d` |
+| first direct-branch post-route to `0x36f800` | `VERIFIED` | `NO_DIRECT_BRANCH_OBSERVED` | `VERIFIED` | `VERIFIED` | First owner-matching direct branch only |
+| global read-context branch-site caller/slot census | `3 callers / 2 slots` | `3 callers / 2 slots` | `3 callers / 2 slots` | `3 callers / 2 slots` | Complete render census at `0x3d4842` / `0x3d4864`; post-route classification covered separately |
+| global read-context post-route family classification | `3 families` | `3 families` | `3 families` | `3 families` | Exact-size cleanup, owner-cache `0x36f800`, visible-`src1` `0x3edb80`; final policy still open |
+| first owner `+0xf0` `0x36f800` weighted store | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | First captured store only; helper store covered separately |
+| first owner `+0xf0` `0x36f800` helper row-cache / row-plan coverage | `VERIFIED` | `VERIFIED` | `VERIFIED` | `VERIFIED` | Captured helper formula plus first-dispatch row-plan coverage; full-render leading/trailing live at `28mm`/`70mm`, zero-hit at `35mm`/`150mm`; final policy open |
+| exact `src1` / `src2` pre-fusion reducer | `OPEN` | `OPEN` | `OPEN` | `OPEN` | No |
+| exact C6 routing | `N/A` | `N/A` | `PARTIAL` | `PARTIAL` | No |
+
+## Current Rule For Implementation
+
+Safe to code now:
+
+- proven helper behavior
+- proven accumulator math
+- proven direct IRAMP contributor-vector identity
+- proven negative architecture exclusions
+- archive-verified wide/tele firing topology
+- tiered crop/framing behavior
+- proven 35mm bridge framing behavior
+
+Not safe to freeze into a parity renderer yet:
+
+- exact anchor pre-fusion reducer
+- remaining producer-side row/map calibration semantics over the ROI-derived dst-coordinate lattice
+- exact full merge topology
+- tele odd-camera routing
+- any merge-critical assumption generalized to 35mm or 150mm without proof

@@ -1,0 +1,13 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/src2_executor_target/src2_executor_target_probe.py
+script src2_executor_target_probe.reset("70mm visible src2 executor dynamic hardware worker target L16_03434 2019-05-18", capture_worker=True, dynamic_dispatch=True, dynamic_dispatch_sites=[0x5D94], dynamic_worker=True, stop_after_worker=True)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src2_executor_target
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+
+breakpoint set -H --shlib libcp.dylib --address 0x3ec462
+
+script src2_executor_target_probe.install_callbacks(lldb.debugger, {"gate": 1})
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src2_executor_target/src2_executor_target_70mm_hwworker.hdr" --profile 3 --export-fmt 3
+script src2_executor_target_probe.continue_if_no_worker_entry(lldb.debugger)
+script src2_executor_target_probe.report()
+quit

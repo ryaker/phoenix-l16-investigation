@@ -1,0 +1,34 @@
+target create /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+
+# Visible src2 wrapper, hot state body, final normalization, and constructor
+# state initializer used by PipelineCache+0x1e0.
+image lookup -a 0x3ecd80
+image lookup -a 0x3ebb80
+image lookup -a 0x3edb80
+image lookup -a 0x1449f0
+image lookup -a 0x5440
+image lookup -a 0x2d30
+image lookup -a 0x5cd0
+image lookup -a 0x429160
+image lookup -a 0x429190
+image lookup -a 0x428db0
+image lookup -a 0x428dc0
+image lookup -a 0x428fe0
+
+disassemble --start-address 0x3ecd80 --end-address 0x3ece10
+disassemble --start-address 0x3ebb80 --end-address 0x3ec780
+disassemble --start-address 0x3edb80 --end-address 0x3edf80
+disassemble --start-address 0x1449f0 --end-address 0x144b80
+disassemble --start-address 0x5440 --end-address 0x5668
+disassemble --start-address 0x2d30 --end-address 0x2e80
+
+# Callback object installed by 0x3ebb80 at libcp+0x3ec410.
+memory read --format x --size 8 --count 10 0x6607e8
+memory read --format x --size 8 --count 8 0x660820
+disassemble --start-address 0x428db0 --end-address 0x429220
+
+# Generic tiled wrapper installed by 0x5440 at libcp+0x5553.
+memory read --format x --size 8 --count 12 0x650290
+disassemble --start-address 0x5bf0 --end-address 0x5e30
+
+quit

@@ -1,0 +1,13 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/owner_f0_resample_36f800/owner_f0_resample_36f800_probe.py
+script owner_f0_resample_36f800_probe.reset()
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/owner_f0_resample_36f800
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3ecac3
+script owner_f0_resample_36f800_probe.attach_setup_breakpoint(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/owner_f0_resample_36f800/owner_f0_resample_35mm.hdr" --profile 3 --export-fmt 3
+script owner_f0_resample_36f800_probe.drive_until_return_or_exit(lldb.debugger)
+script owner_f0_resample_36f800_probe.write_report("35mm owner+0xf0 selected-cache 0x36f800 resample L16_03041 2018-12-26", "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/owner_f0_resample_36f800/owner_f0_resample_35mm.json")
+script owner_f0_resample_36f800_probe.report("35mm owner+0xf0 selected-cache 0x36f800 resample L16_03041 2018-12-26")
+quit

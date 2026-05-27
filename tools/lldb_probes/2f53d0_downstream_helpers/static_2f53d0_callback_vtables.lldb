@@ -1,0 +1,62 @@
+target create /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+
+# Generic executor dispatch helpers used by the inspected callback objects.
+image lookup -a 0x5440
+image lookup -a 0x5670
+disassemble --start-address 0x5440 --end-address 0x56d0
+disassemble --start-address 0x5670 --end-address 0x58e0
+
+# Callback vtable/address-point memory. Slot +0x30 is the substantive worker
+# entry used by the generic callback dispatch shape in this bundle family.
+memory read --format x --size 8 --count 10 0x65a450
+memory read --format x --size 8 --count 10 0x65a4e0
+memory read --format x --size 8 --count 10 0x65a568
+memory read --format x --size 8 --count 10 0x65a5e8
+memory read --format x --size 8 --count 10 0x65a668
+memory read --format x --size 8 --count 10 0x65a6e8
+memory read --format x --size 8 --count 10 0x65a768
+memory read --format x --size 8 --count 10 0x65a7e8
+memory read --format x --size 8 --count 10 0x65a868
+memory read --format x --size 8 --count 10 0x65ab80
+memory read --format x --size 8 --count 10 0x665268
+memory read --format x --size 8 --count 10 0x652948
+memory read --format x --size 8 --count 10 0x668920
+memory read --format x --size 8 --count 10 0x6689a8
+
+# 0x2f4470 callback family.
+image lookup -a 0x2f5fa0
+disassemble --start-address 0x2f5ef0 --end-address 0x2f6420
+
+# 0x2f6420 bilateral-kernel-size callback families selected by its switch.
+image lookup -a 0x2f6ad0
+image lookup -a 0x2f78e0
+image lookup -a 0x2f87e0
+image lookup -a 0x2f97e0
+image lookup -a 0x2fa5d0
+image lookup -a 0x2fb320
+image lookup -a 0x2fc140
+image lookup -a 0x2fd070
+disassemble --start-address 0x2f6a30 --end-address 0x2fdce0
+
+# 0x3048b0 callback family. This caller had zero hits under accepted gated
+# four-zoom runtime probes; this dump is static-only.
+image lookup -a 0x304b10
+disassemble --start-address 0x304a50 --end-address 0x3066d0
+
+# 0x135d0 callback family.
+image lookup -a 0x16e30
+image lookup -a 0x16e70
+disassemble --start-address 0x16d90 --end-address 0x17740
+
+# 0xab590 callback family.
+image lookup -a 0xbfa20
+disassemble --start-address 0xbf980 --end-address 0xbfb50
+
+# 0x3066d0 callback family and final row-executor callback family.
+image lookup -a 0x3070a0
+image lookup -a 0x3070e0
+image lookup -a 0x307d90
+disassemble --start-address 0x306fd0 --end-address 0x307d00
+disassemble --start-address 0x307cf0 --end-address 0x307ef0
+
+quit

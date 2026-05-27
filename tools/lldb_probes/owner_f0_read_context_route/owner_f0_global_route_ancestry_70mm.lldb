@@ -1,0 +1,12 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/owner_f0_read_context_route/owner_f0_route_census_probe.py
+script owner_f0_route_census_probe.reset_global_route_census(64)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/owner_f0_read_context_route
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x3d4842
+breakpoint set --shlib libcp.dylib --address 0x3d4864
+script owner_f0_route_census_probe.attach_global_route_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/owner_f0_read_context_route/owner_f0_global_route_ancestry_70mm.hdr" --profile 3 --export-fmt 3
+script owner_f0_route_census_probe.drive_until_global_route_exit(lldb.debugger, 256)
+script owner_f0_route_census_probe.global_route_write_report("70mm global read-context branch ancestry L16_03434 2019-05-18", "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/owner_f0_read_context_route/owner_f0_global_route_ancestry_70mm.json", lldb.debugger)
+quit

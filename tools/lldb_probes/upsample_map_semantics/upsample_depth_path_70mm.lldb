@@ -1,0 +1,20 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/upsample_map_custody/upsample_map_custody_probe.py
+script upsample_map_custody_probe.reset("70mm L16_03434 UpsampleLayer depth-path builder", 128, 96)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/upsample_map_semantics
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26aa10
+breakpoint set --shlib libcp.dylib --address 0x26aa30
+breakpoint set --shlib libcp.dylib --address 0x26aa39
+breakpoint set --shlib libcp.dylib --address 0x26abe9
+breakpoint set --shlib libcp.dylib --address 0x26abee
+breakpoint set --shlib libcp.dylib --address 0x26abfc
+breakpoint set --shlib libcp.dylib --address 0x26ac13
+breakpoint set --shlib libcp.dylib --address 0x26ac18
+script upsample_map_custody_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/upsample_map_semantics/upsample_depth_path_70mm.hdr" --profile 3 --export-fmt 3
+script upsample_map_custody_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script upsample_map_custody_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/upsample_map_semantics/upsample_depth_path_70mm.json")
+script upsample_map_custody_probe.report(lldb.debugger)
+quit

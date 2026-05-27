@@ -36,8 +36,8 @@
 //   GDepth:Format="RangeInverse") in a DNG container.  Requires a
 //   matching .lris file (Light's state file, written by Lumen).
 //   Load it via Renderer::deserialize(stream, StateType(0)) BEFORE render().
-//   The tool auto-detects a same-named .lris alongside the .lri, or
-//   you can specify --lris <path>.
+//   The tool auto-detects a same-named .lris alongside the .lri unless
+//   --no-auto-lris is passed, or you can specify --lris <path>.
 //
 // ── Build ──
 //   See build.sh in the same directory.
@@ -431,6 +431,8 @@ int main(int argc, char* argv[])
             "  --export-fmt N       Output format: 0=JPEG 1=PPM 2=TIFF 3=HDR 4=DNG (default 3)\n"
             "  --lris <path>        Explicit .lris state file path (required for --export-fmt 4)\n"
             "                       Auto-detected if <input>.lris exists beside the .lri\n"
+            "  --no-auto-lris      Do not auto-detect a same-named .lris sidecar\n"
+            "  --no-lris           Do not load any .lris state, explicit or auto-detected\n"
             "  --write-lris <path>  Serialize render state (depth) to .lris after render\n"
             "\n"
             "DirectRenderer fallback (faster, lower quality):\n"
@@ -453,6 +455,8 @@ int main(int argc, char* argv[])
     bool        write_tiff_  = true;
     const char* lris_path       = nullptr; // explicit .lris path (or auto-detected)
     const char* write_lris_path = nullptr; // path to serialize fresh render state
+    bool        auto_lris       = true;
+    bool        disable_lris    = false;
 
     for (int i = 3; i < argc; i++) {
         if (strcmp(argv[i], "--profile") == 0 && i+1 < argc)
@@ -467,14 +471,24 @@ int main(int argc, char* argv[])
             write_tiff_ = false;
         else if (strcmp(argv[i], "--lris") == 0 && i+1 < argc)
             lris_path = argv[++i];
+        else if (strcmp(argv[i], "--no-auto-lris") == 0)
+            auto_lris = false;
+        else if (strcmp(argv[i], "--no-lris") == 0) {
+            auto_lris = false;
+            disable_lris = true;
+            lris_path = nullptr;
+        }
         else if (strcmp(argv[i], "--write-lris") == 0 && i+1 < argc)
             write_lris_path = argv[++i];
     }
 
+    if (disable_lris)
+        lris_path = nullptr;
+
     // Auto-detect .lris if output extension is .dng and no explicit --lris given.
     // Also auto-detect if a same-named .lris exists alongside the .lri.
     std::string auto_lris_path;
-    if (!lris_path) {
+    if (!lris_path && auto_lris) {
         // Build candidate: replace .lri extension with .lris
         std::string inp(input_path);
         std::string candidate;

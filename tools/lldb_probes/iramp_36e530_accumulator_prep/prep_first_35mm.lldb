@@ -1,0 +1,10 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/iramp_36e530_accumulator_prep/prep_probe.py
+script prep_probe.reset()
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_36e530_accumulator_prep
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x369f80
+breakpoint command add 1 -s python -o "prep_probe.hit(frame, bp_loc, internal_dict)"
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_36e530_accumulator_prep/prep_first_35mm.hdr" --profile 3 --export-fmt 3
+script prep_probe.report("35mm L16_03041 2018-12-26")
+quit

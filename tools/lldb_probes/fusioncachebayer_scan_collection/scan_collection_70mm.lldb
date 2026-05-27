@@ -1,0 +1,19 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/fusioncachebayer_scan_collection/scan_collection_probe.py
+script scan_collection_probe.reset("70mm FusionCacheBayer scan collection L16_03434 2019-05-18")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/fusioncachebayer_scan_collection
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+
+breakpoint set --shlib libcp.dylib --address 0x3eab4c
+breakpoint set --shlib libcp.dylib --address 0x402de0
+breakpoint set --shlib libcp.dylib --address 0x402e10
+breakpoint set --shlib libcp.dylib --address 0x402e25
+breakpoint set --shlib libcp.dylib --address 0x402e35
+breakpoint set --shlib libcp.dylib --address 0x402e42
+breakpoint set --shlib libcp.dylib --address 0x402e6a
+breakpoint set --shlib libcp.dylib --address 0x402e78
+
+script scan_collection_probe.install_callbacks(lldb.debugger, {"constructor_call": 1, "record_start": 2, "normalized_compare": 3, "field_or": 4, "accept_first": 5, "accept_additional": 6, "loop_end": 7, "flag_write": 8})
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/fusioncachebayer_scan_collection/scan_collection_70mm.hdr" --profile 3 --export-fmt 3
+script scan_collection_probe.report_to_file("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/fusioncachebayer_scan_collection/scan_collection_70mm.json")
+quit

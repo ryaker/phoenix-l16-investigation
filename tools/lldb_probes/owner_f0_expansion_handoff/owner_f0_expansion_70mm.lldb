@@ -1,0 +1,11 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/owner_f0_expansion_handoff/owner_f0_expansion_handoff_probe.py
+script owner_f0_expansion_handoff_probe.reset()
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/owner_f0_expansion_handoff
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x3ecac3
+script owner_f0_expansion_handoff_probe.attach_setup_breakpoint(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/owner_f0_expansion_handoff/owner_f0_expansion_70mm.hdr" --profile 3 --export-fmt 3
+script owner_f0_expansion_handoff_probe.continue_if_no_handoff(lldb.debugger)
+script owner_f0_expansion_handoff_probe.report("70mm owner+0xf0 expansion handoff L16_03434 2019-05-18")
+quit

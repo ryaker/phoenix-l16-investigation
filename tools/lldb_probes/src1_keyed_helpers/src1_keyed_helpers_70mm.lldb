@@ -1,0 +1,19 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/src1_keyed_helpers/src1_keyed_helpers_probe.py
+script src1_keyed_helpers_probe.reset("70mm L16_03434 src1 keyed helpers", 1024, 160)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_keyed_helpers
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x1bdc80
+breakpoint set --shlib libcp.dylib --address 0x1bdcfb
+breakpoint set --shlib libcp.dylib --address 0x1bde2b
+breakpoint set --shlib libcp.dylib --address 0x1bde5e
+breakpoint set --shlib libcp.dylib --address 0x1be750
+breakpoint set --shlib libcp.dylib --address 0x1be770
+breakpoint set --shlib libcp.dylib --address 0x1be7ff
+breakpoint set --shlib libcp.dylib --address 0x1be82e
+script src1_keyed_helpers_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_keyed_helpers/src1_keyed_helpers_70mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script src1_keyed_helpers_probe.drive_until_exit_or_step_cap(lldb.debugger, 24000)
+script src1_keyed_helpers_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_keyed_helpers/src1_keyed_helpers_70mm.json")
+quit

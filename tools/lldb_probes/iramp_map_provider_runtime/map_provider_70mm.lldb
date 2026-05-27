@@ -1,0 +1,20 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/iramp_map_provider_runtime/map_provider_probe.py
+script map_provider_probe.reset("70mm L16_03434 IRAMP map-provider runtime", 128, 64)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_map_provider_runtime
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3f7040
+breakpoint set --shlib libcp.dylib --address 0x3f719d
+breakpoint set --shlib libcp.dylib --address 0x3f71a2
+breakpoint set --shlib libcp.dylib --address 0x3f71bb
+breakpoint set --shlib libcp.dylib --address 0x3f7480
+breakpoint set --shlib libcp.dylib --address 0x3f7485
+breakpoint set --shlib libcp.dylib --address 0x3f749e
+breakpoint set --shlib libcp.dylib --address 0x26848f
+script map_provider_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_map_provider_runtime/map_provider_70mm.hdr" --profile 3 --export-fmt 3
+script map_provider_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script map_provider_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_map_provider_runtime/map_provider_70mm.json")
+script map_provider_probe.report(lldb.debugger)
+quit

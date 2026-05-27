@@ -1,0 +1,23 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/2f53d0_downstream_helpers/helper_liveness_probe.py
+script helper_liveness_probe.reset("28mm L16_02130 0x2f53d0 downstream helper liveness", 128, 64)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/2f53d0_downstream_helpers
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3e4b09
+breakpoint set --shlib libcp.dylib --address 0x2f53d0
+breakpoint set --shlib libcp.dylib --address 0x2f55bb
+breakpoint set --shlib libcp.dylib --address 0x2f5679
+breakpoint set --shlib libcp.dylib --address 0x2f59a1
+breakpoint set --shlib libcp.dylib --address 0x2f59d4
+breakpoint set --shlib libcp.dylib --address 0x2f5acc
+breakpoint set --shlib libcp.dylib --address 0x2f5afe
+breakpoint set --shlib libcp.dylib --address 0x2f5b2c
+breakpoint set --shlib libcp.dylib --address 0x2f5bcb
+breakpoint set --shlib libcp.dylib --address 0x2f5c84
+script helper_liveness_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/2f53d0_downstream_helpers/helper_liveness_28mm.hdr" --profile 3 --export-fmt 3
+script helper_liveness_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script helper_liveness_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/2f53d0_downstream_helpers/helper_liveness_28mm.json")
+script helper_liveness_probe.report(lldb.debugger)
+quit

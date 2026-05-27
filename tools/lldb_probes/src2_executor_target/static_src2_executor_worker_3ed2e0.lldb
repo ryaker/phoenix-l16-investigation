@@ -1,0 +1,12 @@
+settings set target.load-cwd-lldbinit false
+target create /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+
+image lookup -a 0x3ed2e0
+image lookup -a 0x65f7e8
+memory read --format x --size 8 --count 12 0x65f7e8
+memory read --format f --size 4 --count 2 0x5a8124
+memory read --format f --size 4 --count 1 0x5d6368
+memory read --format f --size 4 --count 4 0x5d9a20
+disassemble --start-address 0x3ed2e0 --end-address 0x3edb80
+
+quit

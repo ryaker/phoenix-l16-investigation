@@ -35,6 +35,7 @@ __pycache__/
 # LLDB per-run output
 *.lldb.out
 /tmp/
+runs/
 
 # macOS
 .DS_Store
@@ -47,6 +48,7 @@ __pycache__/
 
 # Broken/private-pointing symlinks that shouldn't ship in OSS
 Lumen
+L16_Lumen_ReverseEngineering
 
 # Claude / agent tool artifacts
 .claude/

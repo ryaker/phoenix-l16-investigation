@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/src2_406a10_branch/src2_406a10_branch_probe.py
+script src2_406a10_branch_probe.reset("35mm visible src2 0x406a10 branch L16_03041 2018-12-26", stop_after_after=False)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src2_406a10_branch
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+
+breakpoint set -H --shlib libcp.dylib --address 0x406a2d
+breakpoint set -H --shlib libcp.dylib --address 0x40721b
+breakpoint set -H --shlib libcp.dylib --address 0x407458
+breakpoint set -H --shlib libcp.dylib --address 0x3ebf5f
+
+script src2_406a10_branch_probe.install_callbacks(lldb.debugger, {"entry": 1, "branch_31b110": 2, "branch_31acf0": 3, "after": 4})
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src2_406a10_branch/src2_406a10_branch_35mm.hdr" --profile 3 --export-fmt 3
+script src2_406a10_branch_probe.report()
+quit

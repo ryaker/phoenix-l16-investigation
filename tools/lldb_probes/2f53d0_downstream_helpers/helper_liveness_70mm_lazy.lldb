@@ -1,0 +1,13 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/2f53d0_downstream_helpers/helper_liveness_probe.py
+script helper_liveness_probe.reset("70mm L16_03434 0x2f53d0 downstream helper liveness lazy", 128, 64)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/2f53d0_downstream_helpers
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3e4b09
+script helper_liveness_probe.attach_lazy(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/2f53d0_downstream_helpers/helper_liveness_70mm_lazy.hdr" --profile 3 --export-fmt 3
+script helper_liveness_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script helper_liveness_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/2f53d0_downstream_helpers/helper_liveness_70mm_lazy.json")
+script helper_liveness_probe.report(lldb.debugger)
+quit

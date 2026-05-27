@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/stereolayer_constructor_provenance/stereolayer_constructor_probe.py
+script stereolayer_constructor_probe.reset("28mm L16_02130 StereoLayer constructor provenance narrow, LRIS auto allowed", 5, 220)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_constructor_provenance
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26b750
+breakpoint set --shlib libcp.dylib --address 0x26bbd0
+breakpoint set --shlib libcp.dylib --address 0x26bca0
+script stereolayer_constructor_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_constructor_provenance/ctor_28mm_narrow.hdr" --profile 3 --export-fmt 3
+script stereolayer_constructor_probe.drive_until_exit_or_step_cap(lldb.debugger, 6000)
+script stereolayer_constructor_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_constructor_provenance/ctor_28mm_narrow.json")
+script stereolayer_constructor_probe.report(lldb.debugger)
+quit

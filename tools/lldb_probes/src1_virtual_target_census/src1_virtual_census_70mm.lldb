@@ -1,0 +1,19 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/src1_virtual_target_census/src1_virtual_target_census_probe.py
+script src1_virtual_target_census_probe.reset("70mm L16_03434 visible-src1 virtual target census", 512, 20)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_virtual_target_census
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3e4b09
+breakpoint set --shlib libcp.dylib --address 0x3e3279
+breakpoint set --shlib libcp.dylib --address 0x3e34e2
+breakpoint set --shlib libcp.dylib --address 0x3e3653
+breakpoint set --shlib libcp.dylib --address 0x33f3e8
+breakpoint set --shlib libcp.dylib --address 0x33f94f
+breakpoint set --shlib libcp.dylib --address 0x33ffd4
+script src1_virtual_target_census_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_virtual_target_census/src1_virtual_census_70mm.hdr" --profile 3 --export-fmt 3
+script src1_virtual_target_census_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script src1_virtual_target_census_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/src1_virtual_target_census/src1_virtual_census_70mm.json")
+script src1_virtual_target_census_probe.report(lldb.debugger)
+quit

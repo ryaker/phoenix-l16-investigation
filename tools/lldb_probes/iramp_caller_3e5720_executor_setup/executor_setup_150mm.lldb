@@ -1,0 +1,10 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/iramp_caller_3e5720_executor_setup/executor_setup_probe.py
+script executor_setup_probe.reset()
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_caller_3e5720_executor_setup
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x3e57b4
+breakpoint command add 1 -s python -o "executor_setup_probe.hit(frame, bp_loc, internal_dict)"
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_caller_3e5720_executor_setup/executor_setup_150mm.hdr" --profile 3 --export-fmt 3
+script executor_setup_probe.report("150mm 3e5720 executor setup L16_02285 2018-07-29")
+quit

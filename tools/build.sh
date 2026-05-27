@@ -13,13 +13,26 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-FRAMEWORKS="$SCRIPT_DIR/Lumen/Lumen.app/Contents/Frameworks"
+LOCAL_LUMEN_APP="$SCRIPT_DIR/Lumen/Lumen.app"
+VERIFIED_LUMEN_APP="/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app"
+
+if [[ -n "${LUMEN_APP:-}" ]]; then
+    LUMEN_APP_PATH="$LUMEN_APP"
+elif [[ -d "$LOCAL_LUMEN_APP" ]]; then
+    LUMEN_APP_PATH="$LOCAL_LUMEN_APP"
+elif [[ -d "$VERIFIED_LUMEN_APP" ]]; then
+    LUMEN_APP_PATH="$VERIFIED_LUMEN_APP"
+else
+    LUMEN_APP_PATH="$LOCAL_LUMEN_APP"
+fi
+
+FRAMEWORKS="$LUMEN_APP_PATH/Contents/Frameworks"
 
 # Verify the library exists
 if [[ ! -f "$FRAMEWORKS/libcp.dylib" ]]; then
     echo "ERROR: libcp.dylib not found at:"
     echo "  $FRAMEWORKS/libcp.dylib"
-    echo "Mount or copy Lumen.app into the Lumen/ subdirectory first."
+    echo "Set LUMEN_APP=/path/to/Lumen.app or mount/copy Lumen.app into tools/Lumen/."
     exit 1
 fi
 

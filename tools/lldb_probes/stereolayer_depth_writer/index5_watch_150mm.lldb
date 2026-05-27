@@ -1,0 +1,19 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/stereolayer_depth_writer/stereolayer_index5_watch_probe.py
+script stereolayer_index5_watch_probe.reset("150mm L16_02285 StereoLayer index-5 descriptor watch", 5, 240, 160)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_depth_writer
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26bbd0
+breakpoint set --shlib libcp.dylib --address 0x26bca0
+breakpoint set --shlib libcp.dylib --address 0x276790
+breakpoint set --shlib libcp.dylib --address 0x276860
+breakpoint set --shlib libcp.dylib --address 0x277ccb
+breakpoint set --shlib libcp.dylib --address 0x26aa30
+breakpoint set --shlib libcp.dylib --address 0x26aa39
+script stereolayer_index5_watch_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_depth_writer/index5_watch_150mm.hdr" --profile 3 --export-fmt 3
+script stereolayer_index5_watch_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script stereolayer_index5_watch_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_depth_writer/index5_watch_150mm.json")
+script stereolayer_index5_watch_probe.report(lldb.debugger)
+quit

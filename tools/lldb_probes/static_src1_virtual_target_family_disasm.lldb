@@ -1,0 +1,107 @@
+target create /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+image lookup -a 0x340a30
+image lookup -a 0x340b00
+image lookup -a 0x340bf0
+image lookup -a 0x340cc0
+image lookup -a 0x340f70
+image lookup -a 0x341040
+image lookup -a 0x341770
+image lookup -a 0x342280
+image lookup -a 0x342360
+image lookup -a 0x342c60
+image lookup -a 0x3430d0
+image lookup -a 0x343620
+image lookup -a 0x3438d0
+image lookup -a 0x343b80
+image lookup -a 0x343e10
+image lookup -a 0x345a10
+image lookup -a 0x345ae0
+image lookup -a 0x345c80
+image lookup -a 0x345d50
+image lookup -a 0x345f30
+image lookup -a 0x34a610
+image lookup -a 0x34a780
+image lookup -a 0x34a8f0
+image lookup -a 0x34b3b0
+image lookup -a 0x34b8a0
+image lookup -a 0x34b970
+image lookup -a 0x341b30
+image lookup -a 0x342ca0
+image lookup -a 0x344470
+image lookup -a 0x350ef0
+image lookup -a 0x350ff0
+image lookup -a 0x3510f0
+image lookup -a 0x351a50
+image lookup -a 0x3589c0
+image lookup -a 0x30b770
+image lookup -a 0x2d6cd0
+image lookup -a 0x34b3f0
+image lookup -a 0xa9f20
+image lookup -a 0xfb6a0
+image lookup -a 0xf9ef0
+image lookup -a 0x34e400
+image lookup -a 0xef890
+image lookup -a 0x352a80
+image lookup -a 0x352ce0
+image lookup -a 0x353e50
+image lookup -a 0x307ee0
+image lookup -a 0xef050
+image lookup -a 0xf0610
+image lookup -a 0xef120
+image lookup -a 0xf32d0
+image lookup -a 0xf3340
+image lookup -a 0xf2750
+image lookup -a 0xf36e0
+disassemble --start-address 0x340a30 --count 80
+disassemble --start-address 0x340b00 --count 80
+disassemble --start-address 0x340bf0 --count 80
+disassemble --start-address 0x340cc0 --count 80
+disassemble --start-address 0x340f70 --count 80
+disassemble --start-address 0x341040 --count 80
+disassemble --start-address 0x341770 --count 120
+disassemble --start-address 0x342280 --count 80
+disassemble --start-address 0x342360 --count 80
+disassemble --start-address 0x342c60 --count 80
+disassemble --start-address 0x3430d0 --count 80
+disassemble --start-address 0x343620 --count 80
+disassemble --start-address 0x3438d0 --count 80
+disassemble --start-address 0x343b80 --count 80
+disassemble --start-address 0x343e10 --count 80
+disassemble --start-address 0x345a10 --count 80
+disassemble --start-address 0x345ae0 --count 80
+disassemble --start-address 0x345c80 --count 80
+disassemble --start-address 0x345d50 --count 80
+disassemble --start-address 0x345f30 --count 80
+disassemble --start-address 0x34a610 --count 80
+disassemble --start-address 0x34a780 --count 80
+disassemble --start-address 0x34a8f0 --count 80
+disassemble --start-address 0x34b3b0 --count 80
+disassemble --start-address 0x34b8a0 --count 80
+disassemble --start-address 0x34b970 --count 80
+disassemble --start-address 0x341b30 --count 160
+disassemble --start-address 0x342ca0 --count 180
+disassemble --start-address 0x344470 --count 180
+disassemble --start-address 0x350ef0 --count 120
+disassemble --start-address 0x350ff0 --count 120
+disassemble --start-address 0x3510f0 --count 120
+disassemble --start-address 0x351a50 --count 160
+disassemble --start-address 0x3589c0 --count 160
+disassemble --start-address 0x30b770 --count 160
+disassemble --start-address 0x2d6cd0 --count 160
+disassemble --start-address 0x34b3f0 --count 180
+disassemble --start-address 0xa9f20 --count 160
+disassemble --start-address 0xfb6a0 --count 140
+disassemble --start-address 0xf9ef0 --count 140
+disassemble --start-address 0x34e400 --count 160
+disassemble --start-address 0xef890 --count 120
+disassemble --start-address 0x352a80 --count 140
+disassemble --start-address 0x352ce0 --count 140
+disassemble --start-address 0x353e50 --count 140
+disassemble --start-address 0x307ee0 --count 160
+disassemble --start-address 0xef050 --count 120
+disassemble --start-address 0xf0610 --count 120
+disassemble --start-address 0xef120 --count 120
+disassemble --start-address 0xf32d0 --count 80
+disassemble --start-address 0xf3340 --count 80
+disassemble --start-address 0xf2750 --count 80
+disassemble --start-address 0xf36e0 --count 80

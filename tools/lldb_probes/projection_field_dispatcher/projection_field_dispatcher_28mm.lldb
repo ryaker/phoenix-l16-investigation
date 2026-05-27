@@ -1,0 +1,17 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/projection_field_dispatcher/projection_field_dispatcher_probe.py
+script projection_field_dispatcher_probe.reset("28mm L16_02130 projection field dispatcher", 320)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/projection_field_dispatcher
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3f6170
+breakpoint set --shlib libcp.dylib --address 0x3f61b8
+breakpoint set --shlib libcp.dylib --address 0x3f61ca
+breakpoint set --shlib libcp.dylib --address 0x3f61e1
+breakpoint set --shlib libcp.dylib --address 0x3f6200
+breakpoint set --shlib libcp.dylib --address 0x3f6940
+script projection_field_dispatcher_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/projection_field_dispatcher/projection_field_dispatcher_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script projection_field_dispatcher_probe.drive_until_exit_or_step_cap(lldb.debugger, 24000)
+script projection_field_dispatcher_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/projection_field_dispatcher/projection_field_dispatcher_28mm.json")
+quit

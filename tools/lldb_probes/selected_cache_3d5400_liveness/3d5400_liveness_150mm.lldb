@@ -1,0 +1,16 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/selected_cache_3d5400_liveness/selected_cache_3d5400_liveness_probe.py
+script selected_cache_3d5400_liveness_probe.reset()
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/selected_cache_3d5400_liveness
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3d0408
+breakpoint set --shlib libcp.dylib --address 0x3d042b
+breakpoint set --shlib libcp.dylib --address 0x3d53c0
+breakpoint set --shlib libcp.dylib --address 0x3d5468
+script selected_cache_3d5400_liveness_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/selected_cache_3d5400_liveness/3d5400_liveness_150mm.hdr" --profile 3 --export-fmt 3
+script selected_cache_3d5400_liveness_probe.drive_until_stable_stop_or_exit(lldb.debugger)
+script selected_cache_3d5400_liveness_probe.write_report(lldb.debugger, "150mm 0x3d5400/0x3d5468 liveness L16_02285 2018-07-29", "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/selected_cache_3d5400_liveness/3d5400_liveness_150mm.json")
+script selected_cache_3d5400_liveness_probe.report(lldb.debugger, "150mm 0x3d5400/0x3d5468 liveness L16_02285 2018-07-29")
+quit

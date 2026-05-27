@@ -1,0 +1,18 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/stereolayer_depth_writer/stereolayer_26cc40_producer_probe.py
+script stereolayer_26cc40_producer_probe.reset("28mm L16_02130 StereoLayer 0x26cc40 producer probe", 160)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_depth_writer
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26cc40
+breakpoint set --shlib libcp.dylib --address 0x26cc97
+breakpoint set --shlib libcp.dylib --address 0x26ccaf
+breakpoint set --shlib libcp.dylib --address 0x26cceb
+breakpoint set --shlib libcp.dylib --address 0x26cd25
+breakpoint set --shlib libcp.dylib --address 0x26cd46
+script stereolayer_26cc40_producer_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_depth_writer/producer_26cc40_28mm.hdr" --profile 3 --export-fmt 3
+script stereolayer_26cc40_producer_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script stereolayer_26cc40_producer_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_depth_writer/producer_26cc40_28mm.json")
+script stereolayer_26cc40_producer_probe.report(lldb.debugger)
+quit
