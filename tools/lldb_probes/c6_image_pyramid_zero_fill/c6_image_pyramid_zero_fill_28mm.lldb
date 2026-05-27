@@ -1,0 +1,9 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/c6_image_pyramid_zero_fill/c6_image_pyramid_zero_fill_probe.py
+script c6_image_pyramid_zero_fill_probe.reset("28mm C6 ImagePyramid zero-fill L16_02130 2018-07-23", 256, 4096)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/c6_image_pyramid_zero_fill
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script c6_image_pyramid_zero_fill_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/c6_image_pyramid_zero_fill/c6_image_pyramid_zero_fill_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script c6_image_pyramid_zero_fill_probe.report_to_file("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/c6_image_pyramid_zero_fill/c6_image_pyramid_zero_fill_28mm.json")
+quit
