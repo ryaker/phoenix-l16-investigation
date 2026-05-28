@@ -1,0 +1,9 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/c6_image_pyramid_downstream_liveness/c6_image_pyramid_downstream_liveness_probe.py
+script c6_image_pyramid_downstream_liveness_probe.reset("35mm C6 ImagePyramid downstream liveness L16_03041 2018-12-26", 768, 2048)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/c6_image_pyramid_downstream_liveness
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script c6_image_pyramid_downstream_liveness_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/c6_image_pyramid_downstream_liveness/c6_image_pyramid_downstream_liveness_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script c6_image_pyramid_downstream_liveness_probe.report_to_file("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/c6_image_pyramid_downstream_liveness/c6_image_pyramid_downstream_liveness_35mm.json")
+quit
