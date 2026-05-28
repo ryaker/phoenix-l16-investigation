@@ -9,6 +9,10 @@ The admitted evidence document is:
 
 - [../../../docs/evidence/lldb_c6_focused_f2720_route_census_tele.md](/Volumes/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_c6_focused_f2720_route_census_tele.md)
 
+The remaining 34 direct callsites are covered by:
+
+- [../../../docs/evidence/lldb_c6_unprobed_direct_f2720_route_census_tele.md](/Volumes/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_c6_unprobed_direct_f2720_route_census_tele.md)
+
 That proof uses the focused scripts:
 
 - `c6_route_census_focus_70mm.lldb`

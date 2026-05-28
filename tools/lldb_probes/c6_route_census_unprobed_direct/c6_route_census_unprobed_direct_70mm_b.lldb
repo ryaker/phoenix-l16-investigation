@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/c6_route_census/c6_route_census_probe.py
+script c6_route_census_probe.reset("70mm unprobed direct f2720 callsite census chunk B L16_03434 2019-05-18", 4096, 64, 512, [0xfe5fc, 0x144c80, 0x145703, 0x1459d9, 0x1b7e82, 0x1b7e8d, 0x20b044, 0x20b17d, 0x227d5e, 0x227d77, 0x227e30, 0x2280de, 0x22819c, 0x27d7ce, 0x27db11, 0x31bce0, 0x31bd00])
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/c6_route_census_unprobed_direct
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script c6_route_census_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/c6_route_census_unprobed_direct/c6_route_census_unprobed_direct_70mm_b.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script c6_route_census_probe.report_to_file("/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/c6_route_census_unprobed_direct/c6_route_census_unprobed_direct_70mm_b.json")
+quit
