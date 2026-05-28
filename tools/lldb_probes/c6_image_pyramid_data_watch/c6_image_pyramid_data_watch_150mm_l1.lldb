@@ -1,0 +1,10 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/c6_image_pyramid_data_watch/c6_image_pyramid_data_watch_probe.py
+script c6_image_pyramid_data_watch_probe.reset("150mm C6 ImagePyramid data watch level 1 L16_02285 2018-07-29", 1, 8, 32, 24000)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/c6_image_pyramid_data_watch
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script c6_image_pyramid_data_watch_probe.install_breakpoint(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/c6_image_pyramid_data_watch/c6_image_pyramid_data_watch_150mm_l1.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script c6_image_pyramid_data_watch_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script c6_image_pyramid_data_watch_probe.report_to_file(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/c6_image_pyramid_data_watch/c6_image_pyramid_data_watch_150mm_l1.json")
+quit
