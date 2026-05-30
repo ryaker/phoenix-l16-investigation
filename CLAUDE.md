@@ -94,7 +94,7 @@ arch -x86_64 lldb -s /path/to/script.lldb \
 - **"Do parallel grep sweeps, dump to files, you later analyze."** (2026-04-20)
 - **Round 4 Precision Rule:** paraphrases that "sound like absolutes" must be scope-bound. 0-hits-under-tested-conditions ≠ "NEVER FIRES".
 - **Ledger discipline:** never silently strengthen a `PARTIAL`/`OPEN` claim to `PROVEN` in any downstream doc. `0 hits` keeps its tested scope.
-- **Unit-bound vs universal:** Rich's corpus = 2 physical L16 units. Unit A = L16_02130 + L16_03434; Unit B = L16_03041 + L16_02285. Unit-bound until proven universal.
+- **Unit-bound vs universal (CORRECTED 2026-05-30 — see `docs/evidence/bundle_proof_two_unit_corpus_static.md`):** corpus = 2 physical L16 units, identified by per-file intrinsics calibration SHA-256: **Unit-1 `722a6e72…`** (5724 files), **Unit-2 `223961c6…`** (3484 files). Folders are organized by **shot date, not unit** — 13 date-folders mix both units, so unit identity comes from the per-file hash, never the folder. ⚠ The old "Unit A = L16_02130+L16_03434; Unit B = L16_03041+L16_02285" labeling is **REFUTED** — all four canonical seeds are **Unit-1**, so every "four-zoom verified" claim was tested on ONE body across four focals, NOT two bodies; universality is **unproven** until re-run on the Unit-2 same-name twins: 28mm `2018-07-04/L16_02130`, 35mm `2018-10-28/L16_03041`, 70mm `2020-07-14/L16_03434`, 150mm `2018-07-07/L16_02285`. (CA-vs-FL owner mapping unproven — GPS undecoded; see `docs/hypotheses/HYP-unit-ca-fl-assignment.md`.)
 
 ## Contamination guard
 

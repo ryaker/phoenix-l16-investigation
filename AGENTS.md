@@ -100,7 +100,7 @@ arch -x86_64 lldb -s /path/to/script.lldb \
 - **"Spike doesn't happen till we know and have confirmed everything needed. Spike is not invetigatory it is validation."** (2026-04-20)
 - **"Do parallel grep sweeps, dump to files, you later analyze."** (2026-04-20)
 - **Round 4 Precision Rule:** paraphrases that "sound like absolutes" must be scope-bound. 0-hits-under-tested-conditions ≠ "NEVER FIRES".
-- **Unit-bound vs universal:** Rich's corpus = 2 physical L16 units. Unit A = L16_02130+L16_03434; Unit B = L16_03041+L16_02285. Unit-bound until proven universal.
+- **Unit-bound vs universal (CORRECTED 2026-05-30 — `docs/evidence/bundle_proof_two_unit_corpus_static.md`):** corpus = 2 physical units by per-file intrinsics calib SHA-256: Unit-1 `722a6e72…` (5724 files), Unit-2 `223961c6…` (3484 files). Folders are date-organized NOT unit-organized (13 mixed folders) — unit identity = per-file hash, never the folder. The old "Unit A=L16_02130+L16_03434 / Unit B=L16_03041+L16_02285" labeling is REFUTED — all four canonical seeds are Unit-1, so "four-zoom verified" = one body × four focals, NOT two bodies; universality unproven until re-run on Unit-2 twins (28mm 2018-07-04/L16_02130, 35mm 2018-10-28/L16_03041, 70mm 2020-07-14/L16_03434, 150mm 2018-07-07/L16_02285).
 - **No guesses as facts (2026-05-30):** a fact needs a machine-deterministic check (byte-search /
   reproducible script) or a runtime observation. LLM-read disassembly is NOT fact until independently
   re-extracted. Unproven-but-plausible findings are tracked as first-class hypotheses in

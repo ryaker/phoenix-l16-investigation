@@ -53,16 +53,15 @@ the `PipelineCache` level-vector dims are libcp-computed pyramid halvings — no
   legitimately carry different per-camera bytes.
 - **Pyramid/level dimensions need not be stored** — they are deterministic halvings of 4160×3120.
 
-## Scoped Observation (NOT a doctrine change — flagged for human review)
+## Scoped Observation → RESOLVED 2026-05-30
 
-All four canonical LRIs carry **byte-identical** calibration, and `body_serial` / `module_serial`
-fields are zeroed/redacted in all four. The most likely reading is that all four captures came from one
-physical L16 body — which would mean the repo's "Unit A / Unit B" labeling is not exercised by this
-corpus (it tests one calibration set four times, distinguishing only focal tier, not physical unit).
-**This is an inference, not proof:** identical bytes are also consistent with a shared factory/batch
-calibration, and the serials are redacted, so "same body" cannot be established from bytes alone.
-Settling it needs LRIs from a second physical body. **The `CLAUDE.md` Unit A/B doctrine is left
-unchanged pending that** — recorded here, not silently rewritten.
+This doc originally flagged that all four canonical LRIs carry byte-identical calibration, inferring
+(but not proving) they came from one body. **That is now PROVEN** by the per-file corpus partition:
+all four canonical seeds are Unit-1 (`722a6e72`), and the corpus contains exactly two physical units
+(Unit-1 `722a6e72`, Unit-2 `223961c6`) organized by shot date, not unit. See
+`docs/evidence/bundle_proof_two_unit_corpus_static.md`. The repo "Unit A/B" labeling is REFUTED there,
+and `CLAUDE.md`/`AGENTS.md` are updated to the verified two-unit signatures. The cross-unit four-zoom
+test set (Unit-2 same-name twins of the canonical seeds) is listed in that proof.
 
 ## FACT 4 — libcp `__const` hardcode-vs-compute (independently re-verified)
 
