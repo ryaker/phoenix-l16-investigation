@@ -79,6 +79,32 @@ measurements that agree, the two-unit split is a physical fact, not a parsing ar
 reads 509-529 on 2018-02-05, then 75-90 on 2018-02-12). Counter-reset-shaped (card reformat / DCIM
 reset), recorded as observation only — ~0.1% of boundaries, not explained here.
 
+## FACT 5 — The LRI-format facts hold on BOTH units (cross-unit confirmed)
+
+The Lane B LRI-format facts (`bundle_proof_lri_calibration_origin_static.md`) were originally proven on
+Unit-1's four canonical seeds only. Re-running the same render-free checks on the four **Unit-2** twin
+seeds confirms they hold across both physical bodies
+(`runs/two_unit_corpus/crossunit_v2.py`):
+
+| seed | intrinsics block | 16 records distinct | ROI 4160×3120 | intr sig |
+|---|---|---|---|---|
+| U1 28/35/70/150mm | 32832 B | 16/16 | ✓ | `722a6e72…` |
+| U2 28/35/70/150mm | 32833 B | 16/16 | ✓ | `223961c6…` |
+
+All eight seeds pass: each carries 16 pairwise-distinct per-camera intrinsics records and the
+4160×3120 sensor ROI in `CameraModule.f9.f2`. So the **LRI-format / per-camera-calibration structure is
+unit-invariant** (the *values* differ per body, as expected; the *format* is identical). This discharges
+the universality gap **for the LRI-format facts specifically** — they are now two-unit verified, not
+Unit-1-only.
+
+> Method note: a first pass mis-selected the block (both the ~32 KB intrinsics block and the ~263 KB
+> distortion block parse to 16 field-13 records, so "first 16-record block" was ambiguous). The fixed
+> check pins to the **smallest** 16-record block (the intrinsics block); the bug was caught and corrected
+> before this fact was admitted.
+
+Scope limit: this discharges only the *LRI-format* claims. The **runtime merge/pipeline** "four-zoom
+verified" claims remain Unit-1-only — they need an actual cross-unit render, which is separate work.
+
 ## Consequence for the ledger (flagged, not auto-applied)
 
 The prior `CLAUDE.md` "Unit A = L16_02130+L16_03434; Unit B = L16_03041+L16_02285" labeling is **REFUTED** —
