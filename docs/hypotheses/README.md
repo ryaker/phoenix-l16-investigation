@@ -16,6 +16,12 @@ prove or disprove it stay visible and version-controlled — without ever masque
 - Promotion to fact happens **only** in a `docs/evidence/` proof doc backed by a machine-deterministic
   check or a runtime observation. When that happens, update the hypothesis status to `PROMOTED` with a
   pointer to the proof doc.
+- **Four-zoom rule.** For any merge-critical / pipeline-behavior claim, promotion requires explicit
+  coverage at **28mm, 35mm, 70mm, AND 150mm** (per the claim ledger). A result observed at fewer focal
+  lengths is **scope-bound to those focal lengths** and may NOT be promoted or generalized — assume
+  nothing about cross-zoom behavior; observe it. (Exception: a fact that is purely a property of the
+  binary's bytes — e.g. a constant's value or storage offset — is zoom-independent and needs only one
+  machine-deterministic check; but any claim about how/whether that code *runs* still needs four zooms.)
 - Disproof is recorded here as `REFUTED` with the disproving evidence. Refuted hypotheses are **kept**
   (not deleted) so the same wrong lead is not re-investigated.
 

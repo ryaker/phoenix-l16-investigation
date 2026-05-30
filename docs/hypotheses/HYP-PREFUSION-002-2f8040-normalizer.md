@@ -33,13 +33,30 @@ floor and scaled by a shared per-output reciprocal `1/(pixel·gain)`. If true, n
 
 ## Proof Plan
 
-1. **Static re-extraction (deterministic):** `otool -arch x86_64 -tV libcp.dylib`, slice `0x2f8040`,
-   capture to a log under `runs/`. Confirm the `rcpps`/`mulps` normalizer shape and the `divss/divps`
-   census = 0. Anchor-check `0x3eced0` first.
-2. **Runtime provenance (the decider):** BP at the normalizer (and at the `0x369fa4` accumulator); on
-   first hit read the `source` operand memory window + a full backtrace + `image lookup` to determine
-   whether `source` is multi-camera frame data or a single intermediate tile, and whether the enclosing
-   chain reaches IRAMP `0x365960`/`0x3661b0`.
+> **Four-zoom rule (non-negotiable):** per the claim ledger, merge-critical closure requires explicit
+> zoom coverage for **28mm, 35mm, 70mm, AND 150mm**. A result observed at one focal length is
+> scope-bound to that focal length and CANNOT promote this hypothesis or move `CLM-PREFUSION-002`.
+> Assume nothing about cross-zoom generality — observe it.
+
+1. **Static re-extraction (deterministic, build-universal):** `otool -arch x86_64 -tV libcp.dylib`, slice
+   `0x2f8040`, capture to a log under `runs/`. Confirm the `rcpps`/`mulps` normalizer shape and the
+   `divss/divps` census = 0. Anchor-check `0x3eced0` first. (This part is zoom-independent — it is the
+   binary's code, identical for every render — so a single clean static decode suffices for the
+   *arithmetic shape*. It does NOT establish that this kernel is on the src1/src2 path at any zoom.)
+2. **Runtime provenance — must be done at ALL FOUR zooms, sequentially (never concurrent instrumented
+   renders; concurrency perturbs thread timing and surfaces the documented 150mm race):** for each of
+   `28mm L16_02130`, `35mm L16_03041`, `70mm L16_03434`, `150mm L16_02285`, BP the normalizer (and the
+   `0x369fa4` accumulator); on first hit read the `source` operand window + full backtrace +
+   `image lookup` to determine whether `source` is multi-camera frame data or a single intermediate
+   tile, and whether the enclosing chain reaches IRAMP `0x365960`/`0x3661b0`.
+3. **Promotion gate:** this hypothesis may become fact ONLY when steps 1+2 agree across all four zooms.
+   A partial result (e.g. 28mm-only) is recorded here as a scope-bound observation under "Progress",
+   NOT as promotion, and explicitly names the zooms still unobserved.
+
+## Progress
+
+- (none yet — `renderbp` 28mm run in flight; whatever it returns is 28mm-scope-bound only, with
+  35mm/70mm/150mm still to run before any promotion.)
 
 ## Disproof Criteria
 
