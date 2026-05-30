@@ -51,6 +51,34 @@ the **other** unit:
 All four twin pairs had differing calibration hashes (SAME=False). These eight files are the **true
 cross-unit four-zoom test set**: Unit-1 four-zoom AND Unit-2 four-zoom = the real unit-invariance test.
 
+## FACT 4 — Independent corroboration: per-unit filename sequence is monotonic by date
+
+A **second, independent** confirmation of the partition, using a different data source than the
+calibration hash: the LRI filename number (`L16_NNNNN`). Each physical camera has its own capture counter
+that ticks up over time, so within one unit the filename number should rise with shot date, and the two
+units' counters should be independent of each other. Both predictions hold
+(`runs/two_unit_corpus/unit_sequence_monotonicity.py`):
+
+| Unit | files | filename-number monotonic by date |
+|---|---|---|
+| `722a6e72` | 5724 | **99.91%** (5718 increasing, 5 decreasing) |
+| `223961c6` | 3484 | **99.83%** (3477 increasing, 6 decreasing) |
+
+- `722a6e72` runs `2 → 5708` across 2018-01-19 … 2021-03-06.
+- `223961c6` runs `1 → 3500` across 2017-12-01 … 2021-03-14.
+
+**Independent across units** — on the 13 shared (mixed) dates the two counters sit at unrelated
+positions, e.g. 2018-01-29: `223961c6`[1536-1614] vs `722a6e72`[386-401]; 2018-07-04:
+`223961c6`[2032-2259] vs `722a6e72`[1461-1527]. Two cameras, two independent counters, each internally
+ordered, not aligned with each other.
+
+Because the calibration-hash partition (FACT 1) and this filename-sequence partition are independent
+measurements that agree, the two-unit split is a physical fact, not a parsing artifact.
+
+**Observed, not explained (scope-bound):** ~5-6 date-boundary number *drops* per unit (e.g. `722a6e72`
+reads 509-529 on 2018-02-05, then 75-90 on 2018-02-12). Counter-reset-shaped (card reformat / DCIM
+reset), recorded as observation only — ~0.1% of boundaries, not explained here.
+
 ## Consequence for the ledger (flagged, not auto-applied)
 
 The prior `CLAUDE.md` "Unit A = L16_02130+L16_03434; Unit B = L16_03041+L16_02285" labeling is **REFUTED** —
