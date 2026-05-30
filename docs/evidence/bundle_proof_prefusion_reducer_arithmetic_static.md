@@ -59,10 +59,12 @@ Reproduction scripts (committed under gitignored `runs/`, rerunnable against the
 
 ## Unverified Leads (NOT fact — explicitly excluded from this proof)
 
-A static multi-agent disassembly pass produced a **candidate** finding not verified here: a possible
-per-pixel `Σ(w·v)/Σ(w)` normalizer at `libcp+0x2f8040`. That is **LLM-read disassembly that has not been
-machine-verified against the binary** (one agent additionally glitched mid-run), so per project
-discipline it is kept OUT of this verified doc.
+A static multi-agent disassembly pass produced a **candidate** finding: a possible per-pixel
+`Σ(w·v)/Σ(w)` normalizer. UPDATE 2026-05-30: parent machine-verified the disassembly — the original
+`0x2f8040` address was WRONG (it is a stack spill `movl %esi,-0x194(%rbp)`); the real reciprocal-
+normalize block is `0x2f8584–0x2f85a5` in function `0x2f78e0` (trip count 5; 0 hardware divides, 6
+`rcpps`). Those are now machine-verified bytes. What remains a HYPOTHESIS is the kernel's ROLE — whether
+it operates on the `src1`/`src2` path (no call-graph link proven; not observed live at 28mm).
 
 It is tracked — not lost — as a first-class sister hypothesis, with its proof/disproof plan, in
 [docs/hypotheses/HYP-PREFUSION-002-2f8040-normalizer.md](/Volumes/Dev/L16_Lumen_ReverseEngineering/docs/hypotheses/HYP-PREFUSION-002-2f8040-normalizer.md).
