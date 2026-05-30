@@ -7,14 +7,15 @@
 
 ## Statements (each unproven; do not cite as fact)
 
-1. **libcp `__const` hardcode/compute map.** Lane B's static byte-search reported: coeff `[1.0, 1/3]`
-   present in `__const` (count 14), cubic exp-approx `0x5dae2c`, bilateral eps `0x5dce90`, and the 4096
-   radius-table length are UNIVERSAL constants; the `1/288` scale is absent (computed at runtime).
-   - Provenance: single-tool byte-search by the Lane B agent. Parent re-run this session was
-     INCONCLUSIVE (transient shell-output multiplication glitch corrupted the sanity check). The
-     1/3→14 and 1/288→0 counts reproduced once but could not be cleanly re-confirmed.
-   - To verify: re-run `runs/lri_calibration_origin/verify_libcp_const.py` in a clean shell; confirm a
-     1.0 sanity count is non-zero (proves the search works) before trusting the 1/3 and 1/288 counts.
+> NOTE: statement (1) below was PROMOTED to fact on 2026-05-30 — parent re-verified
+> `1/3`→14, `1/288`→0 with a clean `1.0`→5627 sanity. It now lives in
+> `docs/evidence/bundle_proof_lri_calibration_origin_static.md` FACT 4. Kept here struck-through for
+> provenance. Remaining statements (2)–(4) are still hypotheses.
+
+1. ~~**libcp `__const` hardcode/compute map.**~~ **PROMOTED — see evidence FACT 4.** coeff `1/3` is a
+   universal `__const` (count 14, safe to hardcode); the `1/288` scale is absent (count 0, runtime-
+   computed). The cubic exp-approx `0x5dae2c` / bilateral eps `0x5dce90` / 4096 radius-length sub-claims
+   were not independently re-run and remain hypotheses until checked the same way.
 
 2. **Per-camera K-matrix decode (cams 1..15).** Only cam0's K block decodes cleanly (principal point
    2048.0; focal-px header template `[818, 1500, 818]`). Cams 1..15 do not decode at the same fixed

@@ -64,13 +64,25 @@ calibration, and the serials are redacted, so "same body" cannot be established 
 Settling it needs LRIs from a second physical body. **The `CLAUDE.md` Unit A/B doctrine is left
 unchanged pending that** — recorded here, not silently rewritten.
 
+## FACT 4 — libcp `__const` hardcode-vs-compute (independently re-verified)
+
+Parent re-ran the byte-search this session (`runs/lri_calibration_origin/verify_libcp_const.py`),
+clean result:
+
+| value | float32 occurrences in libcp | verdict |
+|---|---|---|
+| `1.0` (sanity — proves the search works) | 5627 | — |
+| `0.5` (sanity) | 258 | — |
+| coeff `1/3` (0.33333334) | 14 | UNIVERSAL `__const` (safe to hardcode) |
+| scale `1/288` (0.00347222) | 0 | NOT stored — computed at runtime |
+
+So the `0x29ed90` upsample coefficient `1/3` is a build-universal constant Phoenix may hardcode, while
+the `1/288` scale must be reproduced from the runtime computation, not copied.
+
 ## Leads (NOT fact — see docs/hypotheses/)
 
-The libcp `__const` "can-hardcode vs must-compute" distinction (coeff `[1.0, 1/3]` universal; `1/288`
-runtime-computed) and the per-camera K-matrix decode for cams 1..15 are tracked in
-`docs/hypotheses/HYP-PREFUSION-002...`-style notes / `HYP-LANEB-calibration-decode.md`. The libcp-const
-counts were reported by Lane B's static byte-search but my independent re-run this session was
-inconclusive (transient shell-output glitch); they are NOT stated as fact here pending clean re-verify.
+The per-camera K-matrix decode for cams 1..15, the row-composition matrix source link to the `0x25e0c0`
+producer, and the CalibStage-bank mapping are tracked in `docs/hypotheses/HYP-LANEB-calibration-decode.md`.
 
 ## Artifacts
 
