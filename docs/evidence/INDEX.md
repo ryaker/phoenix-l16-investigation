@@ -263,6 +263,8 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   Installed-bundle proof bounding candidate block-geometry helpers away from reducer closure.
 - `bundle_proof_prefusion_feature_selection_lane.md`
   Installed-bundle proof bounding the visible `0x258fe0` / `0x2598a0` feature-selection lane away from reducer closure.
+- `bundle_proof_prefusion_reducer_arithmetic_static.md`
+  Deterministic closed-form verification that the 16 accumulator weights captured in `bundle_lldb_iramp_36e530_accumulator_prep.md` are the periodic (DFT-even) Hann window of length 16, `w[n] = sin²(π(n+0.5)/16)`, to float32 precision (max residual 1.13e-7; symmetric Hann ruled out at 5.70e-2; taps sum to N/2 = 8.0). Scoped to the window closed form only; does not identify the `src1`/`src2` reducer and does not advance `CLM-PREFUSION-002`.
 
 ### External scratch docs with claim-level authority
 

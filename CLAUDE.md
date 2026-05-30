@@ -1,93 +1,116 @@
 # L16 Phoenix Investigation — Session Handoff
 
 **Repo:** github.com/ryaker/phoenix-l16-investigation (CC0-1.0, public)
-**Canonical truth:** `docs/TRUTH.md` (check `Version:` in frontmatter — currently v2)
+**Canonical truth:** `docs/TRUTH.md` (check `Version:` in frontmatter — currently **v3.x**, ledger-backed)
+
+> Authority order: if any doc disagrees with `docs/canonical/CLAIM_LEDGER.md`, **the ledger wins.**
+> `docs/TRUTH.md` may only summarize claims already admitted into the ledger.
 
 ## Read FIRST every session
 
-1. `docs/TRUTH.md` — git-versioned canonical truth. No date in filename.
-2. `/tmp/l16_open_audit/_FINDINGS.md` — 2026-04-20 OPEN-items audit register (841 lines, 17 items, verdict per item)
-3. `~/.claude/projects/-Users-ryaker-Dev-L16-Lumen-ReverseEngineering/memory/open_items_plan.md` — closure plan for remaining 4 non-resolved items
+1. `docs/TRUTH.md` — human-readable root summary (git-versioned, no date in filename).
+2. `docs/canonical/CLAIM_LEDGER.md` — **claim-level authority.** Status vocabulary + per-zoom validation + readiness.
+3. `docs/canonical/PARITY_BLOCKERS.md` — the unknowns that still block clean-room parity.
+4. `docs/canonical/WSJF_PRIORITY.md` — WSJF ranking + dependency-adjusted lane order for the blocker set.
+5. `docs/canonical/MERGE_CRITICAL_TRUTH.md` — merge-critical subset.
+6. `docs/audits/README.md` — artifact custody boundary (durable evidence must NOT live in `/tmp`).
 
-## Current state (2026-04-20 post-Sessions-1+2+3)
+## Current state (post-v3 ledger rebuild, last campaign 2026-05-27)
 
-- **16 of 17 OPEN items RESOLVED.** Sessions 1+2+3 closed #15, #06 Q12, and #16 on 2026-04-20. Doc-hygiene v2.1.1 closed #17.
-- **1 PARTIAL** (non-blocking): #10 OPEN-DARKCURRENT — reconfirmed inactive on bridge HDR; formula extraction deferred to non-HDR profile.
-- **0 TRULY OPEN.** **28mm + 70mm + 150mm bridge HDR spikes all architecturally UNBLOCKED.**
+The earlier v2-era "16 of 17 OPEN items RESOLVED / spike UNBLOCKED / proceed to SPIKE" conclusion has been
+**superseded** by the v3 ledger rebuild. The merge mechanism was re-opened as the real parity wall.
 
-**Session closure summary:**
-- **Session 1 (28mm L16_02130):** HW read-watchpoints on 4 dropped-cam RIC L0 buffers captured 102K trips; 100% IRAMP-family. New VA found: composite-anchor kernel at `libcp+0x2b3410` (4-way SIMD weighted blend). Closes #15.
-- **Session 2 (70mm L16_03434):** Full Phase 1 clean render. Dispatcher cam_ids `[8,10..14]`=B4+C1..C5 match TRUTH M4. CCMInterp 12 hits with 3 distinct dest-rdis (vs 28mm's 1). All 4 #16 kernels fire consistently with 28mm. Closes #06/70mm + #16/70mm.
-- **Session 3 (150mm L16_02285):** Partial Phase 1 (render crashed at `libcp+0x2e945d` under instrumentation — Rich verdict: crash is ours, Lumen.app ships working 150mm). Pre-crash data captured dispatcher cam_ids + IRAMP body first-hits matching 70mm exactly — confirms 150mm takes 70mm tier via `outer_enum=1`. Closes #16/150mm architecturally.
-- **Doc-hygiene:** 12 load-bearing scratch files + external tech-doc cited in TRUTH v2.1.1. Closes #17.
+- **Claim ledger (authority) status:** a mix of `PROVEN`, `PARTIAL`, `OPEN`, and `REFUTED` claims —
+  read `docs/canonical/CLAIM_LEDGER.md` for the live tally; do not paraphrase it from here.
+- **Active parity blockers** (`docs/canonical/PARITY_BLOCKERS.md`), WSJF-ordered for execution:
+  1. `src1` / `src2` pre-fusion merge/reduction mechanism (`CLM-PREFUSION-002`) — **Lane A, start first.**
+  2. Pair-grid producer calibration semantics / LRI origins — Lane B (parallel peer).
+  3. Tele odd-camera routing / C6 (`0xf2720` route) — Lane C (most recently worked).
+  4. Four-zoom merge topology closure — Lane E (integration/validation).
+  5. Final merge acceptance / rejection logic — Lane D (broad deep-decode).
+- **The spike is NOT unblocked.** Rich's rule stands: "Spike is validation, not investigation" — it happens
+  only after the blocking unknowns close in the ledger.
 
-## Instrumentation gotcha (revised v2.1.3)
+**Most recent campaign (Lane C / C6):** proved the key-`15` construct→clear mutation chain (cleared at
+`0x3c90a5`), censused all 58 direct `call 0xf2720` sites with tele runtime coverage, and ran a grid of
+negative data-watchpoints showing the zero-filled ImagePyramid/geometry route is inert under four-zoom
+bridge HDR. Remaining C6 work: untested-field/alias proof, final effect of watched `+0x60..+0x67` reads,
+alternate-route proof, or terminal-filter proof. See `docs/evidence/lldb_c6_*` and `bundle_*` docs.
 
-BP at `libcp+0x2b3410` (composite-anchor kernel) DOES work for hit-counting — captured 1.7M hits at 70mm and 1.5M at 150mm before SIGABRT killed the render. LLDB retains BP counters past target termination, so the quit-script still prints counts. **Earlier v2.1.2 claim "BP crashes render" was a verify-before-trust failure** — I declared impossibility from incomplete log-tail polling without checking the `HIT COUNTS` line at the very end.
+## Evidence custody (enforced)
 
-Takeaway: BP-based hit-counting on hot Halide-JIT kernels (1-2M hits/render) works for counts but not for producing completed output. If a render needs to complete AND be instrumented, use HW read-watchpoints on data (Session 1 approach). If only a hit count is needed, BP auto-continue is fine — SIGABRT-mid-render is acceptable if the quit script executes after.
+- Durable audit registers → `docs/audits/`.
+- Proof / probe writeups → `docs/evidence/` (121 tracked `bundle_*` / `lldb_*` docs; each probe ships its
+  `.lldb` script + `.py` probe + `run_*.sh` where applicable).
+- Reusable probe harnesses → `tools/lldb_probes/`.
+- Rerunnable raw outputs → ignored `runs/<topic>/`.
+- `/tmp` and `/private/tmp` are one-command OS scratch only — **never** cite them as live evidence in
+  handoffs, canonical docs, or specs.
 
-At 150mm, BPs elsewhere (e.g. S2's proven 70mm probe re-run against 150mm) still trigger `EXC_BAD_ACCESS` at `libcp+0x2e945d`. Per Rich (2026-04-20): "Lumen ships working 150mm renders — crash has to be ours." Our probes perturb thread timing in a way that surfaces a race; not a libcp bug.
+## Binaries + LRIs — VERIFIED PATHS (re-verified 2026-05-29)
 
-## Next action
+All VAs in the ledger/TRUTH reference the specific `libcp.dylib` below. Re-verify VAs if it is ever swapped.
 
-All bridge HDR spikes architecturally UNBLOCKED. Per Rich's rule ("spike is validation, not investigation"), proceed to SPIKE.
-- **#10 formula extraction** — optional future work, requires non-HDR render profile (DirectRenderer or DPC); outside bridge HDR scope.
-- **#15 cross-zoom HW-watchpoint confirmation** — optional non-blocking future work: re-run Session 1's watchpoint script against 70mm/150mm dropped-cam buffers to directly observe 0x2b3410 at those tiers (infeasible via BP).
-
-See `~/.claude/projects/-Users-ryaker-Dev-L16-Lumen-ReverseEngineering/memory/open_items_plan.md` for LLDB BP/watchpoint list.
-
-## Binaries + LRIs — VERIFIED PATHS (2026-04-20)
-
-Every session needs these. They are NOT in `docs/TRUTH.md` (TRUTH has VAs only, not filesystem paths). Verified Mach-O + file existence on this machine on 2026-04-20.
-
-**Binaries (all Mach-O x86_64 — must invoke under `arch -x86_64`, this Mac is Apple Silicon):**
+**Binaries (all Mach-O x86_64 — invoke under `arch -x86_64`; this Mac is Apple Silicon):**
 
 | What | Path |
 |---|---|
-| `lri_process` binary | `/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process` |
-| `libcp.dylib` (all VAs in TRUTH reference this) | `/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib` |
-| Lumen.app (DYLD_FRAMEWORK_PATH root — has libceres etc.) | `/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app` |
+| `lri_process` binary | `/Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process` |
+| `libcp.dylib` | `/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib` |
+| Lumen.app (DYLD_FRAMEWORK_PATH root) | `/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app` |
 
-⚠ **Stale paths in tooling:** `tools/probe_symbol_bp.py`, `tools/probe_wb_hit.py`, `tools/run_ics_70mm.lldb` all hardcode `/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/lri_process` (top-level, doesn't exist) and `/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/Lumen/Lumen.app/...` (doesn't exist). Patch or override via args before running.
+⚠ **Stale paths in older tooling:** some scripts under `tools/` hardcode a top-level `lri_process` and a
+`Lumen/Lumen.app` path that do not exist. Patch or override via args before running; verify with `ls`/`file`.
 
-**LRIs (all paths have a space in `Base Photos` — always quote):**
+**LRIs — canonical four-zoom corpus (all paths have a space in `Base Photos` — always quote):**
 
 | Zoom tier | LRI | Unit | Path |
 |---|---|---|---|
 | 28mm (Tier 0 anchor) | L16_02130 | Unit A | `/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri` |
-| 35mm (Tier 0 crop) | L16_02951 | Unit B | `/Volumes/Base Photos/Light/2018-12-19/L16_02951.lri` |
+| 35mm (Tier 0 crop) | L16_03041 | Unit B | `/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri` |
 | 70mm (Tier 1 anchor) | L16_03434 | Unit A | `/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri` (178 MB) |
 | 150mm (Tier 1 crop) | L16_02285 | Unit B | `/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri` |
+
+> **35mm seed correction:** the old seed `L16_02951.lri` (2018-12-19) was filename/date-chosen and is NOT a
+> true 35mm bridge-tier capture. It was superseded by `L16_03041.lri`. See
+> `docs/evidence/lri_35mm_seed_correction_true35_runtime.md`.
 
 **Invocation template (LLDB session):**
 ```bash
 arch -x86_64 lldb -s /path/to/script.lldb \
-  /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+  /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
 # Inside script: set DYLD_FRAMEWORK_PATH + DYLD_LIBRARY_PATH env before run,
 # then: process launch -- --profile 3 "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri"
 ```
 
 **Caveats:**
-- Volume `/Volumes/Base Photos/` is external — confirm mounted before running: `ls "/Volumes/Base Photos/"`
-- `lri_process` CLI `--export-fmt 4` writes JPEGs with `.dng` extension (per `docs/LIBRARY_INVENTORY.md:95`). For real DNG ground truth use `Renderer::writeImage(..., DNG, ...)` path, not CLI.
-- All VAs in TRUTH are against this specific libcp.dylib (6.93 MB, x86_64). If the dylib is ever swapped/rebuilt, VAs re-verify required.
+- `/Volumes/Base Photos/` is external — confirm mounted first: `ls "/Volumes/Base Photos/"`.
+- `lri_process` CLI `--export-fmt 4` writes JPEGs with `.dng` extension (per `docs/LIBRARY_INVENTORY.md`).
+  For real DNG ground truth use the `Renderer::writeImage(..., DNG, ...)` path, not the CLI.
 
 ## Discipline rules (Rich's verbatim)
 
 - **"Spike doesn't happen till we know and have confirmed everything needed. Spike is not invetigatory it is validation."** (2026-04-20)
 - **"Do parallel grep sweeps, dump to files, you later analyze."** (2026-04-20)
 - **Round 4 Precision Rule:** paraphrases that "sound like absolutes" must be scope-bound. 0-hits-under-tested-conditions ≠ "NEVER FIRES".
-- **Unit-bound vs universal:** Rich's corpus = 2 physical L16 units. Unit A = L16_02130+L16_03434; Unit B = L16_02951+L16_02285. Unit-bound until proven universal.
+- **Ledger discipline:** never silently strengthen a `PARTIAL`/`OPEN` claim to `PROVEN` in any downstream doc. `0 hits` keeps its tested scope.
+- **Unit-bound vs universal:** Rich's corpus = 2 physical L16 units. Unit A = L16_02130 + L16_03434; Unit B = L16_03041 + L16_02285. Unit-bound until proven universal.
 
 ## Contamination guard
 
 - `archive/` is pre-commit-hook-enforced frozen. Do NOT cite `archive/TRUTH-v1-*.md`, `archive/phoenix-pipeline-facts-*-DEPRECATED.md`, or `archive/stale_copies/*.md` as authoritative.
-- `/Users/ryaker/Documents/Light_Work/docs/reverse_engineering/` 01..27 numbered docs = separate older research thread; often contradicts `docs/TRUTH.md`. Do NOT cite without cross-check.
-- Scratch files at `/Volumes/Dev/lumen-phoenix-scratch/*.md` are OK to read when `docs/TRUTH.md` cites them by path.
+- `/Users/ryaker/Documents/Light_Work/docs/reverse_engineering/` 01..27 numbered docs = separate older research thread; often contradicts the ledger. Do NOT cite without cross-check.
+- Scratch files at `/Volumes/Dev/lumen-phoenix-scratch/*.md` are OK to read when a canonical doc cites them by path.
+- `docs/quarantine/` holds explicitly-quarantined contradictions — reference-only, never authority.
 
-## Audit artifacts (keep available across sessions)
+## Fact vs hypothesis discipline (Rich, 2026-05-30)
 
-- `/tmp/l16_audit_sweep.sh` — macOS-compatible parallel grep template (17 OPEN items, 216-md corpus)
-- `/tmp/l16_open_audit/_FINDINGS.md` — per-item audit register
-- `/tmp/l16_open_audit/NN_TOPIC.txt` — per-item grep dumps
+- **No guesses as facts.** A fact requires a machine-deterministic check (byte-search, reproducible
+  script) or a runtime observation. LLM-read disassembly is NOT fact until independently re-extracted.
+- Unproven-but-plausible findings are **first-class tracked hypotheses**, not deleted and not hidden:
+  they live in `docs/hypotheses/` (committed), each with provenance + proof/disproof plan. See
+  `docs/hypotheses/README.md`.
+- **No doc outside `docs/hypotheses/` may cite a hypothesis as fact** until it is promoted via a
+  `docs/evidence/` proof doc. Hypotheses carry no ledger status.
+- Zones: `docs/evidence/` = proven/citable; `docs/hypotheses/` = unproven sister facts/not citable;
+  `docs/quarantine/` = superseded/contradictions/reference-only.
