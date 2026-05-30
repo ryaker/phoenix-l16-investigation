@@ -61,7 +61,8 @@ all four canonical seeds are Unit-1 (`722a6e72`), and the corpus contains exactl
 (Unit-1 `722a6e72`, Unit-2 `223961c6`) organized by shot date, not unit. See
 `docs/evidence/bundle_proof_two_unit_corpus_static.md`. The repo "Unit A/B" labeling is REFUTED there,
 and `CLAUDE.md`/`AGENTS.md` are updated to the verified two-unit signatures. The cross-unit four-zoom
-test set (Unit-2 same-name twins of the canonical seeds) is listed in that proof.
+test set (Unit-2 same-name twins of the canonical seeds) is listed in that proof. (Owner identity is
+external knowledge, out of scope — not a bytes-verifiable fact.)
 
 ## FACT 4 — libcp `__const` hardcode-vs-compute (independently re-verified)
 

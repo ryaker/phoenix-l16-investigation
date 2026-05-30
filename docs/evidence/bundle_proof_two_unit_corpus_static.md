@@ -1,7 +1,7 @@
 # Evidence: Two-Unit Corpus Identification (Static, Per-File, Machine-Verified)
 
 **Date:** 2026-05-30
-**Status:** VERIFIED (deterministic per-file byte facts) + one explicitly-unproven item (CA/FL owner).
+**Status:** VERIFIED (deterministic per-file byte facts).
 **Scope:** Full `/Volumes/Base Photos/Light/*/*.lri` corpus. Static only — intrinsics calibration-block
 SHA-256 per file via `tools/lri_field_inspect.py`. No render, no lldb.
 **Method note:** The corpus is organized by **shot date**, NOT by unit (per Rich). So units cannot be
@@ -88,12 +88,11 @@ bodies. **Unit-invariance (universality) is unproven** for those claims; they ar
 on the Unit-2 twins above. This scopes, does not retract, those claims — flagged for human decision before
 any ledger edit.
 
-## UNPROVEN — which unit is CA (Rich) vs FL (father)
+## Owner identity (out of scope)
 
-Per Rich: one body was his (California, mostly static), one his father's (Florida, heavy RV travel). GPS
-is not decodable from these bytes yet and serials are redacted, so the `722a6e72`↔owner / `223961c6`↔owner
-mapping is **unproven** — tracked in `docs/hypotheses/HYP-unit-ca-fl-assignment.md`. Likely future
-discriminator: the father's unit should show a far wider geographic capture spread.
+Which physical unit belongs to which owner is external knowledge, not a bytes-verifiable fact, and gates
+no parity work — so it is deliberately not investigated here. The two units are identified by their
+calibration signatures (`722a6e72`, `223961c6`); that is all this proof asserts.
 
 ## Caveat (scope-bound, not hidden)
 
