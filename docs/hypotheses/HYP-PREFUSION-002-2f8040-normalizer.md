@@ -1,35 +1,49 @@
-# HYP-PREFUSION-002 — Per-Pixel Weighted-Average Normalizer at `libcp+0x2f8040`
+# HYP-PREFUSION-002 — Per-Pixel Weighted-Average Normalizer (function `libcp+0x2f78e0`)
 
 **Status:** `HYPOTHESIS` (unproven; uncitable as fact per `docs/hypotheses/README.md`)
 **Relates to:** `CLM-PREFUSION-002` (the `src1`/`src2` pre-fusion merge/reduction mechanism — still `OPEN`/`BLOCKER`)
-**Created:** 2026-05-30
+**Created:** 2026-05-30 · **Address-corrected:** 2026-05-30 (28mm decider, commit `e34e6d6`)
+
+> **ADDRESS CORRECTION (machine-verified, committed in `e34e6d6`):** the original title VA `0x2f8040`
+> was WRONG — it is a stack spill `movl %esi,-0x194(%rbp)`, not a normalizer. The real
+> `Σ(w·v)/Σ(w)` reciprocal-normalize block is at **`0x2f8584–0x2f85a5`** inside function
+> **`0x2f78e0`** (trip count `movl $0x5,%edx` at `0x2f8418`; division census of the function body =
+> **0** hardware divides, **6** `rcpps`). Those three are now machine-verified FACTS (see
+> `docs/evidence/bundle_proof_prefusion_reducer_arithmetic_static.md`). What stays a HYPOTHESIS is the
+> kernel's **role** on the `src1`/`src2` path.
 
 ## Statement
 
-There may be a function at `libcp+0x2f8040` that computes a per-output-pixel **weighted average**:
+Function `libcp+0x2f78e0` contains a per-output-pixel **weighted average** at `0x2f8584–0x2f85a5`:
 
 ```
 out_pixel = Σ_i ( w_i · v_i )  /  Σ_i ( w_i )       over 5 unrolled contributor records
 ```
 
-with the division done by reciprocal-multiply (`rcpps`+`mulps`, no hardware `div`), weights clamped to a
-floor and scaled by a shared per-output reciprocal `1/(pixel·gain)`. If true, normalization is **`/Σw`
-(first power)** — not `/Σw²`, not `/N` — which would resolve the parity-critical normalization question.
+with the division done by reciprocal-multiply (`rcpps` at `0x2f859f` + `mulps` at `0x2f85a2`, no
+hardware `div`), weights clamped to a floor and scaled by a shared per-output reciprocal `1/(pixel·gain)`.
+Normalization is **`/Σw` (first power)** — not `/Σw²`, not `/N` (the literal `5` is the unroll trip
+count). **The arithmetic shape is machine-verified.** The HYPOTHESIS is whether this kernel operates on
+the `src1`/`src2` pre-fusion path (vs being a local spatial filter), which would resolve the
+parity-critical normalization question for the merge.
 
-## Provenance (and why this is only a hypothesis)
+## Provenance (and why the ROLE is only a hypothesis)
 
-- Produced by static multi-agent workflow `wf_821d9755` (raw: `runs/prefusion_reducer_static/workflow_wf_821d9755_result.json`).
-- It is **LLM-read disassembly**: an agent reported verbatim-looking opcodes, but those bytes were **not
-  machine-verified** against the binary by a deterministic tool. One agent in the run reported two
-  premature/erroneous outputs under a "transient empty-Bash-output" condition.
-- `0x2f8040` appears in **zero** existing repo evidence docs — there is no prior independent cross-check.
+- Arithmetic shape + address: machine-verified by parent against an independent `otool` disasm
+  (`e34e6d6`); reproduction `runs/prefusion_reducer_static/verify_28mm_decider_addresses.sh`.
+  Originally surfaced (at the wrong address) by static workflow `wf_821d9755`.
+- **Role unproven:** no call-graph / data-flow proof links `0x2f78e0` to the `src1`/`src2` path, and at
+  28mm runtime the kernel was **not observed live** (BP-binding/async tooling gap — "not observed under
+  tested conditions," not "never fires").
 
-## Why It Is Not Yet Fact
+## Why It Is Not Yet Fact (the ROLE)
 
-1. The disassembly was never independently re-extracted and captured to a log.
-2. **No runtime render was observed.** The "5 contributors" could be 5 **cameras** (true inter-camera
-   merge) or 5 **spatial neighbor taps** (a local filter). Static bytes cannot decide.
-3. No call-graph / data-flow proof links `0x2f8040` to the `src1`/`src2` path.
+1. **No runtime observation that it is on the merge path.** The "5 contributors" could be 5 **cameras**
+   (true inter-camera merge) or 5 **spatial neighbor taps** (a local filter). Static bytes cannot decide.
+2. No call-graph / data-flow proof links `0x2f78e0` to `src1`/`src2`.
+3. The sibling accumulator `0x369f80` (in function `0x3661b0`, single caller `0x365960`) IS on the IRAMP
+   path and IS Hann-windowed (verified), but at 28mm only zero-valued first-touch tiles were captured —
+   so even that kernel's N-camera-merge role is unresolved (see `bundle_proof_prefusion_reducer_arithmetic_static.md`).
 
 ## Proof Plan
 
@@ -55,16 +69,29 @@ floor and scaled by a shared per-output reciprocal `1/(pixel·gain)`. If true, n
 
 ## Progress
 
-- (none yet — `renderbp` 28mm run in flight; whatever it returns is 28mm-scope-bound only, with
-  35mm/70mm/150mm still to run before any promotion.)
+### 28mm runtime decider — 2026-05-30 (scope-bound to 28mm; promotes NOTHING) — committed `e34e6d6`
+
+- **VERIFIED (zoom-independent binary facts):** address correction above — normalizer at
+  `0x2f8584–0x2f85a5` in `0x2f78e0` (not `0x2f8040`); 0 hw divides / 6 `rcpps`; accumulator `0x369f80`
+  in function `0x3661b0`, single caller `0x365960` (brief hint "accumulator in `0x365960`" REFUTED).
+- **28mm runtime observations (scope-bound, NOT generalizable):** 16 accumulator hits at `0x369fa4`;
+  coeff tile `rbp-0xa0` matched the periodic Hann-16 LUT on all 16; per-tile loop confirmed; backtrace
+  `0x3661b0 ← 0x365960 ← 0x3ec770 ← 0x3ec960 ← 0x3d47d0 ← … ← pthread`.
+- **INCONCLUSIVE:** all 16 tiles were zero-valued first-touch → N-camera-merge vs single-tile NOT
+  resolved; no per-camera loop in the immediate caller; the `0x2f78e0` normalizer not observed live.
+- **Still owed (four-zoom rule):** a redesigned probe that captures NON-ZERO accumulation and
+  instruments the loop at frames `0x3ec770`/`0x3d47d0`, then runs at 28/35/70/150mm sequentially.
+  28mm alone closes nothing.
 
 ## Disproof Criteria
 
-- If the re-disassembly shows `0x2f8040` is **not** a `Σwv/Σw` normalizer (e.g. it is integer/ROI prep,
-  or contains a real hardware divide, or the "5" is not a contributor trip count) → `REFUTED`.
+- The "is it a `Σwv/Σw` normalizer" disproof is now **settled** — the arithmetic shape is machine-verified
+  at `0x2f8584–0x2f85a5`. What remains falsifiable is the ROLE:
 - If runtime shows the `source` operand is a single intermediate tile / spatial neighborhood rather than
   distinct per-camera buffers → the "inter-camera merge" reading is `REFUTED` (the arithmetic could still
   be a local filter; record that distinction).
+- If a call-graph trace shows `0x2f78e0` is never reached from the `src1`/`src2` IRAMP path → `REFUTED`
+  as the merge normalizer.
 
 ## Sub-Hypotheses
 
