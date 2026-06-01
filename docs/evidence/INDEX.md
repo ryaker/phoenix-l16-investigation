@@ -265,10 +265,12 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
 - `lldb_calib_state_operator_runtime_four_zoom.md`
   LLDB runtime proof that all thirteen verified `CalibDataProcessor::State()`
   `operator()` bodies are live in complete accepted bridge HDR renders across
-  `28mm`, `35mm`, `70mm`, and `150mm`; the twelve non-`0x247390` operators are
-  low-count and stable across the quartet, while `0x247390` is the hot member
-  with counts `258`, `283`, `337`, and `207`. This is runtime liveness, not
-  reducer closure.
+  `28mm`, `35mm`, `70mm`, and `150mm`; the corrected body list is `0x229df0`,
+  `0x229ec0`, `0x22a0e0`, `0x22a9b0`, `0x22aaf0`, `0x22ae60`, `0x22af80`,
+  `0x22bdf0`, `0x22bee0`, `0x22c350`, `0x22cd00`, `0x22d250`, and
+  `0x22e1d0`, with full-render count pattern `(1,1,4,4,4,1,1,1,5,5,5,5,1)`.
+  `0x247390` is excluded from the State census and refuted as a State body.
+  This is runtime liveness, not reducer closure.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`

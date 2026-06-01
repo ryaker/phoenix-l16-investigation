@@ -15,7 +15,11 @@ It proves:
 Follow-up callback-identity proof now lives in:
 [bundle_proof_prefusion_callback_reuses_known_runner.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/bundle_proof_prefusion_callback_reuses_known_runner.md)
 
-That follow-up shows the callback object built after this helper tranche reuses the already-bounded `runHigherGroupCams::$_12` / `0x247390` runner family.
+That follow-up shows the callback object built after this helper tranche uses an
+adjacent `SparseLNR::markInliers(..., void(int,int,int))` table whose `+0x30`
+body is `0x247390`. It is not the `runHigherGroupCams::$_12`
+`CalibDataProcessor::State()` runner; the corrected terminal State body is
+`0x22e1d0`.
 
 This note does not by itself prove that the exact `src1` / `src2` N-to-1 reducer has been found.
 
@@ -128,7 +132,9 @@ This note does not by itself prove that the exact `src1` / `src2` N-to-1 reducer
 - Proven:
   `0x5670` is only a generic executor / chunking helper.
 - Proven:
-  follow-up bundle proof now shows the callback object reached after this helper tranche is not a fresh unknown worker; it reuses the already-bounded `runHigherGroupCams::$_12` / `0x247390` runner family.
+  follow-up bundle proof now shows the callback object reached after this helper
+  tranche is not the `CalibDataProcessor::State()` runner; it is the adjacent
+  `SparseLNR::markInliers` callback table with body `0x247390`.
 - Still unproven:
   the exact `src1` / `src2` N-to-1 reducer.
 
@@ -140,7 +146,9 @@ Future anchor pre-fusion work can now treat this helper tranche as bounded:
 2. integer-vector range-copy helper `0x247900`
 3. bitset-entry materializer `0x249410`
 4. generic range executor `0x5670`
-5. callback-object identity, which now separately resolves back to the already-bounded `runHigherGroupCams::$_12` / `0x247390` runner family
+5. callback-object identity, which now separately resolves to the adjacent
+   `SparseLNR::markInliers` / `0x247390` callback table, not the corrected
+   `runHigherGroupCams::$_12` / `0x22e1d0` State runner
 
 This selector branch no longer introduces a fresh unresolved callback surface.
 

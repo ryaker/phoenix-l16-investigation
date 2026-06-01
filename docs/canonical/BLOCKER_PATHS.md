@@ -76,12 +76,11 @@ They are not equal in precision:
      static and four-zoom runtime proof now binds the `0x406a10` branch selector to `PipelineCache` construction through `0x3eab4c -> 0x406960 -> 0x4064c0 -> 0x402d20`; `28mm` / `35mm` select non-sentinel key `1`, write/read byte `1`, and construct field `+0x20`, while `70mm` / `150mm` leave sentinel `16`, write/read byte `0`, and have zero `+0x20` construction-store hits under complete bridge HDR runs; public key/sentinel semantics, scanned fields `+0x58/+0x60`, upstream collection LRI origin, optional `+0x20` semantic name, semantic `src2` contents, and merge/reducer closure remain open
   9. treat the `0x402d20` scan-loop record proof as bounded too:
      runtime proof shows wide scans `10` records and accepts key `1` as the only target-normalized record with sign-bit fields `+0x58/+0x5c = (-1,-1)`; tele scans `11` records and preserves sentinel `16` because no target-normalized record has a sign-bit pair; tele key `15` has `(-1,-1)` and post-mutation `object+0x30 = 0` but is outside this predicate's target-normalized bucket; static follow-up proves the target-normalized buckets are `0xf6c60` camera-ID group ordinals over ranges `0..4`, `5..9`, and `10..15`, and proves `0xf2770` constructs item `+0x60` plus `+0x58/+0x5c`; public `+0x58/+0x5c` semantics, item-input LRI origins, optional `+0x20` semantic name, semantic `src2` contents, and merge/reducer closure remain open
-  10. treat the `CalibDataProcessor::State()` `operator()` family as runtime-live:
-     complete accepted four-zoom runtime census now proves all thirteen verified `+0x30` bodies are live; reference-group bodies `0x229ec0`, `0x22a0e0`, `0x22a9b0`, `0x22aaf0`, `0x22ae60`, `0x22af80`, and `0x22bdf0` hit `(1,4,4,4,1,1,1)` at all four focal lengths
-  11. treat the higher-group `operator()` family as runtime-live too:
-     non-`0x247390` higher-group bodies `0x22bee0`, `0x22c350`, `0x22cd00`, `0x22d250`, and `0x22e1d0` hit `(5,5,5,5,1)` at all four focal lengths; hot runner `0x247390` hits `258`, `283`, `337`, and `207` at `28mm`, `35mm`, `70mm`, and `150mm`; this is entry-liveness/count proof, not return-value or reducer closure
-  12. treat `0x247380` as the preceding delete stub, not the terminal higher-group `operator()` body
-  13. treat the representative inspected operators (`0x229ec0`, `0x22bee0`, `0x247390`) as state-materialization surfaces, not automatic reducer closure; runtime liveness for the broader family does not change that static body boundary
+  10. treat the corrected `CalibDataProcessor::State()` `operator()` family as runtime-live:
+     complete accepted four-zoom runtime census now proves all thirteen corrected bodies are live; the body list is `0x229df0`, `0x229ec0`, `0x22a0e0`, `0x22a9b0`, `0x22aaf0`, `0x22ae60`, `0x22af80`, `0x22bdf0`, `0x22bee0`, `0x22c350`, `0x22cd00`, `0x22d250`, and `0x22e1d0`, with identical full-render count pattern `(1,1,4,4,4,1,1,1,5,5,5,5,1)` at `28mm`, `35mm`, `70mm`, and `150mm`; this is entry-liveness/count proof, not return-value or reducer closure
+  11. treat `0x247390` as refuted for this State-family census:
+     its vtable typeinfo belongs to an adjacent `SparseLNR::markInliers(..., void(int,int,int))` callback table, not `CalibDataProcessor::State()`; the earlier `0x247380` / `0x247390` terminal-State-slot interpretation is superseded by the corrected terminal State body `0x22e1d0`
+  12. treat the representative inspected operators (`0x229df0`, `0x229ec0`, `0x22bee0`) as state-materialization surfaces, not automatic reducer closure; runtime liveness for the broader family does not change that static body boundary
   14. bound the first post-`State()` helper chain away from reducer closure:
      `0x224cc0`, `0x224d70`, `0x242a80`, `0x258ea0`, `0x258f00`, `0x242d00`, `0x242dc0`, `0x243770`, and `0x243870` are now bundle-proven setup/copy/reset surfaces
   13. treat `0x244560` and `0x245a40` as bounded heavy consumers, not closure points:
@@ -93,10 +92,10 @@ They are not equal in precision:
   16. use the visible continuation of `0x2416d0` after those helpers as another exclusion anchor:
       the code still performs bitset tests and writes `record+0x24 = 5` for accepted selected records
   17. treat `0x5670` as a generic range / chunk executor, not reducer closure
-  18. treat the callback object reached after that executor path as bounded too:
-      `0x241b60` installs vtable address point `0x6589e0`, i.e. the already-verified `runHigherGroupCams::$_12` vtable at `0x6589d8`
+  18. treat the callback object reached after that executor path as bounded but not as State-family evidence:
+      `0x241b60` installs vtable address point `0x6589e0`; the adjacent metadata identifies this as a `SparseLNR::markInliers(..., void(int,int,int))` callback table, not a `CalibDataProcessor::State()` table
   19. treat that callback's substantive `+0x30` slot as already known:
-      raw vtable bytes give `0x658a10 = 0x247390`, and prior bundle proof already bounds `0x247390` to thresholded coordinate/bitset state rather than exposed pixel reduction
+      raw vtable bytes give `0x658a10 = 0x247390`, and the callback proof bounds `0x247390` to coordinate/bitset-style state work rather than exposed pixel reduction
   20. treat the candidate block-geometry helper family as bounded too:
       `0x25c990` is two-float coordinate delta / scale, `0x25ca70` is a geometry predicate, `0x25d090` copies validated coordinate pairs into active block vectors and uses `0x25d2a0` / `0x25ca70` to validate or clear block state, and `0x25d4d0` is int-pair vector insertion / copy
   21. do not reopen this selector / block-geometry branch as the missing reducer

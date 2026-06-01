@@ -4,19 +4,19 @@ import struct
 
 
 OPERATORS = {
-    0x229EC0: "runReferenceGroupCams::$_0",
-    0x22A0E0: "runReferenceGroupCams::$_1",
-    0x22A9B0: "runReferenceGroupCams::$_2",
-    0x22AAF0: "runReferenceGroupCams::$_3",
-    0x22AE60: "runReferenceGroupCams::$_4",
-    0x22AF80: "runReferenceGroupCams::$_5",
-    0x22BDF0: "runReferenceGroupCams::$_6",
-    0x22BEE0: "runHigherGroupCams::$_7",
-    0x22C350: "runHigherGroupCams::$_8",
-    0x22CD00: "runHigherGroupCams::$_9",
-    0x22D250: "runHigherGroupCams::$_10",
-    0x22E1D0: "runHigherGroupCams::$_11",
-    0x247390: "runHigherGroupCams::$_12",
+    0x229DF0: "runReferenceGroupCams::$_0",
+    0x229EC0: "runReferenceGroupCams::$_1",
+    0x22A0E0: "runReferenceGroupCams::$_2",
+    0x22A9B0: "runReferenceGroupCams::$_3",
+    0x22AAF0: "runReferenceGroupCams::$_4",
+    0x22AE60: "runReferenceGroupCams::$_5",
+    0x22AF80: "runReferenceGroupCams::$_6",
+    0x22BDF0: "runHigherGroupCams::$_7",
+    0x22BEE0: "runHigherGroupCams::$_8",
+    0x22C350: "runHigherGroupCams::$_9",
+    0x22CD00: "runHigherGroupCams::$_10",
+    0x22D250: "runHigherGroupCams::$_11",
+    0x22E1D0: "runHigherGroupCams::$_12",
 }
 
 
