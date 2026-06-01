@@ -1,0 +1,25 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/calib_state_operator_runtime/state_operator_probe.py
+script state_operator_probe.reset("35mm L16_03041 CalibDataProcessor State operator runtime", 512, 24)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/calib_state_operator_runtime
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x229ec0
+breakpoint set --shlib libcp.dylib --address 0x22a0e0
+breakpoint set --shlib libcp.dylib --address 0x22a9b0
+breakpoint set --shlib libcp.dylib --address 0x22aaf0
+breakpoint set --shlib libcp.dylib --address 0x22ae60
+breakpoint set --shlib libcp.dylib --address 0x22af80
+breakpoint set --shlib libcp.dylib --address 0x22bdf0
+breakpoint set --shlib libcp.dylib --address 0x22bee0
+breakpoint set --shlib libcp.dylib --address 0x22c350
+breakpoint set --shlib libcp.dylib --address 0x22cd00
+breakpoint set --shlib libcp.dylib --address 0x22d250
+breakpoint set --shlib libcp.dylib --address 0x22e1d0
+breakpoint set --shlib libcp.dylib --address 0x247390
+script state_operator_probe.attach_existing(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/calib_state_operator_runtime/state_operator_35mm.hdr" --profile 3 --export-fmt 3
+script state_operator_probe.drive_until_exit_or_step_cap(lldb.debugger, 20000)
+script state_operator_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/calib_state_operator_runtime/state_operator_35mm.json")
+script state_operator_probe.report(lldb.debugger)
+quit

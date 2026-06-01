@@ -262,6 +262,13 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   LLDB runtime proof that the canonical `28mm` index-5 depth descriptor custody path is not dependent on auto-loading the same-name `L16_02130.lris` sidecar: with `--no-auto-lris`, the constructor counts, index-5 size/source-vector shape, `0x26aa30` handoff, returned `2080 x 1560` descriptor, and initial-fill/later-overwrite stacks match the prior 28mm custody evidence. Public LRI origin and public semantic name remain open.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.
+- `lldb_calib_state_operator_runtime_four_zoom.md`
+  LLDB runtime proof that all thirteen verified `CalibDataProcessor::State()`
+  `operator()` bodies are live in complete accepted bridge HDR renders across
+  `28mm`, `35mm`, `70mm`, and `150mm`; the twelve non-`0x247390` operators are
+  low-count and stable across the quartet, while `0x247390` is the hot member
+  with counts `258`, `283`, `337`, and `207`. This is runtime liveness, not
+  reducer closure.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`

@@ -241,3 +241,10 @@ The next bundle-verified candidate surfaces above the visible wrapper layer are:
   `0x22bee0`, `0x22c350`, `0x22cd00`, `0x22d250`, `0x22e1d0`, `0x247390`
 
 These are proven `lt::CalibDataProcessor::State ()` runner surfaces. The representative bodies inspected so far are state-materializers, not direct reducer closure. That still does not close the reducer blocker, but it materially narrows the next decode surface toward later state consumers or deeper image-producing callees rather than these visible state operators themselves.
+
+Follow-up runtime liveness is documented in
+[lldb_calib_state_operator_runtime_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_calib_state_operator_runtime_four_zoom.md):
+all thirteen `operator()` bodies are live in complete accepted bridge HDR renders
+across `28mm`, `35mm`, `70mm`, and `150mm`. That follow-up adds entry counts and
+caller context only; it does not change this static document's body-classification
+boundary or close the reducer blocker.
