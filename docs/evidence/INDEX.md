@@ -151,6 +151,13 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   select only the `0x2fb320` callback arm at `0x2f6420 -> 0x5440`; the
   hypothesis-relevant `0x2f78e0` arm and normalize sites `0x2f8584`,
   `0x2f859f`, and `0x2f85a5` have zero hits under that tested route.
+- `lldb_2fb320_worker_runtime_four_zoom.md`
+  LLDB runtime proof that the selected `0x2fb320` arm under the same first
+  visible-`src1` gate is local descriptor / `vec4` coefficient work: callback
+  fields `+0x08`, `+0x10`, and `+0x18` decode as readable same-shaped
+  descriptor-like records, `+0x20` decodes as a `vec4` coefficient pointer, and
+  the final sampled store writes approximate reciprocal-normalized `xmm4/xmm3`
+  into destination memory across the canonical quartet.
 - `bundle_proof_src1_region_adapter_helper_2e8680.md`
   Installed-bundle proof bounding helper `0x2e8680`, called by the selected `0x341770` visible-`src1` region-adapter body, to one-source Bayer/RAW region helper work with callback vtable `0x659fc0` and substantive slot `0x2e8cc0`; this is not reducer, C6-routing, final blend, or acceptance closure.
 - `lldb_iramp_partner_gate_four_zoom.md`

@@ -89,7 +89,10 @@ The sampled parent chains also pass through the previously bounded
 
 ## Next Proof
 
-The next useful Lane A step is to inspect and/or instrument the now-live
-`0x2fb320` worker family enough to decide whether it is still local
-descriptor filtering, or whether it exposes multi-input merge/reduction inputs
-that matter to `src1` / `src2` parity.
+Completed follow-up:
+[lldb_2fb320_worker_runtime_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_2fb320_worker_runtime_four_zoom.md)
+runtime-bounds the selected `0x2fb320` worker under this route as local
+descriptor / `vec4` coefficient / normalized weighted-store mechanics. The next
+useful Lane A step is to move beyond this bounded helper path toward
+upstream/downstream surfaces that can still expose real multi-input
+merge/reduction or distributed selection/acceptance math.
