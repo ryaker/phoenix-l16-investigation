@@ -6,7 +6,7 @@
 SHA-256 per file via `tools/lri_field_inspect.py`. No render, no lldb.
 **Method note:** The corpus is organized by **shot date**, NOT by unit (per Rich). So units cannot be
 inferred from folders — each LRI was hashed individually; the distinct hashes ARE the units. Reproduced
-in `runs/two_unit_corpus/per_file_unit_partition.py`.
+in local ignored script `runs/two_unit_corpus/per_file_unit_partition.py`.
 
 ## FACT 1 — Exactly two physical units (per-file calibration SHA-256)
 
@@ -127,8 +127,13 @@ heuristic (e.g. `2017-12-08/L16_00696.lri`). They are **unassigned**, not a thir
 coverage gap is a known limitation, not evidence of more bodies. Assigning them needs a parser fix
 (tracked as future work), not a new claim.
 
-## Artifacts (reproduction, gitignored `runs/`)
+## Artifacts (reproduction, local ignored `runs/`)
 
 - `runs/two_unit_corpus/per_file_unit_partition.py` — per-file hash + mixed-folder detection (this proof)
 - `runs/two_unit_corpus/twin_compare.py` — canonical-seed vs twin calibration comparison
 - raw report: `/Volumes/Dev/lumen-phoenix-scratch/per_file_unit_partition_report.txt`
+
+Codex audit note, 2026-06-01: these `runs/` scripts are present locally and reproduced the numbers above,
+but `runs/` is gitignored and the scripts are not git-tracked. The embedded facts above are therefore the
+durable committed evidence; promoting the verifier scripts into a tracked harness path is a separate
+custody hardening step.

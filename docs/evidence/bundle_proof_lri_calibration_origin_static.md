@@ -10,7 +10,7 @@ distribution model (Phoenix must parse calibration from each LRI; see project di
 ## Verification Method
 
 Findings produced by a static agent (Lane B), then **independently re-verified by the parent** with a
-standalone script (`runs/lri_calibration_origin/verify_laneB_independent.py`) that re-hashes raw block
+standalone local script (`runs/lri_calibration_origin/verify_laneB_independent.py`) that re-hashes raw block
 payloads via the repo parser `tools/lri_field_inspect.py` and re-walks proto fields — a different code
 path from the agent's. Only facts that reproduced under that independent re-run are stated as FACT below.
 
@@ -86,6 +86,7 @@ producer, and the CalibStage-bank mapping are tracked in `docs/hypotheses/HYP-LA
 
 ## Artifacts
 
-- Independent re-verification: `runs/lri_calibration_origin/verify_laneB_independent.py` (rerunnable)
+- Independent re-verification: `runs/lri_calibration_origin/verify_laneB_independent.py` (local ignored
+  script; rerunnable, but not git-tracked as of the 2026-06-01 Codex audit)
 - Lane B full writeup + raw dumps: `/Volumes/Dev/lumen-phoenix-scratch/laneB_lri_origin_findings.md`
   and `laneB_*.txt` (scratch corpus; cited, not repo-owned)

@@ -31,6 +31,13 @@ points to a repo-local probe that can reproduce the observation.
 If a historical `/tmp` artifact is needed again, rerun or reconstruct the
 investigation and write the durable result here or in `docs/evidence/`.
 
+## Registers
+
+- `codex_deterministic_reaudit_2026-06-01.md` — deterministic re-audit of the
+  2026-05-31 Opus/Claude work: reran the nine local verifier scripts,
+  independently re-read corrected VAs, swept for hypothesis contamination, and
+  audited commit range `3559b65..aa9904c`.
+
 ## Verified Cleanup Note
 
 On 2026-05-13, the session handoff referenced:

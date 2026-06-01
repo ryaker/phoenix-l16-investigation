@@ -53,7 +53,8 @@ parity-critical normalization question for the merge.
 > Assume nothing about cross-zoom generality — observe it.
 
 1. **Static re-extraction (deterministic, build-universal):** `otool -arch x86_64 -tV libcp.dylib`, slice
-   `0x2f8040`, capture to a log under `runs/`. Confirm the `rcpps`/`mulps` normalizer shape and the
+   function `0x2f78e0` around block `0x2f8584..0x2f85a5`, capture to a log under `runs/`. Confirm the
+   `rcpps`/`mulps` normalizer shape and the
    `divss/divps` census = 0. Anchor-check `0x3eced0` first. (This part is zoom-independent — it is the
    binary's code, identical for every render — so a single clean static decode suffices for the
    *arithmetic shape*. It does NOT establish that this kernel is on the src1/src2 path at any zoom.)

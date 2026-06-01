@@ -44,7 +44,8 @@ captured weights as little-endian float32 and byte-searches the real `libcp.dyli
 64-byte match, at **file offset `0x5fdb50`**, decoding round-trip-exact to all 16 captured weights
 (`decoded[0]=0.009607374668`, `decoded[7]=0.990392684937`). Binary size 6,935,696 bytes.
 
-Reproduction scripts (committed under gitignored `runs/`, rerunnable against the real binary):
+Local reproduction scripts observed under ignored `runs/` (rerunnable against the real binary; not
+git-tracked as of the 2026-06-01 Codex audit):
 - `runs/prefusion_reducer_static/hann_window_closedform_check.py` — closed-form residual check.
 - `runs/prefusion_reducer_static/verify_lut_in_binary.py` — byte-search of the dylib for the LUT.
 
