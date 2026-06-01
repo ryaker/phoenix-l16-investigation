@@ -145,6 +145,12 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   LLDB runtime plus installed-bundle static proof bounding the immediate `0x2f53d0` helper chain under the first visible-`src1` gate: `0xab590`, `0x2f4470`, `0x2f6420`, `0x135d0`, `0x3066d0`, and postbranch `0xab590` are live in capped windows across the canonical quartet, while `0x3048b0` has zero hits under accepted gated probes. Static inspection bounds the surface to descriptor/vector setup, bilateral-kernel dispatch, and executor dispatch; callback bodies are classified separately in the next entry.
 - `lldb_2f53d0_callback_bodies_static.md`
   Installed-bundle static proof classifying the executor callback bodies under the already-live `0x2f53d0` helper chain as local descriptor transform, filtering, interpolation, normalization, and accumulation surfaces rather than semantic `src1` / `src2` reducer closure.
+- `lldb_2f53d0_callback_arm_runtime_four_zoom.md`
+  LLDB runtime proof that, under the first visible-`src1` `0x3e4b09` gate,
+  complete accepted bridge HDR runs at `28mm`, `35mm`, `70mm`, and `150mm`
+  select only the `0x2fb320` callback arm at `0x2f6420 -> 0x5440`; the
+  hypothesis-relevant `0x2f78e0` arm and normalize sites `0x2f8584`,
+  `0x2f859f`, and `0x2f85a5` have zero hits under that tested route.
 - `bundle_proof_src1_region_adapter_helper_2e8680.md`
   Installed-bundle proof bounding helper `0x2e8680`, called by the selected `0x341770` visible-`src1` region-adapter body, to one-source Bayer/RAW region helper work with callback vtable `0x659fc0` and substantive slot `0x2e8cc0`; this is not reducer, C6-routing, final blend, or acceptance closure.
 - `lldb_iramp_partner_gate_four_zoom.md`

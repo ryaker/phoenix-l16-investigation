@@ -15,6 +15,12 @@ This document adds installed-bundle static disassembly of the callback bodies
 invoked through the generic executor helpers `0x5440` and `0x5670`. It does not
 add new runtime liveness beyond the earlier four-zoom helper proof.
 
+Follow-up runtime arm selection is documented separately in
+[lldb_2f53d0_callback_arm_runtime_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_2f53d0_callback_arm_runtime_four_zoom.md).
+That later proof shows the tested first-visible-`src1` route selects the
+`0x2fb320` arm across the canonical quartet; this static document remains the
+body-family classification record.
+
 ## Artifacts
 
 - Static LLDB script:

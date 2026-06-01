@@ -84,6 +84,19 @@ parity-critical normalization question for the merge.
   instruments the loop at frames `0x3ec770`/`0x3d47d0`, then runs at 28/35/70/150mm sequentially.
   28mm alone closes nothing.
 
+### `0x2f53d0 -> 0x2f6420` callback-arm runtime — 2026-06-01 (scope-bound route exclusion)
+
+- **VERIFIED under tested route:** after the first visible-`src1` `0x3e4b09` gate, complete accepted
+  bridge HDR runs at `28mm`, `35mm`, `70mm`, and `150mm` select only the `0x2fb320` callback arm at
+  `0x2f67e2 -> 0x5440` inside live helper `0x2f6420`; the `0x2f78e0` arm, worker entry, and normalize
+  sites `0x2f8584`, `0x2f859f`, and `0x2f85a5` have zero hits under that route. See
+  `docs/evidence/lldb_2f53d0_callback_arm_runtime_four_zoom.md`.
+- **Consequence:** this hypothesis is not a valid explanation for the already-bounded visible-`src1`
+  `0x3449f0 -> 0x345920 -> 0x2f53d0 -> 0x2f6420` runtime path unless a separate pre-gate or alternate
+  caller route is proven.
+- **Still not global disproof:** this does not prove `0x2f78e0` is dead globally; it only excludes this
+  tested post-gate path as a positive runtime route to the normalizer.
+
 ## Disproof Criteria
 
 - The "is it a `Σwv/Σw` normalizer" disproof is now **settled** — the arithmetic shape is machine-verified
