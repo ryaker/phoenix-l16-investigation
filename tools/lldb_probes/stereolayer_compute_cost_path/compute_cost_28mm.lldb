@@ -1,0 +1,26 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/stereolayer_compute_cost_path/stereolayer_compute_cost_probe.py
+script stereolayer_compute_cost_probe.reset("28mm L16_02130 StereoLayer compute cost sibling", 160, 64)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_compute_cost_path
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26b038
+breakpoint set --shlib libcp.dylib --address 0x26f383
+breakpoint set --shlib libcp.dylib --address 0x26f571
+breakpoint set --shlib libcp.dylib --address 0x272100
+breakpoint set --shlib libcp.dylib --address 0x272640
+breakpoint set --shlib libcp.dylib --address 0x274b10
+breakpoint set --shlib libcp.dylib --address 0x2727f0
+breakpoint set --shlib libcp.dylib --address 0x2729b0
+breakpoint set --shlib libcp.dylib --address 0x272c84
+breakpoint set --shlib libcp.dylib --address 0x272ca9
+breakpoint set --shlib libcp.dylib --address 0x276790
+breakpoint set --shlib libcp.dylib --address 0x276860
+breakpoint set --shlib libcp.dylib --address 0x277e70
+breakpoint set --shlib libcp.dylib --address 0x27710f
+breakpoint set --shlib libcp.dylib --address 0x2773dc
+script stereolayer_compute_cost_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_compute_cost_path/compute_cost_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script stereolayer_compute_cost_probe.drive_until_exit_or_step_cap(lldb.debugger, 60000)
+script stereolayer_compute_cost_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/stereolayer_compute_cost_path/compute_cost_28mm.json")
+quit
