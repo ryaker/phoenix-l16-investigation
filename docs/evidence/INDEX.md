@@ -271,6 +271,15 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   `0x22e1d0`, with full-render count pattern `(1,1,4,4,4,1,1,1,5,5,5,5,1)`.
   `0x247390` is excluded from the State census and refuted as a State body.
   This is runtime liveness, not reducer closure.
+- `bundle_proof_state_machine_terminal_22e1d0_static.md`
+  Installed-bundle static proof bounding terminal corrected State body `0x22e1d0`
+  and shared dispatcher `0x22f0f0`: `0x22e1d0` performs keyed vector/tree/object
+  lookup and helper dispatch over per-key records, calls `0x23c5f0`, `0xe6ba0`,
+  and `0xf33d0`, and returns State value `9`; `0x22f0f0` invokes registered
+  State function objects, stores returned `State` values at `r14+0x6c`, and can
+  notify a callback object at `r14+0xe0`. This bounds another State-machine
+  surface away from direct pixel reducer closure; public State semantics and
+  `CLM-PREFUSION-002` remain open.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`

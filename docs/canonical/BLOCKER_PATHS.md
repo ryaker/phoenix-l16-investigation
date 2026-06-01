@@ -81,6 +81,8 @@ They are not equal in precision:
   11. treat `0x247390` as refuted for this State-family census:
      its vtable typeinfo belongs to an adjacent `SparseLNR::markInliers(..., void(int,int,int))` callback table, not `CalibDataProcessor::State()`; the earlier `0x247380` / `0x247390` terminal-State-slot interpretation is superseded by the corrected terminal State body `0x22e1d0`
   12. treat the representative inspected operators (`0x229df0`, `0x229ec0`, `0x22bee0`) as state-materialization surfaces, not automatic reducer closure; runtime liveness for the broader family does not change that static body boundary
+  13. treat terminal corrected State body `0x22e1d0` and dispatcher `0x22f0f0` as bounded away from direct reducer closure:
+     installed-bundle static proof shows `0x22e1d0` iterates the integer-key vector at `this+0x20`, searches/creates keyed tree nodes under `this+0x28`, calls `0x23c5f0`, `0xe6ba0`, and `0xf33d0`, and returns State value `9`; `0x22f0f0` invokes registered State function objects through slot `+0x30`, stores returned `eax` into the current State slot at `r14+0x6c`, and can notify a callback at `r14+0xe0`; public State semantics and runtime return ordering remain open
   14. bound the first post-`State()` helper chain away from reducer closure:
      `0x224cc0`, `0x224d70`, `0x242a80`, `0x258ea0`, `0x258f00`, `0x242d00`, `0x242dc0`, `0x243770`, and `0x243870` are now bundle-proven setup/copy/reset surfaces
   13. treat `0x244560` and `0x245a40` as bounded heavy consumers, not closure points:
