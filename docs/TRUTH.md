@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.148
+**Version**: 3.0.149
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -160,6 +160,8 @@ Latest prefusion `0x20b5e0` branch-window addition: the already-admitted four-zo
 Latest prefusion State `0x22ae60` copy/record addition: reused four-zoom downstream-watch packets plus fresh static disassembly now classify the sampled State-family `0xe0ae0` copy callers beneath corrected State body `0x22ae60`. `0x20bd60` / `"point BA"` is keyed record materialization; `0x25e4b0` is the no-map `0x25e0c0` row-producer variant; `0x20dca0` is keyed record storage; `0x20ca00` is selected Ceres setup with positive-coordinate gates; and `0x239ac0` / `0x239e00` are keyed pair-vector propagation surfaces. This prevents treating those sampled windows as opaque possible reducers, but it does not prove sentinel terminality, image effect, source contribution, reducer closure, or final acceptance/rejection.
 
 Latest prefusion State-machine return addition: accepted no-auto-LRIS canonical bridge HDR runtime proof now captures the dispatcher pre/post path at `0x22f3f6` / `0x22f3ff`. Each of `28mm`, `35mm`, `70mm`, and `150mm` records `38` paired dispatcher calls, exits cleanly, writes `10432x7824` HDR output, and shares the same ordered `(operator, pre-state, returned State)` sequence. The reference-group sequence is `0x229df0 -> 2`, `0x229ec0 -> 3`, `0x22a0e0 -> 3,3,3,6`, `0x22a9b0 -> 6,6,6,4`, `0x22aaf0 -> 4,4,4,7`, `0x22ae60 -> 8`, `0x22af80 -> 9`; the higher-group sequence is `0x22bdf0 -> 1`, `0x22bee0 -> 1,1,1,1,3`, `0x22c350 -> 3,3,3,3,6`, `0x22cd00 -> 6,6,6,6,5`, `0x22d250 -> 5,5,5,5,8`, `0x22e1d0 -> 9`. This proves runtime return ordering for the tested dispatcher path, but it does not assign public State semantics, identify semantic `src1` / `src2` contents, prove reducer closure, or prove final acceptance/rejection.
+
+Latest prefusion State-family exact-body addition: installed-bundle static proof now isolates the exact function body for each corrected State operator. The thirteen State operator bodies contain zero indirect calls; dispatcher `0x22f0f0` contains the expected indirect dispatch calls. The exact State bodies expose direct helper-family surfaces and have zero direct calls to the listed known IRAMP/wrapper/owner-route VAs (`0x365960`, `0x3661b0`, `0x369fa1`, `0x3ecc10`, `0x3ecd80`, `0x3eced0`, `0x3ec960`, `0x3e4a80`, `0x3edb80`, `0x36f800`). This bounds the State shells away from being direct known merge/wrapper entry bodies, but it does not prove helper transitive behavior, public State meanings, semantic `src1` / `src2` contents, image effect, reducer closure, or final acceptance/rejection.
 
 ## Reference-Only Scope Facts
 

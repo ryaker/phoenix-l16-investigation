@@ -323,6 +323,14 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   sequence across all four runs. This proves runtime return ordering for the
   tested dispatcher path, not public State semantics, reducer closure, or final
   acceptance/rejection.
+- `bundle_static_state_family_full_body_call_surface.md`
+  Installed-bundle static proof isolating the exact function body for each of
+  the thirteen corrected State operators. The State operator bodies contain zero
+  indirect calls; dispatcher `0x22f0f0` contains the expected indirect dispatch
+  calls. The exact bodies expose direct helper-family surfaces and have zero
+  direct calls to the listed known IRAMP/wrapper/owner-route VAs. This is a
+  direct-call-surface proof only, not helper transitive closure, public State
+  semantics, reducer closure, or final acceptance/rejection.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`
