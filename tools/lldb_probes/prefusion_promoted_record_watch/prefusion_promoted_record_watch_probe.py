@@ -17,6 +17,7 @@ def reset(
     step_cap=60000,
     watch_limit=3,
     disable_after_state5=True,
+    post_state5_sample_cap=None,
 ):
     builtins.l16_prefusion_promoted_record_watch = {
         "label": label,
@@ -26,6 +27,7 @@ def reset(
         "step_cap": step_cap,
         "watch_limit": watch_limit,
         "disable_after_state5": disable_after_state5,
+        "post_state5_sample_cap": post_state5_sample_cap,
         "breakpoint_ids": {},
         "counts": {
             "gate_before_hits": 0,
@@ -35,12 +37,14 @@ def reset(
             "watchpoints_armed": 0,
             "watchpoint_hits": 0,
             "state5_target2_hits": 0,
+            "post_state5_cap_disabled": 0,
         },
         "active_before_by_thread": {},
         "gate_before": [],
         "gate_after": [],
         "armed": [],
         "watchpoint_samples": [],
+        "state5_first_sample_index": None,
         "errors": [],
         "drive_steps": 0,
         "drive_hit_step_cap": False,
@@ -453,9 +457,18 @@ def _record_watchpoint_stop(debugger):
     )
     if saw_state5_target2:
         state["counts"]["state5_target2_hits"] += 1
+        if state.get("state5_first_sample_index") is None:
+            state["state5_first_sample_index"] = len(state["watchpoint_samples"]) - 1
+    hit_post_state5_cap = (
+        state.get("post_state5_sample_cap") is not None
+        and state["counts"]["state5_target2_hits"] >= state["post_state5_sample_cap"]
+    )
+    if hit_post_state5_cap:
+        state["counts"]["post_state5_cap_disabled"] = 1
     if (
         len(state["watchpoint_samples"]) >= state["watch_hit_cap"]
         or (state.get("disable_after_state5") and saw_state5_target2)
+        or hit_post_state5_cap
     ):
         _disable_watchpoints(debugger)
 
