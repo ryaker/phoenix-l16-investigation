@@ -1,0 +1,22 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_candidate_output_custody/prefusion_candidate_output_custody_probe.py
+script prefusion_candidate_output_custody_probe.reset("35mm L16_03041 prefusion candidate output custody", 640, 160)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_candidate_output_custody
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x2481a0
+breakpoint set --shlib libcp.dylib --address 0x2484a6
+breakpoint set --shlib libcp.dylib --address 0x24c320
+breakpoint set --shlib libcp.dylib --address 0x2484bd
+breakpoint set --shlib libcp.dylib --address 0x2484e4
+breakpoint set --shlib libcp.dylib --address 0x248580
+breakpoint set --shlib libcp.dylib --address 0x24887b
+breakpoint set --shlib libcp.dylib --address 0x24d610
+breakpoint set --shlib libcp.dylib --address 0x248892
+breakpoint set --shlib libcp.dylib --address 0x2488b9
+breakpoint set --shlib libcp.dylib --address 0x2439b0
+script prefusion_candidate_output_custody_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_candidate_output_custody/custody_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script prefusion_candidate_output_custody_probe.drive_until_exit_or_step_cap(lldb.debugger, 60000)
+script prefusion_candidate_output_custody_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_candidate_output_custody/custody_35mm.json")
+quit

@@ -59,6 +59,8 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   Installed-bundle plus LLDB runtime proof bounding the sampled prefusion `state+0x220` callable gate to inline false-return predicate bodies on the canonical four-zoom bridge HDR quartet.
 - `bundle_proof_prefusion_candidate_scoring_family_four_zoom.md`
   Installed-bundle plus LLDB runtime proof bounding the `0x24c320` / `0x24d610` prefusion candidate-scoring families and local patch/search helpers on the canonical four-zoom bridge HDR quartet.
+- `bundle_lldb_prefusion_candidate_output_custody_four_zoom.md`
+  Installed-bundle plus repo-local LLDB proof binding the `0x24c320` / `0x24d610` candidate-scoring output vectors to the shared `0x2439b0` record-state gate by exact output-vector pointer continuity across complete canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. This is scorer-output custody proof, not reducer closure.
 - `lldb_iramp_wrapper_accumulator_four_zoom.md`
   LLDB runtime proof that the canonical four-zoom bridge HDR quartet all hit the visible `src1` wrapper, `src2` wrapper, contributor wrapper, and IRAMP accumulator surfaces at `0x3ecc10`, `0x3ecd80`, `0x3eced0`, and `0x369fa1`.
 - `lldb_iramp_entry_signature_four_zoom.md`
