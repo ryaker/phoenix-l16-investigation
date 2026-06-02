@@ -1,0 +1,21 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/higherwarpdebug_renderdebugview/higherwarpdebug_renderdebugview_probe.py
+script higherwarpdebug_renderdebugview_probe.reset("150mm L16_02285 HigherWarpDebug renderDebugView", 160, 96)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/higherwarpdebug_renderdebugview
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x42c140
+breakpoint set --shlib libcp.dylib --address 0x42cb35
+breakpoint set --shlib libcp.dylib --address 0x42cb5d
+breakpoint set --shlib libcp.dylib --address 0x42cb9c
+breakpoint set --shlib libcp.dylib --address 0x42cbc2
+breakpoint set --shlib libcp.dylib --address 0x42cc5a
+breakpoint set --shlib libcp.dylib --address 0x4300f0
+breakpoint set --shlib libcp.dylib --address 0x430240
+breakpoint set --shlib libcp.dylib --address 0x3e05f5
+breakpoint set --shlib libcp.dylib --address 0x3eb72d
+script higherwarpdebug_renderdebugview_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/higherwarpdebug_renderdebugview/higherwarpdebug_renderdebugview_150mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script higherwarpdebug_renderdebugview_probe.drive_until_exit_or_step_cap(lldb.debugger, 60000)
+script higherwarpdebug_renderdebugview_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/higherwarpdebug_renderdebugview/higherwarpdebug_renderdebugview_150mm.json")
+quit

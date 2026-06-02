@@ -53,6 +53,8 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   Installed-bundle plus LLDB runtime proof bounding the `StereoLayer<false>::runPass(int)` action path to a mode-8 per-tile projection/sampling cost path on the canonical four-zoom bridge HDR quartet, with scoped zero-hit results for `0x277e70` and `0x2730c0`.
 - `bundle_proof_stereolayer_compute_cost_sibling_four_zoom.md`
   Installed-bundle plus LLDB runtime proof bounding the sibling `StereoLayer<false>::compute()` lambda table at `0x667c28`, wrapper `0x274b10`, and worker `0x2727f0`. Static proof shows `0x2727f0` shares the same `0x275630` / `0x2730c0` / `0x2732f0` projection-cost family, while complete no-auto-LRIS bridge HDR probes across `28mm`, `35mm`, `70mm`, and `150mm` record zero hits for `0x274b10`, `0x2727f0`, adjacent setup helpers `0x272100` / `0x272640`, and their callsites, with live `runPass(int)` controls in the same runs.
+- `bundle_proof_higherwarpdebug_renderdebugview_four_zoom.md`
+  Installed-bundle plus LLDB runtime proof classifying high-address helper callers `0x42cb5d -> 0x3f6170`, `0x42cbc2 -> 0x3f7040`, and `0x42cc5a -> 0x3e55f0` as part of a `HigherWarpDebug::renderDebugView` local callback surface. Complete no-auto-LRIS bridge HDR probes across `28mm`, `35mm`, `70mm`, and `150mm` record zero hits for the debug-view entry/callsite/callback sites, while live controls at `0x3e05f5` and `0x3eb72d` hit five times per tier.
 - `bundle_proof_prefusion_callable_gate_four_zoom.md`
   Installed-bundle plus LLDB runtime proof bounding the sampled prefusion `state+0x220` callable gate to inline false-return predicate bodies on the canonical four-zoom bridge HDR quartet.
 - `bundle_proof_prefusion_candidate_scoring_family_four_zoom.md`
