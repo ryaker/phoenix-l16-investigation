@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.144
+**Version**: 3.0.145
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -152,6 +152,8 @@ Latest prefusion node sentinel-downstream addition: selected sentinel-marked nod
 Latest prefusion sentinel score-guard addition: selected tele sentinel-marked node-vector coordinate pairs that reach the `0x218b30` scoring/materialization guard are now proven to skip the body at `0x218bc4 -> 0x218cb8` under clean canonical `70mm` and `150mm` bridge HDR renders. All admitted tele guard samples still read `(-1.0, -1.0)` and recorded `CF = 0`, so the static `jae 0x218cb8` branch was taken. Companion `28mm` and `35mm` watchpoint runs completed cleanly but did not observe `0x218bc4` for the first six watched sentinel pairs within the watchpoint cap; count-only wide runs observed `152` completed sentinel pairs at `28mm` and `106` at `35mm`, so the wide sentinel population is much larger than the watched subset. This is sampled tele guard-skip proof plus a scoped wide non-observation/count; wide-tier guard behavior beyond the first six watched pairs, whole-vector terminality, final image effect, source contribution, reducer closure, and final acceptance/rejection remain unproven.
 
 Latest prefusion wide direct-guard addition: complete canonical `28mm` and `35mm` direct-census runs collected the full observed wide sentinel populations (`152` unique completed sentinel pairs at `28mm`, `106` at `35mm`) while also installing a direct breakpoint at `0x218bc4`. That direct guard breakpoint recorded zero hits in both runs, with no guard cap hit. This proves the `0x218b30` / `0x218bc4` scoring/materialization guard site is not live under the admitted wide runs; it does not prove wide sentinel entries are terminal or non-image-effecting.
+
+Latest prefusion `0x20b5e0` branch-window addition: the already-admitted four-zoom downstream watchpoint runs sampled `0x20b912` stops at `28mm`, `35mm`, `70mm`, and `150mm`, and every sampled stop still read the watched pair as two binary32 `-1.0` lanes. Fresh static disassembly of `0x20b5e0..0x20bc20` proves `0x20b912` is immediately after an x-lane load at `0x20b90c`, and that the local nonpositive/sentinel path loads `0xbf800000` sentinel bits and bypasses the `0x20bac0..0x20bac8` update-write block through `0x20baab -> 0x20bafd`. This is local branch-boundary proof for sampled sentinel reads, not direct runtime flags proof, exhaustive terminality, image effect, source contribution, reducer closure, or final acceptance/rejection.
 
 ## Reference-Only Scope Facts
 
