@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.146
+**Version**: 3.0.147
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -156,6 +156,8 @@ Latest prefusion sentinel score-guard addition: selected tele sentinel-marked no
 Latest prefusion wide direct-guard addition: complete canonical `28mm` and `35mm` direct-census runs collected the full observed wide sentinel populations (`152` unique completed sentinel pairs at `28mm`, `106` at `35mm`) while also installing a direct breakpoint at `0x218bc4`. That direct guard breakpoint recorded zero hits in both runs, with no guard cap hit. This proves the `0x218b30` / `0x218bc4` scoring/materialization guard site is not live under the admitted wide runs; it does not prove wide sentinel entries are terminal or non-image-effecting.
 
 Latest prefusion `0x20b5e0` branch-window addition: the already-admitted four-zoom downstream watchpoint runs sampled `0x20b912` stops at `28mm`, `35mm`, `70mm`, and `150mm`, and every sampled stop still read the watched pair as two binary32 `-1.0` lanes. Fresh static disassembly of `0x20b5e0..0x20bc20` proves `0x20b912` is immediately after an x-lane load at `0x20b90c`, and that the local nonpositive/sentinel path loads `0xbf800000` sentinel bits and bypasses the `0x20bac0..0x20bac8` update-write block through `0x20baab -> 0x20bafd`. This is local branch-boundary proof for sampled sentinel reads, not direct runtime flags proof, exhaustive terminality, image effect, source contribution, reducer closure, or final acceptance/rejection.
+
+Latest prefusion State `0x22ae60` copy/record addition: reused four-zoom downstream-watch packets plus fresh static disassembly now classify the sampled State-family `0xe0ae0` copy callers beneath corrected State body `0x22ae60`. `0x20bd60` / `"point BA"` is keyed record materialization; `0x25e4b0` is the no-map `0x25e0c0` row-producer variant; `0x20dca0` is keyed record storage; `0x20ca00` is selected Ceres setup with positive-coordinate gates; and `0x239ac0` / `0x239e00` are keyed pair-vector propagation surfaces. This prevents treating those sampled windows as opaque possible reducers, but it does not prove sentinel terminality, image effect, source contribution, reducer closure, or final acceptance/rejection.
 
 ## Reference-Only Scope Facts
 
