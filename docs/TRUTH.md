@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.133
+**Version**: 3.0.134
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -132,6 +132,8 @@ Latest prefusion custody addition: the `0x24c320` / `0x24d610` candidate-scorer 
 Latest prefusion record-state addition: `0x2439b0` is now bounded as a live record-state gate over those custody-bound scorer-output vectors. The admitted `28mm` / `35mm` family-A runs are unchanged at the before/after boundary; the admitted `70mm` / `150mm` family-B runs promote target-2 records from state `3` to state `4`; and sampled downstream `0x241fd0` / `0x2416d0` / watched-store sites did not match the exact scorer-output vector under this probe. This is admitted only as boundary behavior; public record-state semantics, reducer closure, and final acceptance/rejection remain unproven.
 
 Latest prefusion promoted-record addition: selected target-2 records promoted by `0x2439b0` from state `3` to state `4` are now proven to be later consumed by downstream code under clean canonical `70mm` and `150mm` renders. At least one watched promoted record per tele seed advances to state `5` through `0x2416d0`. This is admitted only as watched-record downstream-consumer proof; public state `5` semantics, downstream image contribution, reducer closure, and final acceptance/rejection remain unproven.
+
+Latest prefusion state-5 selected-index addition: promoted target-2 record indices captured at `0x2439b0` are now proven to enter concrete `0x2416d0` selected-index vectors under clean canonical `70mm` and `150mm` renders. The small promoted sets captured by this probe are observed reaching `(state=5,target=2)` stores. This is admitted only as selected-index/state-relabel proof; public state `5` semantics, downstream image contribution, reducer closure, and final acceptance/rejection remain unproven.
 
 ## Reference-Only Scope Facts
 

@@ -84,6 +84,8 @@ Recommended execution order:
   it is the most central architectural unknown and partially conditions both tele routing and full topology closure.
 - Scope:
   the search should not require one tidy `N-to-1` reducer closure; it should accept a distributed mechanism if the proof points there.
+- Current narrowed boundary:
+  tele promoted target-2 records are now proven to enter concrete `0x2416d0` selected-index vectors and the small admitted promoted sets reach `(state=5,target=2)` stores; downstream state-5 consumers, image effect, final acceptance/rejection, and reducer closure remain open.
 - Consequence:
   solving it early reduces the chance of spending time validating the wrong topology story.
 
