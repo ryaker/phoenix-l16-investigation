@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.140
+**Version**: 3.0.141
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -146,6 +146,8 @@ Latest prefusion state-5 coordinate-copy-destination addition: representative fi
 Latest prefusion state-5 coordinate-node-destination addition: representative finite non-sentinel destination pairs copied into the `0x22a61a -> 0xe8e70 -> 0x22a61f` node-vector destination are now proven to reach non-copy candidate/index/scoring-selection code under `0x21b2e0` and its `0x21c4f0` callback path across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. The admitted capped window followed at least one finite node-destination pair per run; the sibling node-vector copy site `0x22c93a -> 0x22c93f` had zero observed call/return hits in this proof. This is admitted only as non-copy candidate/index/scoring-selection consumption of a representative node-vector coordinate pair; image effect, reducer closure, and final acceptance/rejection remain unproven.
 
 Latest prefusion node sentinel-write addition: the downstream `0x21b2e0` path is now proven to execute coordinate-pair sentinel invalidation writes at `0x21b923` and `0x21b92a` across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. Runtime samples show finite non-sentinel coordinate pairs before the x-lane store and x already changed to `-1.0` before the y-lane store; static disassembly proves both stores write raw bits `0xbf800000` (`-1.0`). This is admitted only as live coordinate invalidation/rejection write proof downstream of the node-destination scoring-selection path; final image effect, reducer closure, and final acceptance/rejection remain unproven.
+
+Latest prefusion node sentinel-downstream addition: selected sentinel-marked node-vector coordinate pairs are now proven to be touched later by downstream code across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. The watchpoints were armed only after the full pair read `(-1.0, -1.0)` immediately after `0x21b92a`, and every sampled later touch still observed `(-1.0, -1.0)`. Sampled downstream surfaces include State-family copy/record propagation plus coordinate scan/scoring/materialization windows. This is downstream sentinel-coordinate custody / consumption proof only; final image effect, source contribution, reducer closure, and final acceptance/rejection remain unproven.
 
 ## Reference-Only Scope Facts
 

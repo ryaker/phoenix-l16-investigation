@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_node_sentinel_downstream_watch/prefusion_node_sentinel_downstream_watch_probe.py
+script prefusion_node_sentinel_downstream_watch_probe.reset("70mm L16_03434 prefusion node sentinel downstream watch", 128, 3, 64, 300000)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_node_sentinel_downstream_watch
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script prefusion_node_sentinel_downstream_watch_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_node_sentinel_downstream_watch/node_sentinel_downstream_70mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script prefusion_node_sentinel_downstream_watch_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script prefusion_node_sentinel_downstream_watch_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_node_sentinel_downstream_watch/node_sentinel_downstream_70mm.json")
+quit
