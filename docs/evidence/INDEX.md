@@ -331,6 +331,15 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   direct calls to the listed known IRAMP/wrapper/owner-route VAs. This is a
   direct-call-surface proof only, not helper transitive closure, public State
   semantics, reducer closure, or final acceptance/rejection.
+- `lldb_state_helpers_23c5f0_f33d0_four_zoom.md`
+  Installed-bundle plus LLDB runtime proof bounding State helper `0x23c5f0`
+  and selector-gated field-copy helper `0xf33d0`: complete accepted
+  no-auto-LRIS bridge HDR runs at `28mm`, `35mm`, `70mm`, and `150mm` hit
+  `0x23c5f0` exactly four times per run from State bodies `0x22af80` /
+  `0x22e1d0`, hit `0xf33d0` without errors or caps, and prove the static
+  `0x23c5f0 -> 0xf33d0` callsite at `0x23d38d` / return `0x23d392` live with
+  selector `1`. This is helper-selector / field-copy boundary proof, not
+  reducer closure.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`
