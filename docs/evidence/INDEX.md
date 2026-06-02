@@ -347,6 +347,14 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   integer coverage pattern, and snapshot the local pre-destroy tree with no
   traversal truncation. This is local helper-field / tree custody proof, not
   public State semantics, reducer closure, or final acceptance/rejection.
+- `lldb_state_helper_f34e0_match_four_zoom.md`
+  LLDB runtime proof that objects populated by the live `0x23c5f0 -> 0xf33d0`
+  selector-`1` copy path are later passed to `0xf34e0` inside the same
+  `0x23c5f0` helper family through `0x23c5f0 -> 0x264440 -> 0x264270`.
+  Complete accepted no-auto-LRIS runs at all four focal tiers match nine prior
+  destination objects and `204` selector-`1` `0xf34e0` calls per run. This is
+  internal transitive helper-custody proof, not post-`0x23c5f0` image effect,
+  reducer closure, or final acceptance/rejection.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`
