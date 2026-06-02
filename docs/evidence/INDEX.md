@@ -340,6 +340,13 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   `0x23c5f0 -> 0xf33d0` callsite at `0x23d38d` / return `0x23d392` live with
   selector `1`. This is helper-selector / field-copy boundary proof, not
   reducer closure.
+- `lldb_state_helper_23c5f0_exit_snapshot_four_zoom.md`
+  LLDB runtime proof that complete accepted no-auto-LRIS bridge HDR runs at
+  `28mm`, `35mm`, `70mm`, and `150mm` pair every `0x23c5f0` entry with a
+  normal pre-destroy exit, capture the post-`0xf33d0` local `rbp-0x4e0`
+  integer coverage pattern, and snapshot the local pre-destroy tree with no
+  traversal truncation. This is local helper-field / tree custody proof, not
+  public State semantics, reducer closure, or final acceptance/rejection.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`
