@@ -73,7 +73,7 @@ Installed-bundle disassembly shows:
 - Watchpoint stops in `0xe0ae0` are inside a 32-byte chunk copy loop. The sampled stops are on stores such as `0xe0bb2`, `0xe0bb7`, `0xe0bbd`, `0xe0bc3`, `0xe0bd5`, and `0xe0bdb`; under the observed stacks, the caller is the State-family path through `0x20adf1` / `0x20adf6` and `0x22ae6e` / `0x22ae73`.
 - Watchpoint stops around `0x216f60` are inside vector scan/count work over coordinate-like float pairs. The sampled stops include packed float loads / comparisons at `0x217035`, `0x21703a`, `0x217048`, `0x21704f`, `0x217064`, `0x21706a`, `0x2170b7`, and `0x2170bd`, with parent stack `0x22acfa -> 0x22f3ff -> 0x227063`.
 - Watchpoint stops around `0x218b30` are inside a scoring/materialization loop. The sampled stop PC `0x218bc4` is immediately after a memory comparison at `0x218bc0`; the same body later writes a scalar at `0x218f88`, and the observed parent stack is `0x218f81 -> 0x5f5e -> 0x4f83 -> 0x280e`.
-- Watchpoint stop `0x20b912` is inside body `0x20ada0` after the caller has copied a record with `0xe0ae0`; the local code reads coordinate pairs, loads sentinel literal `0xbf800000`, and branches through coordinate tests / fallback output assembly.
+- Watchpoint stop `0x20b912` is inside helper body `0x20b5e0`, which is called from `0x20ada0` after `0x20ada0` has copied a record with `0xe0ae0`; the local helper code reads coordinate pairs, loads sentinel literal `0xbf800000`, and branches through coordinate tests / fallback output assembly.
 
 Public semantic names for these structures are not proven by this note. The safe descriptions are downstream copy/record propagation, coordinate scan/count, and scoring/materialization surfaces.
 
