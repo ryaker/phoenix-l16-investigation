@@ -69,6 +69,8 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   LLDB runtime proof that promoted target-2 record indices captured at `0x2439b0` later enter concrete `0x2416d0` selected-index vectors under clean canonical `70mm` / `150mm` renders, and that the small promoted sets captured here are observed reaching `(state=5,target=2)` stores. This is selected-index/state-relabel proof, not public acceptance semantics, final image contribution, reducer closure, or final acceptance/rejection.
 - `bundle_lldb_prefusion_state5_later_watch_tele.md`
   LLDB hardware data-watch proof that watched promoted tele records that become `(state=5,target=2)` continue downstream into the `0x244560` heavy-consumer family and the already-bounded `0x25d090` candidate block-geometry / active-block helper family. This is later state/candidate/geometry flow, not image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_state5_coord_output_four_zoom.md`
+  LLDB runtime proof that `0x2457c0` is live and normally returning across the canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR quartet, sampled hits at the admitted `0x24593b` store-path site have `record+0x24 == 5`, and every admitted return leaves finite non-sentinel coordinate pairs in `state+0x1e8`. This is coordinate-output materialization proof, not image-effect proof, reducer closure, or final acceptance/rejection.
 - `lldb_iramp_wrapper_accumulator_four_zoom.md`
   LLDB runtime proof that the canonical four-zoom bridge HDR quartet all hit the visible `src1` wrapper, `src2` wrapper, contributor wrapper, and IRAMP accumulator surfaces at `0x3ecc10`, `0x3ecd80`, `0x3eced0`, and `0x369fa1`.
 - `lldb_iramp_entry_signature_four_zoom.md`

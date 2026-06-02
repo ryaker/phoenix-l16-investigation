@@ -85,7 +85,7 @@ Recommended execution order:
 - Scope:
   the search should not require one tidy `N-to-1` reducer closure; it should accept a distributed mechanism if the proof points there.
 - Current narrowed boundary:
-  tele promoted target-2 records are now proven to enter concrete `0x2416d0` selected-index vectors, the small admitted promoted sets reach `(state=5,target=2)` stores, and watched state-5 records continue into `0x244560 -> 0x25d090`; `0x25d090` output/effect, downstream image effect, final acceptance/rejection, and reducer closure remain open.
+  tele promoted target-2 records are now proven to enter concrete `0x2416d0` selected-index vectors, the small admitted promoted sets reach `(state=5,target=2)` stores, watched state-5 records continue into `0x244560 -> 0x25d090`, and four-zoom runs prove `0x2457c0` materializes finite non-sentinel coordinate pairs into `state+0x1e8` from the state-5 store path; `0x25d090` output/effect, downstream `state+0x1e8` consumer/effect, downstream image effect, final acceptance/rejection, and reducer closure remain open.
 - Consequence:
   solving it early reduces the chance of spending time validating the wrong topology story.
 
