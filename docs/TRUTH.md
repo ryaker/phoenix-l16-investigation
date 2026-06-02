@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.137
+**Version**: 3.0.138
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -139,7 +139,9 @@ Latest prefusion state-5 later-watch addition: watched promoted tele records tha
 
 Latest prefusion state-5 coordinate-output addition: `0x2457c0` is now proven live and normally returning across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. Sampled hits at the admitted `0x24593b` store-path site have `record+0x24 == 5`, and every admitted return leaves finite non-sentinel coordinate pairs in `state+0x1e8`. This is admitted only as coordinate-output materialization; downstream image contribution, reducer closure, and final acceptance/rejection remain unproven.
 
-Latest prefusion state-5 coordinate-consumer addition: representative finite non-sentinel coordinate pairs emitted by `0x2457c0` into `state+0x1e8` are now proven to be read by `0xe8e70` vector-copy work under both State-helper copy-out paths (`0x224d70 -> 0x245a40` and `0x224e50 -> 0x245a20 -> 0x244560`) across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. This is admitted only as coordinate-vector custody / copy-out proof; copied-destination downstream image contribution, reducer closure, and final acceptance/rejection remain unproven.
+Latest prefusion state-5 coordinate-consumer addition: representative finite non-sentinel coordinate pairs emitted by `0x2457c0` into `state+0x1e8` are now proven to be read by `0xe8e70` vector-copy work under both State-helper copy-out paths (`0x224d70 -> 0x245a40` and `0x224e50 -> 0x245a20 -> 0x244560`) across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. This is admitted only as coordinate-vector custody / copy-out proof; image-effecting non-copy use of the copied destination, reducer closure, and final acceptance/rejection remain unproven.
+
+Latest prefusion state-5 coordinate-copy-destination addition: representative finite non-sentinel destination pairs copied out by the State-helper `0xe8e70` path are now proven to be touched again by `0xe8e70` vector-copy work across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. The admitted later caller frames include the State-helper recopy sites and two higher node-vector materialization/copy sites at `0x22a61a -> 0xe8e70 -> 0x22a61f` and `0x22c93a -> 0xe8e70 -> 0x22c93f`. This is admitted only as coordinate-vector custody / propagation proof; image-effecting non-copy use of the propagated destination vectors, reducer closure, and final acceptance/rejection remain unproven.
 
 ## Reference-Only Scope Facts
 
