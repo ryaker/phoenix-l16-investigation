@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.142
+**Version**: 3.0.143
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -149,7 +149,7 @@ Latest prefusion node sentinel-write addition: the downstream `0x21b2e0` path is
 
 Latest prefusion node sentinel-downstream addition: selected sentinel-marked node-vector coordinate pairs are now proven to be touched later by downstream code across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. The watchpoints were armed only after the full pair read `(-1.0, -1.0)` immediately after `0x21b92a`, and every sampled later touch still observed `(-1.0, -1.0)`. Sampled downstream surfaces include State-family copy/record propagation plus coordinate scan/scoring/materialization windows. This is downstream sentinel-coordinate custody / consumption proof only; final image effect, source contribution, reducer closure, and final acceptance/rejection remain unproven.
 
-Latest prefusion sentinel score-guard addition: selected tele sentinel-marked node-vector coordinate pairs that reach the `0x218b30` scoring/materialization guard are now proven to skip the body at `0x218bc4 -> 0x218cb8` under clean canonical `70mm` and `150mm` bridge HDR renders. All admitted tele guard samples still read `(-1.0, -1.0)` and recorded `CF = 0`, so the static `jae 0x218cb8` branch was taken. The companion `28mm` and `35mm` runs completed cleanly but did not observe `0x218bc4` for the first three watched sentinel pairs within the watchpoint cap. This is sampled tele guard-skip proof only; wide-tier guard behavior, whole-vector terminality, final image effect, source contribution, reducer closure, and final acceptance/rejection remain unproven.
+Latest prefusion sentinel score-guard addition: selected tele sentinel-marked node-vector coordinate pairs that reach the `0x218b30` scoring/materialization guard are now proven to skip the body at `0x218bc4 -> 0x218cb8` under clean canonical `70mm` and `150mm` bridge HDR renders. All admitted tele guard samples still read `(-1.0, -1.0)` and recorded `CF = 0`, so the static `jae 0x218cb8` branch was taken. Companion `28mm` and `35mm` watchpoint runs completed cleanly but did not observe `0x218bc4` for the first six watched sentinel pairs within the watchpoint cap; count-only wide runs observed `152` completed sentinel pairs at `28mm` and `106` at `35mm`, so the wide sentinel population is much larger than the watched subset. This is sampled tele guard-skip proof plus a scoped wide non-observation/count; wide-tier guard behavior beyond the first six watched pairs, whole-vector terminality, final image effect, source contribution, reducer closure, and final acceptance/rejection remain unproven.
 
 ## Reference-Only Scope Facts
 

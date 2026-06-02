@@ -27,8 +27,14 @@ rejection semantics.
   `tools/lldb_probes/prefusion_sentinel_score_guard/sentinel_score_guard_35mm.lldb`
   `tools/lldb_probes/prefusion_sentinel_score_guard/sentinel_score_guard_70mm.lldb`
   `tools/lldb_probes/prefusion_sentinel_score_guard/sentinel_score_guard_150mm.lldb`
+  `tools/lldb_probes/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_skip3.lldb`
+  `tools/lldb_probes/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_skip3.lldb`
+  `tools/lldb_probes/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_count.lldb`
+  `tools/lldb_probes/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_count.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_sentinel_score_guard/run_four_zoom.sh`
+  `tools/lldb_probes/prefusion_sentinel_score_guard/run_wide_skip3.sh`
+  `tools/lldb_probes/prefusion_sentinel_score_guard/run_wide_count.sh`
 - Raw output directory:
   `runs/prefusion_sentinel_score_guard/`
 
@@ -38,6 +44,10 @@ The admitted runtime JSON reports are:
 - `runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm.json`
 - `runs/prefusion_sentinel_score_guard/sentinel_score_guard_70mm.json`
 - `runs/prefusion_sentinel_score_guard/sentinel_score_guard_150mm.json`
+- `runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_skip3.json`
+- `runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_skip3.json`
+- `runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_count.json`
+- `runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_count.json`
 
 The admitted runs wrote Radiance HDR outputs:
 
@@ -45,6 +55,10 @@ The admitted runs wrote Radiance HDR outputs:
 - `runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm.hdr`
 - `runs/prefusion_sentinel_score_guard/sentinel_score_guard_70mm.hdr`
 - `runs/prefusion_sentinel_score_guard/sentinel_score_guard_150mm.hdr`
+- `runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_skip3.hdr`
+- `runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_skip3.hdr`
+- `runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_count.hdr`
+- `runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_count.hdr`
 
 ## Runtime Scope
 
@@ -119,12 +133,56 @@ watched sentinel pairs within the 512-sample cap. That is not proof that wide
 sentinel entries never reach the guard; it is only a scoped non-observation for
 this watched subset.
 
+## Wide Offset / Count Follow-Up
+
+After the first wide runs recorded no `0x218bc4` guard samples for the first
+three watched sentinel pairs, a `skip3` pass skipped those first three completed
+sentinel pairs and armed the next three.
+
+| Zoom | LRI | Exit | Step cap | JSON errors | Sentinel pairs skipped | Watchpoints armed | Watchpoint samples | Guard samples at `0x218bc4` |
+|---|---|---:|---|---:|---:|---:|---:|---:|
+| `28mm` | `L16_02130` | `0` | `false` | `0` | `3` | `3` | `512` | `0` |
+| `35mm` | `L16_03041` | `0` | `false` | `0` | `3` | `3` | `512` | `0` |
+
+The `skip3` runs therefore expand the scoped wide non-observation from the
+first three watched sentinel pairs to the first six watched sentinel pairs.
+They still do not prove wide-tier absence of guard hits, because each run is
+watchpoint-capped and the full sentinel population is larger.
+
+A count-only pass then ran the same sentinel-store breakpoints with
+`arm_limit = 0`, so no watchpoints were armed and the breakpoints stayed active
+for the full render.
+
+| Zoom | LRI | Exit | Step cap | JSON errors | `0x21b92a` store hits | Completed sentinel pairs |
+|---|---|---:|---|---:|---:|---:|
+| `28mm` | `L16_02130` | `0` | `false` | `0` | `152` | `152` |
+| `35mm` | `L16_03041` | `0` | `false` | `0` | `106` | `106` |
+
+This count-only pass proves that the wide-tier sentinel populations are much
+larger than the first-six watched subset. Wide guard behavior remains open.
+
 ## Admission Checks
 
 The invariant used to admit the four JSONs:
 
 ```bash
 jq -s -e 'all(.[]; .process_exit_status == 0 and (.errors|length == 0) and .drive_hit_step_cap == false and .counts.watchpoints_armed == 3 and .counts.after_store_pair_is_sentinel >= 3 and .counts.watchpoint_guard_not_skip_by_flags == 0 and .counts.watchpoint_guard_skip_by_flags == .counts.watchpoint_guard_known_sentinel_hits)' runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm.json runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm.json runs/prefusion_sentinel_score_guard/sentinel_score_guard_70mm.json runs/prefusion_sentinel_score_guard/sentinel_score_guard_150mm.json
+```
+
+The command returned `true`.
+
+The invariant used to admit the `skip3` wide JSONs:
+
+```bash
+jq -s -e 'all(.[]; .process_exit_status == 0 and (.errors|length == 0) and .drive_hit_step_cap == false and .counts.watchpoints_armed == 3 and .counts.sentinel_pairs_skipped_before_arm == 3 and .counts.watchpoint_guard_hits == 0)' runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_skip3.json runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_skip3.json
+```
+
+The command returned `true`.
+
+The invariant used to admit the count-only wide JSONs:
+
+```bash
+jq -s -e '.[0].process_exit_status == 0 and .[0].drive_hit_step_cap == false and (.[0].errors|length == 0) and .[0].counts.watchpoints_armed == 0 and .[0].counts.store_y_hits == 152 and .[0].counts.after_store_pair_is_sentinel == 152 and .[1].process_exit_status == 0 and .[1].drive_hit_step_cap == false and (.[1].errors|length == 0) and .[1].counts.watchpoints_armed == 0 and .[1].counts.store_y_hits == 106 and .[1].counts.after_store_pair_is_sentinel == 106' runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_count.json runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_count.json
 ```
 
 The command returned `true`.
@@ -136,6 +194,14 @@ file runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm.hdr runs/pref
 ```
 
 reported `Radiance HDR image data` for all four outputs.
+
+The follow-up wide HDR verification command:
+
+```bash
+file runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_skip3.hdr runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_skip3.hdr runs/prefusion_sentinel_score_guard/sentinel_score_guard_28mm_count.hdr runs/prefusion_sentinel_score_guard/sentinel_score_guard_35mm_count.hdr
+```
+
+reported `Radiance HDR image data` for all four follow-up outputs.
 
 ## Proven Facts
 
@@ -151,6 +217,12 @@ reported `Radiance HDR image data` for all four outputs.
    `CF = 0`, so the static `jae 0x218cb8` skip was taken.
 5. In the admitted `28mm` and `35mm` runs, the first three watched sentinel
    pairs did not stop at `0x218bc4` within the 512-sample watchpoint cap.
+6. In the admitted `28mm` and `35mm` `skip3` runs, the next three watched
+   sentinel pairs also did not stop at `0x218bc4` within the 512-sample
+   watchpoint cap.
+7. In the admitted count-only wide runs, the full render observed `152`
+   completed sentinel pairs at `28mm` and `106` completed sentinel pairs at
+   `35mm`.
 
 ## Safe Conclusion
 
@@ -160,5 +232,6 @@ x-lane `<= 0` guard before the y-lane/body work. This is a real downstream
 non-contribution / rejection clue for those watched tele samples.
 
 The broader parity blocker remains open: this does not prove all sentinel
-entries, wide-tier guard behavior, image-level source contribution, reducer
-closure, or final acceptance / rejection.
+entries, wide-tier guard behavior beyond the first six watched pairs,
+image-level source contribution, reducer closure, or final acceptance /
+rejection.
