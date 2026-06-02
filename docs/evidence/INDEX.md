@@ -314,6 +314,15 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   notify a callback object at `r14+0xe0`. This bounds another State-machine
   surface away from direct pixel reducer closure; public State semantics and
   `CLM-PREFUSION-002` remain open.
+- `lldb_state_machine_return_runtime_four_zoom.md`
+  LLDB runtime proof that the accepted no-auto-LRIS canonical bridge HDR quartet
+  executes an identical ordered State-return skeleton at dispatcher sites
+  `0x22f3f6` / `0x22f3ff`: `38` paired pre/post calls per render, clean
+  `10432x7824` HDR output at `28mm`, `35mm`, `70mm`, and `150mm`, no JSON
+  errors, no step cap, and the same `(operator, pre-state, returned State)`
+  sequence across all four runs. This proves runtime return ordering for the
+  tested dispatcher path, not public State semantics, reducer closure, or final
+  acceptance/rejection.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`

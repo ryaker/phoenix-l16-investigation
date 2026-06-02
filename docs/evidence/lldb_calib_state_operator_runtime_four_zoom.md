@@ -112,7 +112,9 @@ itself assign public names to the caller fields or prove final reducer policy.
 
 - This does not prove that any `CalibDataProcessor::State ()` body is the exact
   `src1` / `src2` merge/reduction closure.
-- This does not decode return values from the operators.
+- This census proof does not decode return values from the operators. Follow-up
+  runtime return ordering is covered by
+  [lldb_state_machine_return_runtime_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_state_machine_return_runtime_four_zoom.md).
 - This does not assign public semantics to the returned `State` values or object
   fields.
 - This does not prove that `0x247390` is dead or irrelevant; it only removes it
@@ -123,7 +125,11 @@ itself assign public names to the caller fields or prove final reducer policy.
 ## Next Proof
 
 Use this result to stop treating the State-family address list as unknown, but
-do not treat the family as reducer closure. The next useful Lane A proof is a
-static/runtime decode of the terminal corrected State body `0x22e1d0` and its
-immediate consumers after `0x22f3ff`, not further probing of the adjacent
-`0x247390` SparseLNR callback as if it were a `State()` return path.
+do not treat the family as reducer closure. The terminal corrected State body
+and dispatcher are bounded by
+[bundle_proof_state_machine_terminal_22e1d0_static.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/bundle_proof_state_machine_terminal_22e1d0_static.md),
+and the dispatcher return ordering is bounded by
+[lldb_state_machine_return_runtime_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_state_machine_return_runtime_four_zoom.md).
+The remaining Lane A work is public State semantics and image/merge effect, not
+further probing of adjacent `0x247390` SparseLNR as if it were a `State()`
+return path.

@@ -136,7 +136,10 @@ This proves helper reuse, not helper public semantics.
 
 - This does not prove public names for `this+0x8`, `this+0x10`, `this+0x18`,
   `this+0x20`, `this+0x28`, `r14+0x58`, `r14+0x68`, `r14+0x6c`, or `r14+0xe0`.
-- This does not prove runtime return ordering for all State transitions.
+- This static proof does not prove runtime return ordering for all State
+  transitions. Follow-up runtime return ordering for the canonical four-zoom
+  no-auto-LRIS dispatcher path is covered by
+  [lldb_state_machine_return_runtime_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_state_machine_return_runtime_four_zoom.md).
 - This does not prove public semantics of returned State value `9`.
 - This does not prove public semantics of helper calls `0x23c5f0`, `0xe6ba0`,
   or `0xf33d0`.
@@ -153,6 +156,8 @@ are invalid diagnostics only and are not cited for any claim in this proof.
 ## Consequence For Blocker Work
 
 The corrected terminal State candidate is no longer an open plausible direct
-reducer surface. Future Lane A work should move past `0x22e1d0` / `0x22f0f0`
-unless the goal is specifically State-return ordering or public State-machine
-semantics. The exact `src1` / `src2` merge/reduction mechanism remains open.
+reducer surface. Follow-up runtime proof now covers the canonical four-zoom
+State-return ordering at `0x22f3f6` / `0x22f3ff`, so future Lane A work should
+move past `0x22e1d0` / `0x22f0f0` unless the goal is specifically public
+State-machine semantics. The exact `src1` / `src2` merge/reduction mechanism
+remains open.
