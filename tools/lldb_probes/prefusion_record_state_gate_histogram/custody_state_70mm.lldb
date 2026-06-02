@@ -1,0 +1,20 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_record_state_gate_histogram/prefusion_record_state_gate_histogram_probe.py
+script prefusion_record_state_gate_histogram_probe.reset("70mm L16_03434 prefusion record-state gate histogram", 320, 512, 512)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_record_state_gate_histogram
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x2484e4
+breakpoint set --shlib libcp.dylib --address 0x2484e9
+breakpoint set --shlib libcp.dylib --address 0x2488b9
+breakpoint set --shlib libcp.dylib --address 0x2488be
+breakpoint set --shlib libcp.dylib --address 0x241fd0
+breakpoint set --shlib libcp.dylib --address 0x2416d0
+breakpoint set --shlib libcp.dylib --address 0x241828
+breakpoint set --shlib libcp.dylib --address 0x2422a6
+breakpoint set --shlib libcp.dylib --address 0x242306
+script prefusion_record_state_gate_histogram_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_record_state_gate_histogram/custody_state_70mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script prefusion_record_state_gate_histogram_probe.drive_until_exit_or_step_cap(lldb.debugger, 60000)
+script prefusion_record_state_gate_histogram_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_record_state_gate_histogram/custody_state_70mm.json")
+quit
