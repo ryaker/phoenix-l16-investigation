@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.136
+**Version**: 3.0.137
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -138,6 +138,8 @@ Latest prefusion state-5 selected-index addition: promoted target-2 record indic
 Latest prefusion state-5 later-watch addition: watched promoted tele records that become `(state=5,target=2)` are now proven to continue downstream into `0x244560` and the already-bounded `0x25d090` candidate block-geometry / active-block helper family under clean canonical `70mm` and `150mm` renders. This is admitted only as later state/candidate/geometry flow; downstream image contribution, reducer closure, and final acceptance/rejection remain unproven.
 
 Latest prefusion state-5 coordinate-output addition: `0x2457c0` is now proven live and normally returning across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. Sampled hits at the admitted `0x24593b` store-path site have `record+0x24 == 5`, and every admitted return leaves finite non-sentinel coordinate pairs in `state+0x1e8`. This is admitted only as coordinate-output materialization; downstream image contribution, reducer closure, and final acceptance/rejection remain unproven.
+
+Latest prefusion state-5 coordinate-consumer addition: representative finite non-sentinel coordinate pairs emitted by `0x2457c0` into `state+0x1e8` are now proven to be read by `0xe8e70` vector-copy work under both State-helper copy-out paths (`0x224d70 -> 0x245a40` and `0x224e50 -> 0x245a20 -> 0x244560`) across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. This is admitted only as coordinate-vector custody / copy-out proof; copied-destination downstream image contribution, reducer closure, and final acceptance/rejection remain unproven.
 
 ## Reference-Only Scope Facts
 
