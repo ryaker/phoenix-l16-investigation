@@ -20,6 +20,11 @@ def reset(
     watch_pairs_per_copy=1,
     watch_hit_cap=64,
     step_cap=300000,
+    copy_call_a=COPY_CALL_A,
+    copy_ret_a=COPY_RET_A,
+    copy_call_b=COPY_CALL_B,
+    copy_ret_b=COPY_RET_B,
+    site_label="copy_dest",
 ):
     builtins.l16_prefusion_state5_coord_copy_dest_watch = {
         "label": label,
@@ -30,6 +35,28 @@ def reset(
         "watch_hit_cap": watch_hit_cap,
         "step_cap": step_cap,
         "breakpoint_ids": {},
+        "sites": {
+            "call_a": {
+                "va": copy_call_a,
+                "name": f"{site_label}_call_a_{copy_call_a:x}",
+                "count_key": "copy_call_a_hits",
+            },
+            "ret_a": {
+                "va": copy_ret_a,
+                "name": f"{site_label}_ret_a_{copy_ret_a:x}",
+                "count_key": "copy_ret_a_hits",
+            },
+            "call_b": {
+                "va": copy_call_b,
+                "name": f"{site_label}_call_b_{copy_call_b:x}",
+                "count_key": "copy_call_b_hits",
+            },
+            "ret_b": {
+                "va": copy_ret_b,
+                "name": f"{site_label}_ret_b_{copy_ret_b:x}",
+                "count_key": "copy_ret_b_hits",
+            },
+        },
         "counts": {
             "copy_call_a_hits": 0,
             "copy_call_b_hits": 0,
@@ -249,13 +276,8 @@ def _disable_breakpoint(debugger, name):
 
 
 def _disable_copy_breakpoints(debugger):
-    for name in (
-        "copy_call_a_224e23",
-        "copy_ret_a_224e28",
-        "copy_call_b_224f03",
-        "copy_ret_b_224f08",
-    ):
-        _disable_breakpoint(debugger, name)
+    for site in _state()["sites"].values():
+        _disable_breakpoint(debugger, site["name"])
 
 
 def _disable_watchpoints(debugger):
@@ -273,10 +295,10 @@ def install_breakpoints(debugger):
     state = _state()
     target = debugger.GetSelectedTarget()
     sites = (
-        (COPY_CALL_A, "copy_call_a_224e23"),
-        (COPY_RET_A, "copy_ret_a_224e28"),
-        (COPY_CALL_B, "copy_call_b_224f03"),
-        (COPY_RET_B, "copy_ret_b_224f08"),
+        (state["sites"]["call_a"]["va"], state["sites"]["call_a"]["name"]),
+        (state["sites"]["ret_a"]["va"], state["sites"]["ret_a"]["name"]),
+        (state["sites"]["call_b"]["va"], state["sites"]["call_b"]["name"]),
+        (state["sites"]["ret_b"]["va"], state["sites"]["ret_b"]["name"]),
     )
     for site, name in sites:
         before = target.GetNumBreakpoints()
@@ -308,12 +330,12 @@ def _pending_list(thread_id):
 def _copy_call(frame, thread_id, regs, pc_va):
     state = _state()
     process = frame.GetThread().GetProcess()
-    if pc_va == COPY_CALL_A:
-        state["counts"]["copy_call_a_hits"] += 1
-        site = "copy_call_a_224e23"
+    if pc_va == state["sites"]["call_a"]["va"]:
+        state["counts"][state["sites"]["call_a"]["count_key"]] += 1
+        site = state["sites"]["call_a"]["name"]
     else:
-        state["counts"]["copy_call_b_hits"] += 1
-        site = "copy_call_b_224f03"
+        state["counts"][state["sites"]["call_b"]["count_key"]] += 1
+        site = state["sites"]["call_b"]["name"]
     packet = {
         "site": site,
         "thread_id": thread_id,
@@ -377,12 +399,12 @@ def _copy_ret(frame, thread_id, regs, pc_va):
     state = _state()
     process = frame.GetThread().GetProcess()
     target = process.GetTarget()
-    if pc_va == COPY_RET_A:
-        state["counts"]["copy_ret_a_hits"] += 1
-        site = "copy_ret_a_224e28"
+    if pc_va == state["sites"]["ret_a"]["va"]:
+        state["counts"][state["sites"]["ret_a"]["count_key"]] += 1
+        site = state["sites"]["ret_a"]["name"]
     else:
-        state["counts"]["copy_ret_b_hits"] += 1
-        site = "copy_ret_b_224f08"
+        state["counts"][state["sites"]["ret_b"]["count_key"]] += 1
+        site = state["sites"]["ret_b"]["name"]
     pending = _pending_list(thread_id)
     if not pending:
         state["counts"]["copy_ret_without_pending"] += 1
@@ -410,9 +432,10 @@ def hit(frame, bp_loc, _dict):
     pc_va = _module_va(target, frame.GetPC())
     regs = _registers(frame)
     thread_id = frame.GetThread().GetThreadID()
-    if pc_va in (COPY_CALL_A, COPY_CALL_B):
+    state = _state()
+    if pc_va in (state["sites"]["call_a"]["va"], state["sites"]["call_b"]["va"]):
         _copy_call(frame, thread_id, regs, pc_va)
-    elif pc_va in (COPY_RET_A, COPY_RET_B):
+    elif pc_va in (state["sites"]["ret_a"]["va"], state["sites"]["ret_b"]["va"]):
         _copy_ret(frame, thread_id, regs, pc_va)
     else:
         _state()["errors"].append({"error": "unexpected breakpoint", "pc_va": pc_va})

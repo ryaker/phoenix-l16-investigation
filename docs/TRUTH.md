@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.138
+**Version**: 3.0.139
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -142,6 +142,8 @@ Latest prefusion state-5 coordinate-output addition: `0x2457c0` is now proven li
 Latest prefusion state-5 coordinate-consumer addition: representative finite non-sentinel coordinate pairs emitted by `0x2457c0` into `state+0x1e8` are now proven to be read by `0xe8e70` vector-copy work under both State-helper copy-out paths (`0x224d70 -> 0x245a40` and `0x224e50 -> 0x245a20 -> 0x244560`) across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. This is admitted only as coordinate-vector custody / copy-out proof; image-effecting non-copy use of the copied destination, reducer closure, and final acceptance/rejection remain unproven.
 
 Latest prefusion state-5 coordinate-copy-destination addition: representative finite non-sentinel destination pairs copied out by the State-helper `0xe8e70` path are now proven to be touched again by `0xe8e70` vector-copy work across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. The admitted later caller frames include the State-helper recopy sites and two higher node-vector materialization/copy sites at `0x22a61a -> 0xe8e70 -> 0x22a61f` and `0x22c93a -> 0xe8e70 -> 0x22c93f`. This is admitted only as coordinate-vector custody / propagation proof; image-effecting non-copy use of the propagated destination vectors, reducer closure, and final acceptance/rejection remain unproven.
+
+Latest prefusion state-5 coordinate-node-destination addition: representative finite non-sentinel destination pairs copied into the `0x22a61a -> 0xe8e70 -> 0x22a61f` node-vector destination are now proven to reach non-copy candidate/index/scoring-selection code under `0x21b2e0` and its `0x21c4f0` callback path across clean canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. The admitted capped window followed at least one finite node-destination pair per run; the sibling node-vector copy site `0x22c93a -> 0x22c93f` had zero observed call/return hits in this proof. This is admitted only as non-copy candidate/index/scoring-selection consumption of a representative node-vector coordinate pair; image effect, reducer closure, and final acceptance/rejection remain unproven.
 
 ## Reference-Only Scope Facts
 
