@@ -1,0 +1,17 @@
+<!-- provenance: workflow wf_4ebb1a19-717 (l16-lri-block4-w9), 2026-06-03; finder + (verifier where it ran); verifier reliable=None -->
+**Status:** NEEDS_CODEX_VALIDATION (quarantine, deterministic LRI byte-parse, 28mm Unit-1 seed).
+**Verifier reliability:** verifier stage did not run (finder-only) — treat as LEAD pending independent re-parse
+
+Block 5 decode of /Volumes/Base Photos/Light/2018-07-23/L16_02130.lri 28mm Unit-1.
+
+Block 5 block_offset=162587576 payload_size=1786 msg_type byte=0. Volume confirmed mounted. Deterministic parse via /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_field_inspect.py scan_lri_blocks parse_proto_fields fixed32 raw to float via struct.unpack little-endian f.
+
+(1) FIELD ENUMERATION OBSERVED. field 16 wt2 len 1782 is the single top field no other top fields. Inside field1 varint = 2 field2 wt2 len 1777. Inside field2 field1 fixed32 = 42.0 field2 fixed32 = 1023.0 field3 fixed32 = 2.0 then field4 repeated 28 times. Each field4 entry field1 varint = radius 100 125 to 775 step 25 field2 fixed32 = scalar A 0.00604 to 0.01697 increasing field3 fixed32 = scalar B 73.786 to 26.780 decreasing field4 5 6 7 each a sub-message of two fixed32 floats a b = channels 0 1 2 3. Float budget 3 header plus 28 times 2 scalars plus 4 channels times 2 = 283 fixed32 values.
+
+(2) THE CURVE OBSERVED parsed values. Domain radius 100 to 775 fixed step 25 N=28. No radius-0 falloff-1.0 center entry. It is NOT radius-falloff scalar pairs each radius carries 2 standalone scalars plus 4 per-channel a b coefficient pairs a radius-indexed per-channel correction LUT likely a 2-term polynomial in radius a positive increasing b small negative a correction-gain growing toward the corners not a normalized 1.0 to 0.x falloff. ch0 a 1.949e-4 at r=100 to 1.454e-3 at r=775 monotonic increasing all 4 channels verified monotonic. ch0 b -7.245e-6 to -4.792e-5. scalar A column min max 0.00604 0.01697. scalar B column min max 26.780 73.786.
+
+(3) GLOBAL vs PER-CAMERA PER-CHANNEL OBSERVED. GLOBAL Block 5 is the only block with the field16 radius-table signature all 11 blocks scanned a single table not per-camera replicated. Per-channel 4 = Bayer ch0 ch1 ch2 within about 1 percent ch3 about 5-6 percent higher across all radii RGGB. NOT luminance-only.
+
+(4) RELATIONSHIP TO BLOCK 3 4 6 OBSERVED DISTINCT not duplicate. Block 3 32832 B 16 field13 entries per-camera distortion each about 1944 2149 B entry0 subfields field1=0 field3=1924B blob field7=13B. Block 4 262968 B 16 field13 entries per-camera shading grids each about 15081 17783 B entry0 field4 = 14151B inner float blob 2D grid. Block 6 35266 B 42 field13 entries. Block 5 = 1 global 28 by 4-channel radius table different cardinality 1 vs 16 42 different schema field16 vs field13 different shape radius-indexed coeff pairs vs large 2D float grids. Distinct artifact not a duplicate of Block-3 distortion LUTs or Block-4 shading grid.
+
+NOT investigated open. libcp consumption math poly eval vs multiply not traced channel order assumed Bayer unconfirmed header scalars 42.0 1023.0 2.0 and inner field1=2 are hypotheses only 42=floor 1023=10-bit max code 2=type version cross-unit cross-zoom universality single capture only.
