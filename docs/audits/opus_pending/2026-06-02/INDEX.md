@@ -17,6 +17,13 @@ Where a packet says **"PROVEN `CLM-MERGE-002`"** it is *citing the ledger's* sta
 not asserting Opus authority. A contamination audit (2026-06-02) found no cross-citation of one Opus
 packet as fact, and `NEEDS_CODEX_VALIDATION` on every packet.
 
+## Start here for the merge story
+
+`MERGE_PIPELINE.md` — end-to-end IRAMP merge→output dataflow synthesis (entry → coverage gate →
+block-match align → SSIM-class score → soft similarity-weighted blend → Hann accumulator → edge-pad →
+cubic resample → runtime color matrix), one table with per-stage VAs, confidence, and packet refs.
+Navigational only; no new claims. Read it before the per-lane packets below.
+
 ## How Codex should consume this
 
 1. Re-run each packet's `commands.txt` / probe from scratch against the real binary+LRIs.
