@@ -1,0 +1,25 @@
+{
+  "topic": "laneA6_score_metric",
+  "lane": "A (merge-weight metric; touches CLM-PREFUSION-002 weighting + Blocker 5 acceptance)",
+  "status": "NEEDS_CODEX_VALIDATION",
+  "created": "2026-06-03",
+  "author": "opus (quarantine research manager; no ledger authority)",
+  "extends": "docs/evidence/bundle_lldb_iramp_36cde0_scalar.md (Codex; left the metric un-named)",
+  "binary": {"path": "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib", "sha256": "b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9", "arch": "x86_64", "note": "VA == file offset"},
+  "function": "0x36cde0",
+  "finding": "per-contributor merge score = CDF 9/7 wavelet-domain SSIM-class structural-similarity/quality metric between the two 16x16 patches; returns sqrt(q1*q2)",
+  "byte_verified_constants": {
+    "ssim_stabilizers": "0x5fdc50 = (0.01,0.03,0.03,1.0)  [SSIM K1=0.01,K2=0.03]",
+    "patch_norm": "0x5cbfc0 = 1/256",
+    "haar": "0x5cbf80=0.70710677 (1/sqrt2), 0x5cbfa0=1.41421354 (sqrt2)",
+    "cdf97": "0x5cbfd0=1.58613432(a) 0x5cbfe0=3.17226863(2a) 0x5cbff0=-0.05298012(b) 0x5cc000=-0.10596024(2b) 0x5cc010=-0.88291109(g) 0x5cc020=-1.76582217(2g) 0x5cc030=1.14960444(zeta) 0x5cc040=0.86986440(1/zeta)",
+    "remap": "0x5fdc60=(-0.8..), 0x5fdc70=5.26315784 (=1/0.19)"
+  },
+  "confidence": {
+    "constants": "OBSERVED (byte-read, deterministic)",
+    "metric_family": "LEAD (SSIM + CDF 9/7 by exact constant match; alpha/beta/gamma/zeta/1-zeta match 6-7 sig figs)",
+    "closed_form": "NOT assembled; SSIM variant not pinned; CDF 9/7 delta not tightly located"
+  },
+  "parity_relevance": "names the merge-weight metric -> clean-room reimplementable from published SSIM + CDF 9/7; candidate input to ghost/trail suppression (Blocker 5)",
+  "non_claims_ref": "non_claims.md"
+}

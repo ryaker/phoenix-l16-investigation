@@ -37,6 +37,8 @@ packet as fact, and `NEEDS_CODEX_VALIDATION` on every packet.
 
 | P | 182 unassigned LRIs (two-unit completeness) | **Deterministic.** The 182 corpus files unassigned by the two-unit partition yield **NO calibration signature and NO third unit** — even an exhaustive `LELR`-magic-scan re-parse assigns 0/182 with 0 third signatures. Split: 4 zero-block + 178 with 1–4 blocks but no 16×field-13 intrinsics (assigned files have ~12 blocks); mechanism = 90 early-walk-termination + 92 walk-complete; spans 2017–2021 (not early-firmware-only). **The "exactly two units, no third" claim is not threatened**; gap is container-format/parser-coverage. Open: whether they carry calibration under a different proto field (extended-parser assignment) — not a third-unit risk. | `laneP_parser_gap_182/` |
 
+| A6 | per-contributor merge SCORE metric `0x36cde0` | **Extends Codex `bundle_lldb_iramp_36cde0_scalar.md`** (which left the metric un-named). Byte-verified constants identify the score as a **CDF 9/7 wavelet-domain, SSIM-class structural-similarity/quality metric**: SSIM stabilizers `0x5fdc50=(0.01,0.03,..)` (K1/K2) on μ/σ²/σ_AB; **CDF 9/7 lifting** α/β/γ/ζ/(1/ζ) byte-exact at `0x5cbfd0..0x5cc040`; returns `sqrt(q1·q2)`. Names the merge-weight metric → clean-room-reimplementable; candidate input to Blocker-5 acceptance. Closed form / SSIM-variant / δ not pinned (LEAD). | `laneA6_score_metric/` |
+
 ## Cross-cutting note for Codex (anchor spec)
 
 Lanes A1/A2/C reported `anchorPassed=TRUE`; Lane B reported `FALSE` — **not a conflict.** `0x3eced0`

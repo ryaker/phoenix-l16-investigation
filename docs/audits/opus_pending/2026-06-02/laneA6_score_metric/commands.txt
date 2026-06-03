@@ -1,0 +1,18 @@
+# Lane A6 — reproducible byte-reads (deterministic)
+DYLIB=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+
+python3 -c "
+import struct
+d=open('$DYLIB','rb').read()
+f1=lambda o: struct.unpack('<f', d[o:o+4])[0]
+f4=lambda o: struct.unpack('<4f', d[o:o+16])
+print('SSIM stabilizers 0x5fdc50:', f4(0x5fdc50))   # (0.01,0.03,0.03,1.0)
+print('remap 0x5fdc60:', f4(0x5fdc60), ' 0x5fdc70:', f4(0x5fdc70))  # (-0.8..), (5.263=1/0.19..)
+print('1/256 0x5cbfc0:', f1(0x5cbfc0))
+print('Haar 0x5cbf80:', f1(0x5cbf80), ' 0x5cbfa0:', f1(0x5cbfa0))   # 0.7071, 1.4142
+for o in [0x5cbfd0,0x5cbfe0,0x5cbff0,0x5cc000,0x5cc010,0x5cc020,0x5cc030,0x5cc040]:
+    print(hex(o), '=', round(f1(o),8))   # CDF 9/7: a,2a,b,2b,g,2g,zeta,1/zeta
+"
+# Canonical CDF 9/7 (JPEG2000 lossy): a=-1.586134342 b=-0.052980118 g=0.882911076 d=0.443506852 zeta=1.149604398
+# Cross-ref Codex committed: docs/evidence/bundle_lldb_iramp_36cde0_scalar.md (structure + first-loop stats)
+# Function body: otool -arch x86_64 -tV "$DYLIB" | awk '/^0000000000036cde0/{f=1} f{print} /^0000000000036e530/{if(f)exit}'
