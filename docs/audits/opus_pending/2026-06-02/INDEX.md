@@ -19,6 +19,7 @@
 | A2 | reducer/body search | RTTI: `0x2f78e0` normalizer = `ImageDenoiseBilateralGeneric<5,true>` (LEAD: bilateral denoise, not the merge); `0x3ec960` = per-camera `SourceImageCache` lambda (`LensUndistortCRA`, ONE camera+ONE tile); `0x369f80` IMAGE-EFFECTING accumulator. AGAINST a single tidy N→1 reducer on the **direct-call surface** (vtable/std::function indirection uncrossable statically — needs Codex runtime backtrace) | `7eb2a77` |
 | C | C6 tele alias/terminal-route | clear `0x3c90a5 = movb $0x0,0x30(%rax)` zeros ONLY `item+0x30`; key at `+0x60` stays `15`, so `+0x30`-blind classifier `0xf6c60` (mask `0xfc00`) still maps key15 → camera-group-type 2, surviving the clear (CANDIDATE survival angle). No `call 0xf2720`-independent pointer-into-image-kernel path found statically | `c93988e` |
 | B | Unit-2 four-zoom accumulator coeff tile | OBSERVED: all four Unit-2 twin seeds (28/35/70/150mm) capture a `0x369fa4` coeff tile float32-identical to the Unit-1 Hann-16 reference (maxdiff 0.0). Cross-unit runtime re-capture; sequential renders. NOT a universality claim | `8441753` |
+| A3 | src1/src2 per-tile merge nest (static) | **READ `CORRECTION.md` first.** Machine-verified nest in `0x3661b0`: tile-X `0x369140` → tile-Y `0x369160` → contributor loop `0x3692f0..0x369f24` with a per-tile **coverage sentinel** `0x36930f cmpl $0x80000000` (tile-level acceptance) → single Hann **overlap-add** `0x369f80` into shared loop-invariant output base `-0x1710`. Cross-camera combine is INSIDE the contributor body `0x369320..0x369ec4`; the `addps` RMW is cross-TILE, not cross-camera. **OPEN decisive Q (localized):** does `0x369320..0x369ec4` SUM contributors (H-REDUCE) or SELECT one (H-SELECT)? Untraced. First commit `ecfc8ab` mis-read the loop; corrected in `ad7172d` | `ecfc8ab`→`ad7172d` |
 
 ## Cross-cutting note for Codex (anchor spec)
 
@@ -35,4 +36,8 @@ is the enclosing **function prologue**; the `mulps → maxps → sqrtps` triplet
 - Lane B observed only the FIRST accumulator hit per render (zero/early tiles); no non-zero
   multi-camera accumulation captured (the known probe-redesign gap from the prior 28mm decider).
 - 182/9390 corpus LRIs remain unassigned to a unit under the current parser (parser-coverage gap).
+- **Lane A3 decisive question is untraced:** the per-tile inner body `0x369320..0x369ec4` — SUM vs
+  SELECT of coverage-passing contributors. Step 0 of A3's plan (static trace of that range) is the
+  cheapest next move; no render needed. The `0x80000000` coverage sentinel is a candidate tile-level
+  acceptance mechanism worth cross-referencing with the ledger's open acceptance/rejection item.
 </content>
