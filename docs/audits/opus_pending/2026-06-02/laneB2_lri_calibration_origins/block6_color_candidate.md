@@ -30,6 +30,20 @@ This matters because:
 - It is a plausible **LRI source for the A5 post-merge runtime `__bss` 3×3 color matrix** (which is
   computed per-render, not embedded) — i.e. that runtime matrix may be derived from these LRI matrices.
 
+## Four-zoom + two-unit confirmation (OBSERVED, byte-reproduced)
+
+Block 6 exists in **all 8 canonical seeds** (same 14×1472 + 28×519 structure, payload 35,266). Record-0
+`f2.2` matrix:
+- **Unit-1** (all 4 zooms identical): `[0.8996, 0.1317, −0.0671, 0.31, 1.0739, −0.384, −0.0572, −0.4301, 1.3125]`
+- **Unit-2** (all 4 zooms identical): `[0.9073, 0.119, −0.062, 0.315, 1.0644, −0.3795, −0.0583, −0.409, 1.2925]`
+
+So Block 6 is **per-body constant** (identical across a unit's 28/35/70/150mm captures) and **differs
+between units** — the same behavior as the intrinsics block. Strikingly, **both units share the identical
+row-sums (0.964, 1.0, 0.825)** while the entries differ per body. That is a strong **CCM signature**: a
+fixed per-row color target with per-sensor-body coefficients (each physical body calibrated to the same
+target). This materially strengthens the "color-calibration block" reading (still CANDIDATE for the exact
+public role).
+
 ## Non-claims / open
 - The (14, 28, 42) grouping does NOT map to the 16 cameras; the per-record grouping semantics are
   **unknown** (not per-camera). Do not assume per-camera.
