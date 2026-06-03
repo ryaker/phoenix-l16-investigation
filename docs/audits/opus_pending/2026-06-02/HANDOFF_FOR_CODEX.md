@@ -73,6 +73,16 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
 6. Illuminant enum `f2.f1∈{0,2,6}` → which illuminant (A/D50/D65); libcp's actual undistort eval order
    (poly vs LUT); Block-8 AWB gains (being mapped next, LRI-side).
 
+## ⚠ SPIKE-CRITICAL: libcp output is NONDETERMINISTIC
+5 baseline renders of the same 28mm seed → ≥3 distinct decoded-pixel hashes (~48% of pixels differ;
+per-channel mean stable only to ~0.034 counts) — multithreaded merge/accumulation-order nondeterminism.
+**The validation spike CANNOT use exact pixel/byte match against libcp** (libcp doesn't match itself);
+acceptance must be statistical (mean/percentile tolerance). Also bounds the differential-render method:
+only large effects (e.g. AWB R→249) are trustworthy. (See `ccm_consumption_runtime_INCONCLUSIVE.md`.)
+Block-6 CCM consumption + variant{0,2,6} selection remain UNRESOLVED (entry-time perturbation inert — CCM
+parsed mid-render; needs break inside `setColorCorrection`/`ImageApplyColorMatrix` = native-arm64/single-step).
+All 3 variants share row-sums [0.9642,1.0,0.8252] (don't distinguish them); `setColorCorrection` exists (LEAD CCM IS used).
+
 ## Boundary
 The high-value statically/LRI-tractable surface for both blockers is comprehensively covered. Remaining
 merge-core unknowns are all runtime (your domain); remaining LRI items are lower-marginal or runtime. The
