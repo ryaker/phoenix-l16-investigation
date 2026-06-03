@@ -1,0 +1,31 @@
+{
+  "lane": "C",
+  "topic": "c6_alias_terminal_route_static",
+  "created": "2026-06-02",
+  "status": "NEEDS_CODEX_VALIDATION",
+  "agent": "opus-quarantine",
+  "method": "STATIC ONLY (otool -arch x86_64 -tV). No render, no runtime breakpoints.",
+  "binary": {
+    "path": "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib",
+    "arch": "x86_64",
+    "macho_text_vmaddr": 0,
+    "note": "file offset == VA",
+    "sha256": "b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9",
+    "size_bytes": 6935696,
+    "mtime": "Oct  8 2019"
+  },
+  "anchor": {
+    "requested_va": "0x3eced0",
+    "requested_sequence": "mulps -> maxps -> sqrtps",
+    "anchorPassed": true,
+    "note": "0x3eced0 is the function prologue (pushq %rbp). The mulps->maxps->sqrtps triple appears INSIDE that function, first occurrence at 0x3ecfe4 (mulps %xmm0,%xmm2) / 0x3ecfe7 (maxps %xmm1,%xmm2) / 0x3ecfea (sqrtps %xmm2,%xmm2), repeating at 0x3ecff4, 0x3ed02c, 0x3ed065, 0x3ed077, 0x3ed101, 0x3ed135. Anchor satisfied at function granularity."
+  },
+  "c6_anchors_reconfirmed_static_as_LEAD": {
+    "f2720_key_getter": "0x000f2720 = pushq %rbp; movq %rsp,%rbp; movl 0x60(%rdi),%eax; popq %rbp; retq  -> returns item+0x60 (the key int)",
+    "f2770_constructor": "0x000f2770 constructs the C6 item; reads source 0x30(%r14) via 0x137d70 then stores int into item+0x60; copies byte 0x60(%r14) into item+0x30 (the active flag).",
+    "clear_site": "0x003c90a5 = movb $0x0, 0x30(%rax) preceded by callq 0xf2720; cmpl $0xf,%eax; jne 0x3c90a9. Clears item+0x30 ONLY (NOT item+0x60).",
+    "f2720_direct_callers": 58,
+    "f6c60_callers": 59,
+    "f2750_callers": 50
+  }
+}

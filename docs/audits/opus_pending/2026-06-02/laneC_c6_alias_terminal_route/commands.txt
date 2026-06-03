@@ -1,0 +1,52 @@
+# Lane C - C6 alias / terminal-filter / alternate-route - STATIC commands
+# binary: /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+# All run from /Volumes/Dev/L16-opus-quarantine. file offset == VA (__TEXT vmaddr=0).
+
+# --- sha256 of binary under analysis ---
+shasum -a 256 "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib"
+
+# --- full disassembly dump (source for all greps below) ---
+otool -arch x86_64 -tV \
+  "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib" \
+  > runs/laneC_c6_alias_terminal_route/full_disasm.txt
+
+# --- ANCHOR self-check (0x3eced0 function; mulps/maxps/sqrtps inside) ---
+grep -n '^00000000003eced0' runs/laneC_c6_alias_terminal_route/full_disasm.txt
+sed -n '961021,961200p' runs/laneC_c6_alias_terminal_route/full_disasm.txt | grep -nE 'mulps|maxps|sqrtps'
+
+# --- C6 anchors: key getter, constructor, clear ---
+grep -n '^00000000000f2720' runs/laneC_c6_alias_terminal_route/full_disasm.txt   # key getter
+grep -n '^00000000000f2770' runs/laneC_c6_alias_terminal_route/full_disasm.txt   # constructor
+grep -n '^00000000003c90a5' runs/laneC_c6_alias_terminal_route/full_disasm.txt   # clear movb $0x0,0x30
+
+# --- ANGLE 1: every dst field the C6 item constructor (f2770) writes ---
+awk 'NR>=237811 && NR<=238010' runs/laneC_c6_alias_terminal_route/full_disasm.txt \
+  | grep -oE '(movl|movb|movw|movq)\t[^,]+, 0x[0-9a-f]+\((%rdx|%r13)\)' \
+  | grep -oE '0x[0-9a-f]+\((%rdx|%r13)\)' | sort -u
+
+# --- ANGLE 1: trivial getters in the C6 accessor cluster f2720..f2768 ---
+awk 'NR>=237600 && NR<=237811' runs/laneC_c6_alias_terminal_route/full_disasm.txt \
+  | grep -E '^00000000000f2[4-7][0-9a-f]{2}\t(movl|movb|movzbl|movzwl|movq|leaq)\t0x[0-9a-f]+\(%rdi\)'
+
+# --- ANGLE 1: blind enumeration of all readers at +0x68..0xa0 on %rdi (superset, NOT item-attributed) ---
+grep -nE '\t(movl|movb|movzbl|movzwl|movq|leaq)\t0x(6[89a-f]|[789a][0-9a-f])\(%rdi\), %' \
+  runs/laneC_c6_alias_terminal_route/full_disasm.txt
+
+# --- ANGLE 2/3: all 58 direct f2720 callers + following 3 instrs (key consumption census) ---
+grep -nE 'callq\s+0xf2720' runs/laneC_c6_alias_terminal_route/full_disasm.txt
+
+# --- ANGLE 2: all literal cmpl $0xf,%eax (key==15 candidate tests) ---
+grep -nE 'cmpl\s+\$0xf, %eax' runs/laneC_c6_alias_terminal_route/full_disasm.txt
+
+# --- ANGLE 2: all +0x30 active-flag gates (superset across structs) ---
+grep -nE 'cmpb\s+\$0x0, 0x30\(%r' runs/laneC_c6_alias_terminal_route/full_disasm.txt
+
+# --- ANGLE 3: f6c60 key->camera-group-type classifier body ---
+grep -n '^00000000000f6c60' runs/laneC_c6_alias_terminal_route/full_disasm.txt
+sed -n '241818,241870p' runs/laneC_c6_alias_terminal_route/full_disasm.txt
+
+# --- ANGLE 2/3: gated selection region around 0x1a8df0 (cmpb 0x30 gate -> f2720 -> f6c60 -> list store) ---
+sed -n '/^00000000001a8df0/,/^00000000001a8e70/p' runs/laneC_c6_alias_terminal_route/full_disasm.txt
+
+# --- f2750 (leaq 0x58 sub-region) readers ---
+grep -nE 'callq\s+0xf2750' runs/laneC_c6_alias_terminal_route/full_disasm.txt
