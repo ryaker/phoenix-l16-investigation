@@ -45,7 +45,16 @@ The spatial stage is now **assembled** (not just constant-spotted):
 ~0.8 → 0. With A7 (`weight=max(0,score−0.5)`) this is a layered soft floor: low-similarity contributors
 get zero weight. See `closed_form_stage1.md`. (Stage-2 CDF 9/7 wavelet + `sqrt(q1·q2)` still LEAD.)
 
+## Stage-2 + combination (`closed_form_stage2.md`)
+
+`score = sqrt(q1·q2)` (geometric mean, `0x36e511 mulss; 0x36e515 sqrtss`). Stage-2 helpers `0x371730`/
+`0x371a90` are byte-confirmed **CDF 9/7 wavelet lifting** (load 2α=3.172 @`0x5cbfe0`); q2 is a
+wavelet-domain statistic (identified, not fully assembled — 188 ops, deferred). Score closed-form:
+`score = sqrt( q1·q2 )`, q1 ASSEMBLED (SSIM-cs), q2 IDENTIFIED (CDF 9/7 wavelet). See
+`closed_form_stage2.md`.
+
 ## Files
+- `closed_form_stage2.md` — CDF 9/7 wavelet stage-2 identity + the sqrt(q1·q2) combination.
 - `closed_form_stage1.md` — assembled stage-1 SSIM contrast-structure arithmetic + the ~0.8 soft floor.
 - `observations.md` — the constants + how they map to SSIM/CDF-9/7; the assembled-so-far arithmetic.
 - `non_claims.md` — what is NOT proven (the exact closed form; δ; the precise SSIM variant).
