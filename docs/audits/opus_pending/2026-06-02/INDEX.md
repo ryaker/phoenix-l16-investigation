@@ -24,6 +24,14 @@ per Rich's 2026-06-03 directive. Worked top-down, one per tick, slow. Planning o
 
 ## Start here for the merge story
 
+**`MERGE_MECHANISM_SYNTHESIS.md` (2026-06-03, waves 1–4) — read this FIRST.** Consolidated quarantine
+synthesis: the **two-stage split** (`0x216f60` geometry/warp-record builder vs `0x3661b0` terminal pixel
+N→1 merge), full pixel-merge pipeline (src1/src2 = geometry descriptors; index-validity contributor gate;
+wavelet-domain SSIM-class score; `1/Σscore`-normalized soft average; lane-3 detail-transfer; `__bss`
+color matrix), acceptance statistics, and the verify-before-trust reconciliation that the IRAMP source/
+warp producer is Codex's **FusionCacheBayer** (`0x406a10`), NOT `0x216f60`. Residual merge-core unknowns
+are all runtime (Codex's domain). Supersedes the older `MERGE_PIPELINE.md` table for the merge story.
+
 `MERGE_PIPELINE.md` — end-to-end IRAMP merge→output dataflow synthesis (entry → coverage gate →
 block-match align → SSIM-class score → soft similarity-weighted blend → Hann accumulator → edge-pad →
 cubic resample → runtime color matrix), one table with per-stage VAs, confidence, and packet refs.
