@@ -41,6 +41,22 @@ CoD and Size are 1–10 (Opus estimates, not truth). "Collision" flags overlap w
 - Next (re-score live): cross-unit K/distortion VALUE diff (Unit-2 twin); unknown `f3.2.4/f3.2.6`
   scalars; Block-6 (42×field-13) identity.
 
+## Reassessment (2026-06-03, after Block-6 four-zoom)
+
+The high-WSJF (>~1.0), deterministic, collision-free static surface is now **largely covered**:
+merge pipeline (A3/A5/A6/A7 + MERGE_PIPELINE synthesis), corpus integrity (P), and LRI calibration
+origins (B2: intrinsics field map + four-zoom/two-unit + cross-unit + Block-6 color). Remaining backlog
+items are all **lower WSJF** and gated on things outside the safe deterministic lane:
+- q2 wavelet full assembly — error-prone (188 ops), metric already identified+stage-1 done ⇒ low CoD/Size.
+- runtime renders (#3/#6) — downgraded (Codex has score samples; chain-continuity render-risky).
+- C6 (#7), Block-6 matrix ROLES, intrinsics field public NAMES — need the **binary consumer** = Codex's
+  `0x23faf0`/iramp lanes (collision); not safely doable solo.
+- 182 alternate-format RE (#8) — deep, non-blocking (integrity settled).
+
+**Stance:** continue thoughtfully (not attached to producing a packet per tick). Act on a genuinely
+high-value lead or Rich's direction; otherwise brief check + hold rather than grinding low-WSJF work.
+Best remaining candidate if pressed: a careful q2 stage-2 partial assembly, accepting it may stay partial.
+
 ## Notes
 - This backlog is Opus planning, not a finding; it cites no claim as fact and touches no canonical doc.
 - WSJF re-scored if a new finding changes CoD (e.g. if #1 reveals a hard gate, Blocker-5 CoD drops).
