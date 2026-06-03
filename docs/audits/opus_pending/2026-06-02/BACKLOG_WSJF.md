@@ -22,6 +22,14 @@ CoD and Size are 1–10 (Opus estimates, not truth). "Collision" flags overlap w
 
 1 → 2 → 3 → 4 → (5/6 as fillers) → 7/8 only on direction.
 
+## Progress (2026-06-03)
+
+- **#1 DONE** — A7 `lane_semantics.md`: score-weighted mean (denom = Σ raw score); lane-0 identity open.
+- **#2 DONE** — A5 `guided_detail_transfer.md`: `out=(B+C)+clamp((A−B)·2·C.lane3, ±0.1)` bounded residual.
+- **#4 PARTIAL** — `laneB2_lri_calibration_origins/`: intrinsics in LRI Block 3; cam0 fx/cx/cy + 5+5+6
+  focal tiers byte-verified (OBSERVED); distortion/LUT/date CANDIDATE; binary-consumer side left to Codex.
+- Next: **#3 runtime confirmation** (the highest-CoD remaining), done thoughtfully across ticks.
+
 ## Notes
 - This backlog is Opus planning, not a finding; it cites no claim as fact and touches no canonical doc.
 - WSJF re-scored if a new finding changes CoD (e.g. if #1 reveals a hard gate, Blocker-5 CoD drops).

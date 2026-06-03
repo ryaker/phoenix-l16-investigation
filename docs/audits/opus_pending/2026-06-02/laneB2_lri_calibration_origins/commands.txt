@@ -1,0 +1,23 @@
+# Lane B2 — reproduce the OBSERVED items (deterministic; corpus must be mounted)
+# ls "/Volumes/Base Photos/"   # confirm mount
+cd /Volumes/Dev/L16_Lumen_ReverseEngineering
+python3 - <<'PY'
+import sys; sys.path.insert(0,'tools')
+import lri_field_inspect as L, struct, collections
+p="/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri"
+blks=L.scan_lri_blocks(p)
+cand=sorted((len(b['payload']),i,b) for i,b in enumerate(blks)
+            if sum(1 for fn,wt,rv in L.parse_proto_fields(b['payload']) if fn==13)==16)
+recs=[rv for fn,wt,rv in L.parse_proto_fields(cand[0][2]['payload']) if fn==13]
+print("intrinsics block payload:", cand[0][0], " #cam records:", len(recs))
+# cam0 K values present?
+def find(buf,val,tol=0.05): return [round(struct.unpack('<f',buf[o:o+4])[0],3)
+    for o in range(len(buf)-4) if abs(struct.unpack('<f',buf[o:o+4])[0]-val)<tol]
+for v in (3375.884,2084.516,1541.342,4160.0): print("cam0", v, "->", bool(find(recs[0],v)))
+# focal tiers
+for ci,rec in enumerate(recs):
+    c=collections.Counter(round(struct.unpack('<f',rec[o:o+4])[0],1)
+        for o in range(len(rec)-4) if 1000<struct.unpack('<f',rec[o:o+4])[0]<40000)
+    print(f"cam{ci:2d} fx~", c.most_common(1)[0][0])
+PY
+# expect: cams 0-4 ~3370, 5-9 ~8300, 10-15 ~18700 (L16 5+5+6)

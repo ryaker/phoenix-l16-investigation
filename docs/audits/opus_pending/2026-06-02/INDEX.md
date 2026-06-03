@@ -53,6 +53,8 @@ Navigational only; no new claims. Read it before the per-lane packets below.
 
 | A7 | score consumption → Blocker 5 (accept/reject) | **Extends Codex tuple-consumer docs.** Within span `0x36a7d8..0x36a93c` the per-contributor score is a SOFT normalized blend weight: byte-decoded `weight_vec4 = (score + 2·max(score−0.5, 0), score, score, score)` (offset const `0x5a8120 = −0.5`), `mulps` into source, accumulate, `rcpss`-normalize (`Σw·src/Σw`). **The only float gate on the score is a `maxss` clamp — NO hard score-thresholded accept/reject branch** (all conditional jumps are loop bounds). With A6 (SSIM score) ⇒ ghost/trail suppression is **soft** (low-SSIM contributors down-weighted, >0.5 boosted), not a hard reject. Lane semantics of the vec4 + later post-blend stages open. | `laneA7_score_consumption/` |
 
+| B2 | LRI per-camera calibration origins (Blocker 2, input side) | **OBSERVED (byte-verified):** intrinsics live in LRI **Block 3** (smallest 16×field-13); cam0 `fx=fy=3375.884, cx=2084.516(≈4160/2), cy=1541.342(≈3120/2)`; 16 cams cluster into the L16 **5+5+6** focal tiers (fx ≈3370/8300/18700). Stored as tagged protobuf fixed32. **CANDIDATE** (subagent, not all re-verified): 3×3 K layout, distortion coeffs `[0.0326,0.1501,0,0,-0.5774]`, 101+30 LUT, calib date. LRI-side only (binary consumer = Codex's `0x23faf0` thread, untouched). | `laneB2_lri_calibration_origins/` |
+
 ## Cross-cutting note for Codex (anchor spec)
 
 Lanes A1/A2/C reported `anchorPassed=TRUE`; Lane B reported `FALSE` — **not a conflict.** `0x3eced0`
