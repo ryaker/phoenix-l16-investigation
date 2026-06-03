@@ -17,6 +17,11 @@ Where a packet says **"PROVEN `CLM-MERGE-002`"** it is *citing the ledger's* sta
 not asserting Opus authority. A contamination audit (2026-06-02) found no cross-citation of one Opus
 packet as fact, and `NEEDS_CODEX_VALIDATION` on every packet.
 
+## Backlog (WSJF-ordered)
+
+`BACKLOG_WSJF.md` — remaining quarantine investigation items ranked by WSJF (Cost-of-Delay / Job-Size),
+per Rich's 2026-06-03 directive. Worked top-down, one per tick, slow. Planning only (no claims).
+
 ## Start here for the merge story
 
 `MERGE_PIPELINE.md` — end-to-end IRAMP merge→output dataflow synthesis (entry → coverage gate →
