@@ -1,0 +1,47 @@
+# Lane A1 — EXACT commands (copy-paste reproducible)
+# Mac is Apple Silicon; libcp.dylib is Mach-O x86_64. file offset == VA.
+
+BIN="/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib"
+
+# 0. hash
+shasum -a 256 "$BIN"
+# -> b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9
+
+# 1. ANCHOR self-check at 0x3eced0 (expect mulps -> maxps -> sqrtps triplet)
+otool -arch x86_64 -tV "$BIN" 2>/dev/null \
+  | awk '/^00000000003eced0/{f=1} f' \
+  | grep -nE "mulps|maxps|sqrtps" | head
+# observed: 0x3ecfe4 mulps ; 0x3ecfe7 maxps ; 0x3ecfea sqrtps  => anchorPassed
+
+# 2. full disasm to a temp file for grepping
+otool -arch x86_64 -tV "$BIN" 2>/dev/null > /tmp/libcp_full_disasm.txt
+
+# 3. node producer 0x23faf0 bounded by its epilogue (subq $0x4f8 frame; ends at 0x2404c9 retq)
+awk '/^000000000023faf0/{f=1} f{print} /^00000000002404c[0-9a-f]/ && /retq/{exit}' \
+  /tmp/libcp_full_disasm.txt > runs/laneA1_post_node_consumers/func_23faf0.log
+
+# 4. destination-node (r12) field writes in +0x28..+0xa0 inside 0x23faf0
+grep -nE "mov[a-z]*[[:space:]]+%[a-z0-9]+, 0x(2[8-9a-f]|[3-9a-f][0-9a-f])\(%r12\)" \
+  runs/laneA1_post_node_consumers/func_23faf0.log \
+  | grep -vE "0x(a[1-9a-f]|[b-f][0-9a-f])\(%r12\)"
+
+# 5. caller 0x23c5f0 (captured generously, then sliced)
+awk '/^000000000023c5f0/{f=1} f' /tmp/libcp_full_disasm.txt \
+  | head -853 > runs/laneA1_post_node_consumers/func_23c5f0.log
+
+# 6. find the two call 0x23faf0 sites + node destination stack slots
+grep -nE "callq[[:space:]]+0x23faf0" runs/laneA1_post_node_consumers/func_23c5f0.log
+grep -nE 'leaq.*0x1f8\(%rbp\)' runs/laneA1_post_node_consumers/func_23c5f0.log   # site 0x23c6da rdi
+grep -nE 'leaq.*0x378\(%rbp\)' runs/laneA1_post_node_consumers/func_23c5f0.log   # site 0x23cbbc rdi
+
+# 7. downstream reads of node1 base slot (-0x1f8) and its fields
+grep -nE '0x1f8\(%rbp\)' runs/laneA1_post_node_consumers/func_23c5f0.log
+# the consumer widening block (node1 +0x28..+0x50 -> r14 +0x28..+0xa0):
+awk 'NR>=130 && NR<=212' runs/laneA1_post_node_consumers/func_23c5f0.log \
+  > runs/laneA1_post_node_consumers/node1_consumer_block.log
+
+# 8. classify callees that receive the record pointer
+awk '/^00000000001dc5a0/{f=1} f{print} f&&/retq/{c++; if(c==1)exit}' /tmp/libcp_full_disasm.txt \
+  | head -60 > runs/laneA1_post_node_consumers/callee_1dc5a0.log
+awk '/^00000000000db240/{f=1} f{print} f&&/retq/{c++; if(c==1)exit}' /tmp/libcp_full_disasm.txt \
+  | head -60 > runs/laneA1_post_node_consumers/callee_db240.log

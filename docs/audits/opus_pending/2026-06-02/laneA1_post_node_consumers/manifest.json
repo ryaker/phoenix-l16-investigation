@@ -1,0 +1,26 @@
+{
+  "topic": "Lane A1 post-node consumers (static) - who reads the 0x23faf0 node fields +0x28..+0xa0 downstream",
+  "lane": "A1",
+  "binary": {
+    "path": "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib",
+    "arch": "x86_64",
+    "sha256": "b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9",
+    "note": "Mach-O x86_64; __TEXT vmaddr=0 so file offset == VA"
+  },
+  "anchor": {
+    "va": "0x3eced0",
+    "anchorPassed": true,
+    "evidence": "mulps/maxps/sqrtps triplet at 0x3ecfe4/0x3ecfe7/0x3ecfea"
+  },
+  "method": "STATIC ONLY - otool -arch x86_64 -tV. No process launch, no runtime breakpoints.",
+  "status": "NEEDS_CODEX_VALIDATION",
+  "created": "2026-06-02",
+  "node_producer_va": "0x23faf0",
+  "caller_va": "0x23c5f0",
+  "node_dst_stack_slots": ["-0x1f8(%rbp) @ site 0x23c6da", "-0x378(%rbp) @ site 0x23cbbc"],
+  "candidate_consumers": [
+    {"va": "0x23c917-0x23c98a", "confidence": "CANDIDATE", "role": "inline cvtps2pd widening of node1 +0x28..+0x50 into r14 record +0x28..+0xa0"},
+    {"va": "0xdb240", "confidence": "OBSERVED", "role": "red-black tree insert-fixup; receives r14 record pointer (container insert, not field reader)"},
+    {"va": "0x1dc5a0", "confidence": "LEAD", "role": "consumes a 0x48-byte double matrix (-0x110/-0x130), adjacent to node1 read, not direct node1 +0x28 reader"}
+  ]
+}
