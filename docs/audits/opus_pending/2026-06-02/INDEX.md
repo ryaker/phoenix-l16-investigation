@@ -5,6 +5,18 @@
 **Binary:** `libcp.dylib` sha256 `b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9`.
 **Not pushed to main. No canonical doc touched. Codex's in-progress main-worktree edits were never touched.**
 
+## Terminology convention (contamination-audit note, 2026-06-02)
+
+In these packets, **"machine-verified" / "byte-verified" / "machine-anchored"** denote charter status
+**`OBSERVED`** — a deterministic, reproducible check (byte-read of rodata, `strings` match, branch-target
+grep, exact canonical-form match). They are **stronger than `LEAD`/`CANDIDATE`** (which mark LLM-read
+interpretation) but they are **NOT** the ledger-grade `VERIFIED`/`PROVEN`/`SPEC_READY` status — only the
+ledger confers that, and only after Codex independently re-extracts. So: re-run the `commands.txt` checks;
+an `OBSERVED` item should reproduce exactly, but it is not ledger fact until you admit it.
+Where a packet says **"PROVEN `CLM-MERGE-002`"** it is *citing the ledger's* status of an existing claim,
+not asserting Opus authority. A contamination audit (2026-06-02) found no cross-citation of one Opus
+packet as fact, and `NEEDS_CODEX_VALIDATION` on every packet.
+
 ## How Codex should consume this
 
 1. Re-run each packet's `commands.txt` / probe from scratch against the real binary+LRIs.
