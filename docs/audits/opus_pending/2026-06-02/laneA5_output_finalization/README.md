@@ -31,8 +31,16 @@ contributor scoring of Lane A3) or in a different function. Scope-bound to `0x36
   alloc, and `callq 0x5440` (subdivision driver). `0x36f800` is its byte-sibling with different kernel
   constants.
 
+## Kernel identity (`kernel_identity.md`) — BYTE-VERIFIED
+
+The two resamplers' kernels are decoded deterministically from rodata: `0x2b2be0` = **cubic B-spline**
+(B=1,C=0), `0x36f800` = **Catmull-Rom** (B=0,C=0.5), both 4-tap × 64-phase, exact canonical match ≤3e-8.
+Parity-grade: clean-room Phoenix can reimplement from formula (standard published kernels). See
+`kernel_identity.md`.
+
 ## Files
 
+- `kernel_identity.md` — byte-verified resampler kernel identification (B-spline + Catmull-Rom).
 - `observations.md` — step-by-step finalization with VAs; helper roles.
 - `non_claims.md` — what is NOT established (the cubic-coefficient values, the runtime output identity).
 - `commands.txt` — reproducible extraction + the deterministic `strings`/grep checks.

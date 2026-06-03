@@ -19,3 +19,12 @@ grep -nE 'callq	0x3750a0|callq	0x2b2be0|callq	0x36f800|jle	0x36a15b' runs/laneA5
 
 # Confirm cubic LUT loop + functor + subdivision driver
 grep -nE 'cmpq	\$0x40|__Znwm|callq	0x5440' runs/laneA5_output_finalization/resampler_2b2be0.txt
+
+# --- kernel_identity.md: byte-verify resampler kernel coefficients (deterministic) ---
+PY() { python3 -c "import struct; print(struct.unpack('<f', open('$DYLIB','rb').read()[$1:$1+4])[0])"; }
+# 0x2b2be0 B-spline inner: expect 3.0 -6.0 4.0 0.16666667
+for off in 0x5a9b04 0x5d7fe8 0x5a8870 0x5aae60; do PY $((off)); done
+# 0x36f800 Catmull-Rom inner: expect 9.0 -15.0 6.0 0.16666667
+for off in 0x5aae80 0x5d9a0c 0x5aae70 0x5aae60; do PY $((off)); done
+# generics: 1/64, 1.0, 2.0
+for off in 0x5abed4 0x5a8128 0x5a887c; do PY $((off)); done
