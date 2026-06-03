@@ -57,6 +57,15 @@ items are all **lower WSJF** and gated on things outside the safe deterministic 
 high-value lead or Rich's direction; otherwise brief check + hold rather than grinding low-WSJF work.
 Best remaining candidate if pressed: a careful q2 stage-2 partial assembly, accepting it may stay partial.
 
+**#1-blocker collision check (2026-06-03):** re-read the `CLM-PREFUSION-002` ledger row. The true #1
+parity wall is the **upstream `src1`/`src2` merge/reduction math** (`OPEN`, BLOCKER) — and it is the
+subject of Codex's *live, deep* thread (dozens of `bundle_lldb_prefusion_*` / `state5` / `state_helper`
+docs on the binary-consumer side). My A3–A7 work is on a **different** mechanism (post-contributor IRAMP
+accumulator/blend `CLM-MERGE-002`, already `PROVEN`), NOT the pre-fusion reducer. Conclusion: there is no
+safe high-WSJF *solo* lane into the #1 blocker — entering `src1`/`src2` reducer disasm = high collision
+with Codex. So: do not open it. Hold the deterministic-static surface as covered; resume on Rich's
+direction or Codex's return (2026-06-07).
+
 ## Notes
 - This backlog is Opus planning, not a finding; it cites no claim as fact and touches no canonical doc.
 - WSJF re-scored if a new finding changes CoD (e.g. if #1 reveals a hard gate, Blocker-5 CoD drops).
