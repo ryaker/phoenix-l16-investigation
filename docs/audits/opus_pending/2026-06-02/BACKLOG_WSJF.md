@@ -28,7 +28,13 @@ CoD and Size are 1–10 (Opus estimates, not truth). "Collision" flags overlap w
 - **#2 DONE** — A5 `guided_detail_transfer.md`: `out=(B+C)+clamp((A−B)·2·C.lane3, ±0.1)` bounded residual.
 - **#4 PARTIAL** — `laneB2_lri_calibration_origins/`: intrinsics in LRI Block 3; cam0 fx/cx/cy + 5+5+6
   focal tiers byte-verified (OBSERVED); distortion/LUT/date CANDIDATE; binary-consumer side left to Codex.
-- Next: **#3 runtime confirmation** (the highest-CoD remaining), done thoughtfully across ticks.
+- **#4 extended** — `four_zoom_two_unit.md`: intrinsics block + 5+5+6 tiers confirmed across all 4 zooms
+  AND both units (byte-verified); intrinsics are per-body constants; Unit-1≠Unit-2; block index varies.
+- **WSJF re-score (2026-06-03):** #3 (runtime render) **downgraded** — Codex's `iramp_36cde0` doc already
+  has non-zero score first-hit samples, and full chain-continuity is render-risky/large ⇒ low CoD/Size
+  now. Deterministic, collision-free LRI/static items outrank it. Revised order: finish #4 sub-items
+  (e.g. re-verify the 28mm K/distortion CANDIDATE labels deterministically; decode the f3.f3 distortion
+  model) → #2-class small decodes → #3 only when a focused render window is warranted.
 
 ## Notes
 - This backlog is Opus planning, not a finding; it cites no claim as fact and touches no canonical doc.
