@@ -1,0 +1,21 @@
+# Lane A5 — reproducible extraction + deterministic checks
+DYLIB=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+
+# DETERMINISTIC anchor: assert strings inside 0x3750a0 (edge-extend helper)
+strings -a "$DYLIB" | grep -iE 'Amount to extend must be positive|ROI must be within image|ROI start must be non-negative'
+
+# Finalization tail of 0x3661b0 (to first retq)
+otool -arch x86_64 -tV "$DYLIB" \
+  | awk '/^0000000000369ff2/{f=1} f{print; if(f && $2=="retq"){exit}}' \
+  > runs/laneA5_output_finalization/finalization_369ff2.txt
+
+# Resampler head 0x2b2be0
+otool -arch x86_64 -tV "$DYLIB" \
+  | awk '/^00000000002b2be0/{f=1} f{print} /^00000000002b3400/{if(f)exit}' \
+  > runs/laneA5_output_finalization/resampler_2b2be0.txt
+
+# Confirm call sites + geometric gate (grep-deterministic)
+grep -nE 'callq	0x3750a0|callq	0x2b2be0|callq	0x36f800|jle	0x36a15b' runs/laneA5_output_finalization/finalization_369ff2.txt
+
+# Confirm cubic LUT loop + functor + subdivision driver
+grep -nE 'cmpq	\$0x40|__Znwm|callq	0x5440' runs/laneA5_output_finalization/resampler_2b2be0.txt

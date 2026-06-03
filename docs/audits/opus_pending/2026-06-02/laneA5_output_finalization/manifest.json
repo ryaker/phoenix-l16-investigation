@@ -1,0 +1,28 @@
+{
+  "topic": "laneA5_output_finalization",
+  "lane": "A (IRAMP merge -> output; touches CLM-MERGE-002 acceptance/rejection question)",
+  "status": "NEEDS_CODEX_VALIDATION",
+  "created": "2026-06-02",
+  "author": "opus (quarantine research manager; no ledger authority)",
+  "binary": {
+    "path": "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib",
+    "sha256": "b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9",
+    "arch": "x86_64", "note": "VA == file offset"
+  },
+  "method": "static otool -tV + deterministic strings/grep anchors",
+  "renders_run": false,
+  "deterministic_anchors": {
+    "edge_extend_asserts": ["Amount to extend must be positive", "ROI must be within image!", "ROI start must be non-negative!"],
+    "call_sites": ["0x36a072 callq 0x3750a0", "0x36a08a callq 0x3750a0", "0x36a200 callq 0x2b2be0", "0x36a273 callq 0x36f800"],
+    "geometric_gate": ["0x36a0eb jle 0x36a15b", "0x36a0ef jle 0x36a15b"],
+    "resampler_shape": ["0x2b2be0 cmpq $0x40 (64-entry LUT)", "__Znwm functor", "callq 0x5440 subdivision driver"]
+  },
+  "finding": "post-merge finalization = bounds-clamp + edge-pad (0x3750a0) + cubic resample to output (0x2b2be0/0x36f800); only rejection is degenerate-rect skip; NO score/quality acceptance gate in 0x369ff2..0x36ae41",
+  "leads": {
+    "cubic_kernel": "LEAD (64-entry separable kernel LUT; family/coeffs not decoded)",
+    "two_views": "LEAD (-0x1730/-0x17d0 = two planes/levels of merged result, same scale)",
+    "output_identity": "CANDIDATE (0x2b2be0 writes final output vs pyramid level — runtime to confirm)"
+  },
+  "non_claims_ref": "non_claims.md",
+  "consistent_with": "PROVEN CLM-MERGE-002 (this is the resample-to-output stage after the weighted accumulator)"
+}
