@@ -35,6 +35,11 @@ CoD and Size are 1–10 (Opus estimates, not truth). "Collision" flags overlap w
   now. Deterministic, collision-free LRI/static items outrank it. Revised order: finish #4 sub-items
   (e.g. re-verify the 28mm K/distortion CANDIDATE labels deterministically; decode the f3.f3 distortion
   model) → #2-class small decodes → #3 only when a focused render window is warranted.
+- **#4 sub-item DONE** — `verified_field_map.md`: independently reproduced cam0's nested calibration
+  structure (K matrix `[fx 0 cx; 0 fy cy; 0 0 1]` per-scale, 5-coeff distortion, two (x,y) LUT curves,
+  calib date) — all OBSERVED-structure; semantic names still CANDIDATE. B2 CANDIDATEs upgraded.
+- Next (re-score live): cross-unit K/distortion VALUE diff (Unit-2 twin); unknown `f3.2.4/f3.2.6`
+  scalars; Block-6 (42×field-13) identity.
 
 ## Notes
 - This backlog is Opus planning, not a finding; it cites no claim as fact and touches no canonical doc.
