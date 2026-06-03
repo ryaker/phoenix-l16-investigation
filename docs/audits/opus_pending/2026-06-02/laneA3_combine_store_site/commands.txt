@@ -16,8 +16,11 @@ otool -arch x86_64 -tV "$DYLIB" \
 grep -n -- '-0x1710(%rbp)' runs/laneA3_combine_store_site/func_3661b0_accumulator.txt
 #   expect exactly: zero-init (0x366356), pre-loop addq (0x36640c), in-loop read (0x369f65)
 
-# 4. Confirm contributor loop landmarks
-grep -nE '0x366b00|0x368b95|0x368bb5|0x366af2' runs/laneA3_combine_store_site/func_3661b0_accumulator.txt
+# 4. Confirm the CORRECTED loop nest (see CORRECTION.md): tile-X/tile-Y/contributor + coverage gate
+grep -nE '	(jl|jb)	0x369(140|160|2f0)$' runs/laneA3_combine_store_site/func_3661b0_accumulator.txt
+#   expect: 0x369fec jl 0x369140 ; 0x369fd9 jl 0x369160 ; 0x369f24 jb 0x3692f0
+grep -nE '0x36930f|cmpl	\$0x80000000' runs/laneA3_combine_store_site/func_3661b0_accumulator.txt
+#   expect the per-tile coverage sentinel: 0x36930f cmpl $0x80000000,%eax ; 0x369314 jne 0x369320
 
 # Runtime confirmation probe (see proof_or_disproof_plan.md) lives at:
 #   tools/lldb_probes/opus_pending/laneA3_combine_store_site/

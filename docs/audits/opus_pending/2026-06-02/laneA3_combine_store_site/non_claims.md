@@ -1,9 +1,15 @@
 # Lane A3 — Non-claims (what this packet does NOT establish)
 
-1. **Not proven that overlap actually occurs at runtime.** The `addps`-RMW proves the *capability* to
-   sum overlapping contributions. It does NOT prove the per-contributor warp offsets ever collide on
-   the same output element. If every contributor's warp maps to a strictly disjoint tile, behavior is
-   effectively mosaic despite the RMW structure. This is the single ambiguity the runtime plan resolves.
+> The first commit's loop-containment narrative was wrong and is retracted in `CORRECTION.md`. These
+> non-claims are the corrected set.
+
+0. **Sum-vs-select is NOT resolved.** The decisive question — whether the per-tile inner body
+   `0x369320..0x369ec4` SUMS valid contributors (H-REDUCE) or SELECTS one (H-SELECT) — is OPEN. That
+   body was not traced. This packet only localizes the question and proves the surrounding nest shape.
+
+1. **The `addps`/`movaps` RMW is NOT cross-camera summation.** It runs once per tile after the
+   contributor loop exits; it is cross-tile Hann overlap-add into the shared output. It must not be
+   cited as evidence of N→1 camera reduction.
 
 2. **Not a verified reducer closure for `CLM-PREFUSION-002`.** This packet locates a *candidate*
    physical convergence point (the `0x369fa4/0x369fa8` accumulate into the `-0x1710` buffer). It does

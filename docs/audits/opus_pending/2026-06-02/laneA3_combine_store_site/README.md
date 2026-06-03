@@ -6,27 +6,31 @@
 
 ## One-line summary
 
-OBSERVED-from-disasm + CANDIDATE: the IRAMP merge (`0x365960` → `0x3661b0`) iterates its
-contributor vector in ONE outer loop (top `0x366b00`, induction `rbx`, back-branch `0x368bb5`,
-trip = `(this->_vec18.end-begin)/16`) and every contributor **read-modify-writes the SAME
-persistent accumulation buffer** (base = `-0x1710(%rbp)`, member-derived from `this->0x8`,
-loop-invariant) via `addps (%rdx,%rcx,4); movaps %xmm1,(%rdx,%rcx,4)` at `0x369fa4/0x369fa8`.
-This favors **H-REDUCE (true N→1 reduction)** over **H-MOSAIC (disjoint per-contributor tiles)**.
+> ⚠ **See `CORRECTION.md`** — the first commit's mechanism narrative was self-caught as wrong and
+> corrected. Read `observations.md` (corrected) and `CORRECTION.md` together; this summary is corrected.
+
+Machine-verified loop nest in `0x3661b0`: **tile-X `0x369140` → tile-Y `0x369160` → contributor loop
+`0x3692f0..0x369f24` (sentinel-gated `0x80000000` per-tile coverage) → single Hann overlap-add
+`0x369f80` into a shared, loop-invariant output base `-0x1710(%rbp)`** (3 accesses only). The
+cross-camera combination happens **inside** the contributor-loop body `0x369320..0x369ec4` (one pass
+per tile); the `addps/movaps` RMW is **cross-tile Hann overlap-add**, not cross-camera summation.
+Whether the inner body **sums** valid contributors (H-REDUCE) or **selects** one (H-SELECT) is **OPEN**
+and now localized to `0x369320..0x369ec4`.
 
 ## The distinction this packet attacks
 
 The entry-side input count is already proven four-zoom elsewhere (5-element contributor + 5-element
 warp vectors, `lldb_iramp_entry_signature_four_zoom.md`). That proves 5 contributors are *passed in*.
-It does NOT prove how they reduce to one output. This packet narrows that:
+It does NOT prove how they reduce to one output. This packet localizes that to the per-tile inner body
+`0x369320..0x369ec4` and reframes the open question:
 
-- **H-REDUCE** — all contributors accumulate into the same output elements (overlapping warped
-  contributions summed). The merge is a real reduction.
-- **H-MOSAIC** — each contributor writes a disjoint output region; "merge" is tiling/selection.
+- **H-REDUCE** — the inner body sums all valid (coverage-passing) contributors into the per-tile result.
+- **H-SELECT** — the inner body selects one contributor (e.g. last/best valid) per tile.
 
-Static structure favors H-REDUCE (see `observations.md`). The unresolved ambiguity: the `addps`-RMW
-proves the *capability* to sum overlapping contributions; it does NOT prove the per-contributor warp
-offsets actually overlap at runtime. Only a runtime observation of one output element receiving writes
-from ≥2 distinct contributors settles it. See `proof_or_disproof_plan.md`.
+This packet does NOT resolve H-REDUCE vs H-SELECT — the inner body was not traced. What it DOES
+establish (machine-verified): the nest shape, the per-tile sentinel `0x80000000` coverage gate
+(a tile-level acceptance mechanism), and the shared loop-invariant output base. See
+`proof_or_disproof_plan.md` for the experiment that resolves sum-vs-select.
 
 ## Files
 

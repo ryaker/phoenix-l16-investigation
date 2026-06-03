@@ -4,36 +4,33 @@
   "status": "NEEDS_CODEX_VALIDATION",
   "created": "2026-06-02",
   "author": "opus (quarantine research manager; no ledger authority)",
+  "correction_note": "First commit ecfc8ab mis-read the loop containment; corrected in CORRECTION.md. The accumulate is NOT inside the 0x366b00-0x368bb5 loop; real nest is tile->tile->contributor (sentinel-gated) then a single Hann overlap-add.",
   "binary": {
     "path": "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib",
     "sha256": "b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9",
     "arch": "x86_64",
     "note": "VA == file offset"
   },
-  "method": "static otool -tV disasm trace (LLM-read, not yet Codex-re-extracted)",
+  "method": "static otool -tV disasm trace, machine-verified branch targets",
   "renders_run": false,
-  "key_vas": {
-    "iramp_entry": "0x365960",
-    "accumulator_fn": "0x3661b0",
-    "contributor_loop_top": "0x366b00",
-    "contributor_loop_back": "0x368bb5",
-    "contributor_index_reg": "rbx",
-    "trip_count_vector": "this+0x18, 16-byte stride",
-    "dest_base_slot": "-0x1710(%rbp)",
-    "dest_base_resolve": "0x369f65",
-    "accumulate_rmw": ["0x369fa4 addps", "0x369fa8 movaps"],
-    "contributor_id_snapshot": "-0x4410(%rbp) (0x366b6a)"
+  "verified_nest": {
+    "tile_x_loop": "0x369140 .. 0x369fec (jl 0x369140)",
+    "tile_y_loop": "0x369160 .. 0x369fd9 (jl 0x369160)",
+    "contributor_loop": "0x3692f0 .. 0x369f24 (jb 0x3692f0), counter -0x4358, warp stride 0x280",
+    "coverage_sentinel": "0x36930f cmpl $0x80000000 ; jne 0x369320 valid else jmp 0x369f0b",
+    "valid_body": "0x369320 .. 0x369ec4 (jmp 0x369f0b back to loop)",
+    "hann_overlap_add": ["0x369f80 weights", "0x369fa1 mulps (%rdi)", "0x369fa4 addps (%rdx,%rcx,4)", "0x369fa8 movaps back"],
+    "shared_output_base": "-0x1710(%rbp) (3 accesses: 0x366356 zero, 0x36640c pre-loop, 0x369f65 read)"
   },
   "leads": {
-    "favored_hypothesis": "H-REDUCE (true N->1 reduction): all contributors RMW the same loop-invariant buffer",
-    "confidence": "LEAD/CANDIDATE",
-    "open_runtime_ambiguity": "whether per-contributor warp offsets actually overlap (reduction) vs land disjoint (mosaic)"
+    "established": "per-tile contributor loop with sentinel 0x80000000 coverage gate (tile-level acceptance); single Hann overlap-add into shared member-derived output buffer",
+    "OPEN_decisive": "sum-vs-select inside 0x369320..0x369ec4 (H-REDUCE vs H-SELECT) — untraced",
+    "confidence": "LEAD (structure machine-verified; semantics open)"
   },
-  "runtime_proof": {
-    "breakpoint": "0x369f65",
-    "log": ["rdx (dest base+warp offset)", "-0x4410(%rbp) (contributor id)"],
-    "decision_rule": "same rdx under >=2 distinct contributor ids => H-REDUCE; else H-MOSAIC",
-    "scope": "four-zoom 28/35/70/150mm Unit-1 canonical seeds, sequential renders, Codex offline only"
+  "next_experiment": {
+    "step0_static": "trace 0x369320..0x369ec4: add-into-position-keyed-temp (sum) vs overwrite/cmov/last-writer (select)",
+    "step1_runtime": "break 0x36930f count gate-passers per tile; break inner accumulate site; read per-tile temp before/after each valid contributor on a multi-contributor tile",
+    "scope": "four-zoom 28/35/70/150mm Unit-1, sequential renders, Codex offline only"
   },
   "non_claims_ref": "non_claims.md",
   "disjoint_from": "Codex live state_helper_23faf0_record_chain thread (0x23c5f0/0x23faf0) — disjoint VAs"
