@@ -37,7 +37,16 @@ Haar √2: `0x5cbf80 = 0.70710677`, `0x5cbfa0 = 1.41421354`.
 `0x5cc000=-0.10596024` (2β), `0x5cc010=-0.88291109` (γ), `0x5cc020=-1.76582217` (2γ),
 `0x5cc030=1.14960444` (ζ), `0x5cc040=0.86986440` (1/ζ). All match to 6–7 sig figs.
 
+## Stage-1 closed form (`closed_form_stage1.md`)
+
+The spatial stage is now **assembled** (not just constant-spotted):
+`q1 = clamp( (μ_A[3]·(2σ_AB+0.03)/(σ²_A+σ²_B+0.03) − 0.8)/0.19, 0, 1 )` — the canonical SSIM
+**contrast-structure** term `(2σ_AB+C2)/(σ²_A+σ²_B+C2)`, luminance-weighted, stretched so SSIM-cs below
+~0.8 → 0. With A7 (`weight=max(0,score−0.5)`) this is a layered soft floor: low-similarity contributors
+get zero weight. See `closed_form_stage1.md`. (Stage-2 CDF 9/7 wavelet + `sqrt(q1·q2)` still LEAD.)
+
 ## Files
+- `closed_form_stage1.md` — assembled stage-1 SSIM contrast-structure arithmetic + the ~0.8 soft floor.
 - `observations.md` — the constants + how they map to SSIM/CDF-9/7; the assembled-so-far arithmetic.
 - `non_claims.md` — what is NOT proven (the exact closed form; δ; the precise SSIM variant).
 - `commands.txt` — reproducible byte-reads.
