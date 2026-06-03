@@ -33,6 +33,19 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
   = per-camera per-channel SPECTRAL SENSITIVITY CURVES (3ch × 76 float32, 380–755nm, R@595/G@525/B@470)**.
 - **Corpus-validated (4-zoom × 2-unit):** spectral curves, distortion, excluded-pair {1,15} all hold;
   calibration is per-body-constant (identical across a unit's 4 zooms) and Unit-1 ≠ Unit-2.
+- **Clean-room LRI input map (wave 8):** per-capture **AWB/WB gains = Block 8 `B8.19.15`** =
+  [R 1.7178, G 1.0, G 1.0, B 1.5888] (Bayer RGGB, global, distinct from Block-6 per-camera scalars/CCM; no
+  standalone CCT). Full **11-block inventory**: Block 0+2 = raw sensor planes in the block *body* (pre
+  `msg_offset`; blk0 cams {0,4,6,8,9}, blk2 {1,2,3,5,7} = 10 fired cams @28mm); Block 4 = per-module cal,
+  Block 5 = vignetting/falloff. Block 0 LightHeader: f1/f2 = GUID (not timestamps), f3 = date submsg,
+  f5 = reference camera, f18 = hw_info; per-camera exposure/gain/focus (no plain EXIF scalars).
+
+### Runtime results (I ran renders — Codex offline, sequential, 28mm)
+- **`__bss 0x671980` post-merge "color matrix" is a FIXED CONSTANT** = Ohta/PCA **I1I2I3** orthonormal
+  decorrelation basis (`[1/√3,1/√3,1/√3]`,`[1/√2,0,−1/√2]`,`[1/√6,−2/√6,1/√6]`). Write-watchpoint: ZERO
+  render-time writes; written once at static-init from a literal pool. **Clean-room: reimplement from
+  formula (published transform), NOT per-LRI calibration.** (Resolves handoff residual #3.)
+- AWB-gains consumption probe (does libcp read `B8.19.15` in the pixel path) — RUNNING.
 
 ## Verify-before-trust catches (so you know what was corrected, not just asserted)
 1. A finder fabricated a **"zero rcpss" negative** — rcpss exists at `0x36a938` (re-extracted).
@@ -47,8 +60,8 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
 1. **Producer link** — already crossed in your committed evidence (FusionCacheBayer); just confirm it feeds
    the IRAMP `+0x258/+0x270` vectors.
 2. `0x216f60` geometry-record consumer + record-count == fired-camera N (your `0x23faf0` thread).
-3. `__bss 0x671980` color matrix: written once at init (constant) vs per-image (clean-room: determines
-   whether Phoenix computes it or treats it as calibration) — single write-watchpoint.
+3. ~~`__bss 0x671980` color matrix constant-vs-computed~~ — **RESOLVED by runtime probe: fixed I1I2I3
+   constant (see Runtime results above).**
 4. Score final-operand certification at `0x36e511` (low marginal; static structure already strong).
 5. `0x218e20` gate consumer behind `__const 0x6580e0` indirect dispatch.
 6. Illuminant enum `f2.f1∈{0,2,6}` → which illuminant (A/D50/D65); libcp's actual undistort eval order
