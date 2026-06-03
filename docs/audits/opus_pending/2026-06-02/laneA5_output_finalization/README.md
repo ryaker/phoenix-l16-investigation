@@ -38,8 +38,16 @@ The two resamplers' kernels are decoded deterministically from rodata: `0x2b2be0
 Parity-grade: clean-room Phoenix can reimplement from formula (standard published kernels). See
 `kernel_identity.md`.
 
+## Apply structure (`apply_structure.md`) — machine-anchored
+
+The resampler runs in **Q16.16 fixed-point**: `phase = (coord_q >> 10) & 0x3f` (64 phases), integer
+`srcIdx = coord_q >> 16`, then a **separable 4-tap `mulps`/`addps`** accumulate per axis into the dst
+view. Scale constant `0x5abed8 = 65536.0` byte-verified; apply loop `0x2b3410..0x2b3435`. With
+`kernel_identity.md` this is a complete clean-room resampler spec. See `apply_structure.md`.
+
 ## Files
 
+- `apply_structure.md` — Q16.16 coords, 64-phase index, separable 4-tap apply (machine-anchored).
 - `kernel_identity.md` — byte-verified resampler kernel identification (B-spline + Catmull-Rom).
 - `observations.md` — step-by-step finalization with VAs; helper roles.
 - `non_claims.md` — what is NOT established (the cubic-coefficient values, the runtime output identity).
