@@ -44,9 +44,16 @@ Codex validates on return (2026-06-07).
    ```
    Accumulator base `-0x1710(rbp)`, zeroed once at `0x366356`, advanced at `0x36640c`. Exhaustive grep of
    the ~4000-insn body for select-style ops: **no `maxps/minps/blendvps/cmpps` in the pixel path** (only
-   one unrelated `maxss` at `0x36a860` in post-loop bbox finalize). ⇒ static LEAD that the merge is
-   **SUM, not select/max** — directly addresses the long-standing "sum-vs-select OPEN" question. Matches
-   Codex's prior Hann-accumulator anchor at `0x369fa1` (`CLM-MERGE-002`).
+   one unrelated `maxss` at `0x36a860` in post-loop bbox finalize).
+
+   **Honesty / scope:** this `0x369fa1` accumulate IS the already-known Hann **spatial overlap-add**
+   (`CLM-MERGE-002`, already PROVEN) — it is NOT a newly-discovered reducer, and I am not claiming it as
+   one. What the exhaustive no-`maxps/blendvps` grep adds is **corroboration** that the combine is
+   weighted-add rather than a hard select/max. The actual per-contributor N→1 quality layer is Codex's
+   downstream **reciprocal/score-weighted add** (`bundle_lldb_iramp_tuple_post_reciprocal_weighted_add.md`,
+   `0x36cde0` score). So the converged reading stays: **score-weighted N→1, not naive sum, not hard
+   select** — and this static pass is consistent with it. The genuinely NEW contribution of THIS packet is
+   §1 (arg correction) + §3 (src1/src2 role asymmetry), not the operator.
 
 ## What remains UNKNOWN (do not overstate)
 - **Which buffer feeds each accumulate** (src1 vs src2 vs a source-image-vector entry) is NOT established:
