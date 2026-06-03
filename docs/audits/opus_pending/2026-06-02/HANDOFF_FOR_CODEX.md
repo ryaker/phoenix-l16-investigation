@@ -45,7 +45,13 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
   decorrelation basis (`[1/√3,1/√3,1/√3]`,`[1/√2,0,−1/√2]`,`[1/√6,−2/√6,1/√6]`). Write-watchpoint: ZERO
   render-time writes; written once at static-init from a literal pool. **Clean-room: reimplement from
   formula (published transform), NOT per-LRI calibration.** (Resolves handoff residual #3.)
-- AWB-gains consumption probe (does libcp read `B8.19.15` in the pixel path) — RUNNING.
+- **AWB-gains consumption CONFIRMED** (differential render): Block-8 `B8.19.15` IS consumed by the pixel
+  path, as the **reciprocal** (1/gain) form, **coupled into a color matrix** (perturbing R-reciprocal
+  collapsed G/B). Forward copies are inert. Site = `DemosaickLightV1(…,Vec3<f>)`/`setWhiteBalance(AWB)`
+  (exact VA open — see below). Clean-room: parse B8.19.15, apply 1/gain folded into the demosaic matrix.
+- **Runtime-method caveat for your validation:** READ watchpoints are non-functional under this Rosetta
+  x86_64 LLDB (positive-control proven); WRITE watchpoints work. Use differential rendering / single-step,
+  and hash DECODED pixels (the output file MD5 changes from an embedded timestamp + JPEG entropy offset).
 
 ## Verify-before-trust catches (so you know what was corrected, not just asserted)
 1. A finder fabricated a **"zero rcpss" negative** — rcpss exists at `0x36a938` (re-extracted).
