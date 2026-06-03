@@ -1,5 +1,11 @@
 # Lane A3 — Proof / disproof plan (CORRECTED)
 
+> ⚠ **RETRACTED — see `step0_reconciliation.md`.** The `-0x4240` watchpoint plan below was premised on
+> `-0x4240` being a pixel accumulator. Codex's committed `bundle_lldb_iramp_36cde0_scalar.md` shows
+> `0x36cde0` returns a per-contributor SCORE and `-0x4240` is a compared patch. The real reduction is
+> Codex's downstream reciprocal-weighted add. Kept below only for provenance.
+
+
 > Superseded the original collision-counting plan (which assumed the wrong loop structure — see
 > `CORRECTION.md`). The real open question is sum-vs-select inside the per-tile contributor body.
 

@@ -32,6 +32,17 @@ establish (machine-verified): the nest shape, the per-tile sentinel `0x80000000`
 (a tile-level acceptance mechanism), and the shared loop-invariant output base. See
 `proof_or_disproof_plan.md` for the experiment that resolves sum-vs-select.
 
+## FINAL frame (`step0_reconciliation.md`) — read this last
+
+A pre-task check against Codex's committed `iramp_*` lane reframes and partly RETRACTS the sum-vs-select
+question. `0x36cde0(-0x4240,-0x11a0)` returns a per-contributor **match SCORE** (Codex's
+`bundle_lldb_iramp_36cde0_scalar.md`), so `-0x4240` is a compared patch, NOT a pixel accumulator. The
+inner body emits a per-contributor `(flow_x, flow_y, score)` tuple; the real pixel reduction is
+downstream and already traced by Codex as a **reciprocal-weighted add**
+(`bundle_lldb_iramp_tuple_post_reciprocal_weighted_add.md`). **Converged answer:** the merge is a
+score-weighted N→1 reduction (motion-aligned + quality-weighted), not a naive sum and not a hard select.
+The `-0x4240` runtime watchpoint task is retracted. See `step0_reconciliation.md`.
+
 ## Step 0 update (`step0_inner_body.md`)
 
 Tracing the inner body added a machine-verified mechanism finding and refined the open question:
