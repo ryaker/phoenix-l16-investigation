@@ -57,14 +57,23 @@ items are all **lower WSJF** and gated on things outside the safe deterministic 
 high-value lead or Rich's direction; otherwise brief check + hold rather than grinding low-WSJF work.
 Best remaining candidate if pressed: a careful q2 stage-2 partial assembly, accepting it may stay partial.
 
-**#1-blocker collision check (2026-06-03):** re-read the `CLM-PREFUSION-002` ledger row. The true #1
-parity wall is the **upstream `src1`/`src2` merge/reduction math** (`OPEN`, BLOCKER) — and it is the
-subject of Codex's *live, deep* thread (dozens of `bundle_lldb_prefusion_*` / `state5` / `state_helper`
-docs on the binary-consumer side). My A3–A7 work is on a **different** mechanism (post-contributor IRAMP
-accumulator/blend `CLM-MERGE-002`, already `PROVEN`), NOT the pre-fusion reducer. Conclusion: there is no
-safe high-WSJF *solo* lane into the #1 blocker — entering `src1`/`src2` reducer disasm = high collision
-with Codex. So: do not open it. Hold the deterministic-static surface as covered; resume on Rich's
-direction or Codex's return (2026-06-07).
+**#1-blocker re-prioritization (2026-06-03, CORRECTS the prior "collision" note):** re-read the
+`CLM-PREFUSION-002` ledger row. The true #1 parity wall is the **upstream `src1`/`src2` merge/reduction
+math** (`OPEN`, BLOCKER). My A3–A7 work is on a **different** mechanism (post-contributor IRAMP
+accumulator/blend `CLM-MERGE-002`, already `PROVEN`), NOT the pre-fusion reducer.
+
+> **Correction (Rich, 2026-06-03):** "Codex owns validation and upgrade or downgrade of findings to
+> verified truth, but that doesn't mean investigation into any corner is owned by Codex." The prior note
+> here wrongly treated "Codex is active in this area" as "off-limits / no safe lane." WRONG. Investigation
+> territory is NOT owned — only ledger validation is. My quarantine findings are cheap, weak-labeled
+> (`NEEDS_CODEX_VALIDATION`) leads; independent investigation of the same area **corroborates or
+> challenges** Codex's frontier, it does not conflict with committed truth. "Collision" is at most a small
+> WSJF cost input (possible duplicate effort), **never** a prohibition.
+
+**Revised WSJF:** the `src1`/`src2` pre-fusion reducer is the **highest cost-of-delay** item (the #1 OPEN
+blocker). That makes it the **top investigation target**, not an excluded one. Pursue it in quarantine
+with weak labels. Discipline stays exactly as before: write only to `opus_pending/`, weak language, no
+canonical/main doc touched, Codex validates later.
 
 ## Notes
 - This backlog is Opus planning, not a finding; it cites no claim as fact and touches no canonical doc.
