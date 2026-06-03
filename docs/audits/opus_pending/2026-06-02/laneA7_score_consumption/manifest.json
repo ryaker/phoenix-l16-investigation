@@ -1,0 +1,16 @@
+{
+  "topic": "laneA7_score_consumption",
+  "lane": "A (Blocker 5: final merge acceptance/rejection / ghost suppression)",
+  "status": "NEEDS_CODEX_VALIDATION",
+  "created": "2026-06-03",
+  "author": "opus (quarantine research manager; no ledger authority)",
+  "extends": ["docs/evidence/bundle_lldb_iramp_tuple_downstream_consumer.md", "docs/evidence/bundle_lldb_iramp_tuple_post_reciprocal_weighted_add.md", "opus laneA6_score_metric (sibling context)"],
+  "binary": {"path": "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib", "sha256": "b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9", "arch": "x86_64", "note": "VA == file offset"},
+  "span": "0x36a7d8..0x36a93c",
+  "finding": "per-contributor score consumed as SOFT normalized blend weight; weight_vec4 = (score + 2*max(score-0.5,0), score, score, score), * source, accumulated, reciprocal-normalized. NO hard score-thresholded accept/reject branch (only a maxss clamp).",
+  "byte_verified_constants": {"score_offset": "0x5a8120 = -0.5", "lane3_blend": "0x5df904 = 0.2", "guided": "0x5a887c = 2.0"},
+  "blocker5_implication": "ghost/trail suppression is SOFT: low-similarity (low-SSIM, Lane A6) contributors carry low weight; >0.5 contributors get a super-linear lane-0 boost. No hard rejection in this span.",
+  "confidence": {"instructions_and_constants": "OBSERVED (deterministic)", "ghost_suppression_semantics": "LEAD (depends on A6 SSIM identity + lane semantics)"},
+  "open": ["weight_vec4 lane semantics (needs source vec4 layout)", "later post-blend stages 0x36aa30/0x36abf0/0x36acf0", "runtime confirmation"],
+  "non_claims_ref": "non_claims.md"
+}

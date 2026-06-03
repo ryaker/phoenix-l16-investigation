@@ -39,6 +39,8 @@ packet as fact, and `NEEDS_CODEX_VALIDATION` on every packet.
 
 | A6 | per-contributor merge SCORE metric `0x36cde0` | **Extends Codex `bundle_lldb_iramp_36cde0_scalar.md`** (which left the metric un-named). Byte-verified constants identify the score as a **CDF 9/7 wavelet-domain, SSIM-class structural-similarity/quality metric**: SSIM stabilizers `0x5fdc50=(0.01,0.03,..)` (K1/K2) on μ/σ²/σ_AB; **CDF 9/7 lifting** α/β/γ/ζ/(1/ζ) byte-exact at `0x5cbfd0..0x5cc040`; returns `sqrt(q1·q2)`. Names the merge-weight metric → clean-room-reimplementable; candidate input to Blocker-5 acceptance. Closed form / SSIM-variant / δ not pinned (LEAD). | `laneA6_score_metric/` |
 
+| A7 | score consumption → Blocker 5 (accept/reject) | **Extends Codex tuple-consumer docs.** Within span `0x36a7d8..0x36a93c` the per-contributor score is a SOFT normalized blend weight: byte-decoded `weight_vec4 = (score + 2·max(score−0.5, 0), score, score, score)` (offset const `0x5a8120 = −0.5`), `mulps` into source, accumulate, `rcpss`-normalize (`Σw·src/Σw`). **The only float gate on the score is a `maxss` clamp — NO hard score-thresholded accept/reject branch** (all conditional jumps are loop bounds). With A6 (SSIM score) ⇒ ghost/trail suppression is **soft** (low-SSIM contributors down-weighted, >0.5 boosted), not a hard reject. Lane semantics of the vec4 + later post-blend stages open. | `laneA7_score_consumption/` |
+
 ## Cross-cutting note for Codex (anchor spec)
 
 Lanes A1/A2/C reported `anchorPassed=TRUE`; Lane B reported `FALSE` — **not a conflict.** `0x3eced0`

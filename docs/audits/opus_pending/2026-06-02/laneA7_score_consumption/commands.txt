@@ -1,0 +1,18 @@
+# Lane A7 — reproduction
+DYLIB=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+
+# Score-weight dataflow slice (0x36a7d8..0x36a96d)
+otool -arch x86_64 -tV "$DYLIB" | awk '/^000000000036a7d8/{f=1} f{print} /^000000000036a96d/{if(f)exit}'
+
+# Decode the gate/blend constants (rip-relative targets):
+python3 -c "
+import struct
+d=open('$DYLIB','rb').read(); f1=lambda o: struct.unpack('<f', d[o:o+4])[0]
+print('0x36a855 score offset @0x5a8120 =', f1(0x5a8120))   # -0.5  (next-instr 0x36a85d + disp 0x23d8c3)
+print('0x36a9bc lane3 blend  @0x5df904 =', f1(0x5df904))   # 0.2   (0x36a9c4 + 0x274f40)
+print('0x36abca guided const @0x5a887c =', f1(0x5a887c))   # 2.0   (0x36abd2 + 0x23dcaa)
+"
+# Threshold check: only float-compare on the score in 0x36a7d8..0x36aa80 is the maxss clamp (0x36a860);
+# all conditional branches are loop bounds (testl %eax / cmpq), none score-predicated.
+# Cross-ref Codex: docs/evidence/bundle_lldb_iramp_tuple_downstream_consumer.md,
+#                  docs/evidence/bundle_lldb_iramp_tuple_post_reciprocal_weighted_add.md
