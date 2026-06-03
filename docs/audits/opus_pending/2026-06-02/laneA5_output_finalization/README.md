@@ -45,8 +45,16 @@ The resampler runs in **Q16.16 fixed-point**: `phase = (coord_q >> 10) & 0x3f` (
 view. Scale constant `0x5abed8 = 65536.0` byte-verified; apply loop `0x2b3410..0x2b3435`. With
 `kernel_identity.md` this is a complete clean-room resampler spec. See `apply_structure.md`.
 
+## Post-blend color matrix (`post_blend_color_matrix.md`)
+
+The merge tail applies a per-pixel **3×3 matrix** (`0x36acf0`, `out.rgb = M·in.rgb`, alpha preserved).
+Its 9 coefficients load from `__bss` (`0x671980..`, `fileoff=0`) → **runtime-populated, not a file
+constant** → a per-LRI color-correction/white-balance matrix. Clean-room-friendly (parse from LRI);
+values require a runtime read (deferred). See `post_blend_color_matrix.md`.
+
 ## Files
 
+- `post_blend_color_matrix.md` — the runtime 3×3 color matrix at the merge tail (__bss-sourced).
 - `apply_structure.md` — Q16.16 coords, 64-phase index, separable 4-tap apply (machine-anchored).
 - `kernel_identity.md` — byte-verified resampler kernel identification (B-spline + Catmull-Rom).
 - `observations.md` — step-by-step finalization with VAs; helper roles.
