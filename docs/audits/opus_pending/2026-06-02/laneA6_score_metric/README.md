@@ -60,3 +60,6 @@ wavelet-domain statistic (identified, not fully assembled — 188 ops, deferred)
 - `non_claims.md` — what is NOT proven (the exact closed form; δ; the precise SSIM variant).
 - `commands.txt` — reproducible byte-reads.
 - `manifest.json` — machine-readable summary.
+
+
+> **REFINED 2026-06-03 (wave-2 `score_q1q2_lineage.md`, commit pending):** the `sqrt(q1·q2)` FORM holds, but this lane's "q1 = SSIM contrast-structure / q2 = CDF 9/7 wavelet" SEMANTIC SPLIT is **REFUTED**. Static backward-trace shows both final factors are `hmin` reductions of one wavelet-flavored score family (`sqrt(hmin(A)·hmin(B))`, minss `0x36e40b`/`0x36e42c`); the SSIM constants `0x5fdc50/60/70` are consumed UPSTREAM (`0x36cea6`,`0x36e200`) as stabilizers within that score, NOT as a separate SSIM factor. So: wavelet-domain SSIM-class metric, not SSIM×wavelet.
