@@ -1,0 +1,44 @@
+# Lane A2 reducer/body search -- exact commands (STATIC ONLY; no render, no runtime, no breakpoints)
+# libcp.dylib sha256: b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9
+# Mach-O x86_64; file offset == VA (__TEXT vmaddr=0).
+
+LIB="/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib"
+
+# 0. sha256 + arch
+shasum -a 256 "$LIB"
+file "$LIB"
+
+# 1. ANCHOR SELF-CHECK (expect mulps -> maxps -> sqrtps near 0x3eced0)
+otool -arch x86_64 -tV "$LIB" | awk '/^00000000003eced0/{f=1} f{print; n++} n>120{exit}' | grep -iE "mulps|maxps|sqrtps"
+
+# 2. Full disasm dump (1,333,882 lines)
+otool -arch x86_64 -tV "$LIB" > runs/laneA2_reducer_body_search/full_disasm.txt
+
+# 3. nm symbols (707 lines; kernels are stripped/local -- no exact matches)
+nm -arch x86_64 "$LIB" > runs/laneA2_reducer_body_search/nm_symbols.txt
+
+# 4. Direct refs to the known kernels
+grep -nE "0x369f80" runs/laneA2_reducer_body_search/full_disasm.txt   # only a jne loop-head (self loop)
+grep -nE "0x2f78e0" runs/laneA2_reducer_body_search/full_disasm.txt   # 0 textual refs -> indirect
+grep -nE "call.*0x3661b0\b" runs/laneA2_reducer_body_search/full_disasm.txt  # caller 0x365f4b
+grep -nE "call.*0x365960\b" runs/laneA2_reducer_body_search/full_disasm.txt  # caller 0x3ec7da
+
+# 5. 0x23faf0 callsite census (38 callq sites, 23 distinct host functions)
+grep -nE "0x23faf0" runs/laneA2_reducer_body_search/full_disasm.txt
+
+# 6. Pointer-table (vtable) search for indirect-only kernels -- found:
+#    0x2f78e0 -> 0x65a598   (vtable slot)
+#    0x3ec960 -> 0x65f610   (vtable slot)
+#    (done in callgraph_probe.py / inline python)
+
+# 7. RTTI resolution of vtable clusters (inline mangled names in __DATA):
+#    0x65a5b0 -> name @0x5f2630 = std::function __func wrapping
+#       lt::Internal::(anon)::ImageDenoiseBilateralGeneric<5,true>(Image<vec4x32f>&, ..., Rectangle<int> const&)
+#    0x608010 = lt::SourceImageCache::SourceImageCache(...)::$_0::operator()(Tile<vec4x16f> const&)
+#                 ::'lambda'(Image<vec4x32f>&, Rectangle<int> const&)
+#    0x6088a0 = lt::PipelineCache::PipelineCache(...)::$_0
+
+# 8. Reproducible call-graph + reachability + vtable probe (the load-bearing result)
+python3 tools/lldb_probes/opus_pending/laneA2_reducer_body_search/callgraph_probe.py \
+    runs/laneA2_reducer_body_search/full_disasm.txt "$LIB" \
+    > runs/laneA2_reducer_body_search/probe_repro.log

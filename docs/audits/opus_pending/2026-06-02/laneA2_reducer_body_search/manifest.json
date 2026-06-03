@@ -1,0 +1,55 @@
+{
+  "lane": "A2",
+  "topic": "reducer_body_search",
+  "status": "NEEDS_CODEX_VALIDATION",
+  "created": "2026-06-02",
+  "agent": "opus-quarantine (no truth authority)",
+  "method": "STATIC ONLY (otool -arch x86_64 -tV, nm -arch x86_64, raw __DATA pointer/RTTI reads). NO render, NO runtime, NO breakpoints.",
+  "libcp_dylib": {
+    "path": "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib",
+    "sha256": "b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9",
+    "macho": "Mach-O 64-bit dynamically linked shared library x86_64",
+    "file_offset_equals_va": true
+  },
+  "anchor": {
+    "va": "0x3eced0",
+    "expected": "mulps -> maxps -> sqrtps",
+    "observed_at": "0x3ecfe4 (mulps), 0x3ecfe7 (maxps), 0x3ecfea (sqrtps)",
+    "anchorPassed": true
+  },
+  "key_vas": {
+    "0x369f80": "accumulator inner loop: acc += source4 * (coeff_i*coeff_j), Hann-16; IMAGE-EFFECTING; in fn 0x3661b0",
+    "0x3661b0": "accumulator fn; direct caller 0x365960",
+    "0x365960": "Hann window weight precompute; direct caller 0x3ec770; two equal-length std::vector<16B> args",
+    "0x3ec770": "accumulator-caller (mode-0 resample branch); direct caller 0x3ec960",
+    "0x3ec960": "SourceImageCache per-tile lambda vfunc (vtable slot 0x65f610); indirect-only entry",
+    "0x2f78e0": "ImageDenoiseBilateralGeneric<5,true> std::function body (vtable slot 0x65a598); indirect-only; IMAGE-EFFECTING (denoise)",
+    "0x23faf0": "tree-node-family record/metadata copy-ctor/clone; 38 callsites / 23 host fns; METADATA-ONLY"
+  },
+  "rtti_strings": {
+    "0x608010": "lt::SourceImageCache::SourceImageCache(...)::$_0::operator()(Tile<vec4x16f> const&)::lambda(Image<vec4x32f>&, Rectangle<int> const&)",
+    "0x6088a0": "lt::PipelineCache::PipelineCache(...)::$_0",
+    "0x5f2630": "std::__function::__func wrapping lt::Internal::(anon)::ImageDenoiseBilateralGeneric<5,true>(Image<vec4x32f>&, ImageRef const&, ImageRef const&, ..., Rectangle<int> const&)"
+  },
+  "bounded_result": {
+    "image_effecting_candidates": ["0x369f80 (OBSERVED)", "0x3661b0/0x365960/0x3ec770/0x3ec960 SourceImageCache chain (OBSERVED+RTTI)", "0x2f78e0 ImageDenoiseBilateral (OBSERVED via RTTI)"],
+    "metadata_only": ["0x23faf0 record-clone (OBSERVED)"],
+    "record_to_kernel_direct_path": "EMPTY (23 hosts, no direct-call path to any of 6 kernels)",
+    "hard_caveat": "DIRECT-CALL only; 0x2f78e0/0x3ec960/0x369f80 are vtable/std::function indirect; static graph cannot cross indirection. Indirect link NOT excluded.",
+    "reducer_assessment": "AGAINST a single tidy N->1 reducer in the searched surface; the image-kernel sub-graph is shallow (3 fns) and gated as per-camera SourceImageCache source production + bilateral denoise. CANDIDATE: pre-fusion merge is distributed/indirect, not one reducer. NEEDS_CODEX_VALIDATION."
+  },
+  "files": {
+    "readme": "docs/audits/opus_pending/2026-06-02/laneA2_reducer_body_search/README.md",
+    "observations": "docs/audits/opus_pending/2026-06-02/laneA2_reducer_body_search/observations.md",
+    "non_claims": "docs/audits/opus_pending/2026-06-02/laneA2_reducer_body_search/non_claims.md",
+    "proof_or_disproof_plan": "docs/audits/opus_pending/2026-06-02/laneA2_reducer_body_search/proof_or_disproof_plan.md",
+    "commands": "docs/audits/opus_pending/2026-06-02/laneA2_reducer_body_search/commands.txt",
+    "probe": "tools/lldb_probes/opus_pending/laneA2_reducer_body_search/callgraph_probe.py",
+    "logs": [
+      "runs/laneA2_reducer_body_search/full_disasm.txt",
+      "runs/laneA2_reducer_body_search/nm_symbols.txt",
+      "runs/laneA2_reducer_body_search/callgraph_summary.log",
+      "runs/laneA2_reducer_body_search/probe_repro.log"
+    ]
+  }
+}
