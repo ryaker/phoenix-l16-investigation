@@ -1,0 +1,56 @@
+# Lane B Unit-2 four-zoom — exact commands (2026-06-02)
+# libcp.dylib sha256 b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9
+# All renders SEQUENTIAL, one at a time.
+
+# ---- environment verification ----
+shasum -a 256 /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+file /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+ls "/Volumes/Base Photos/Light/2018-07-04/L16_02130.lri"   # 28mm Unit-2
+ls "/Volumes/Base Photos/Light/2018-10-28/L16_03041.lri"   # 35mm Unit-2
+ls "/Volumes/Base Photos/Light/2020-07-14/L16_03434.lri"   # 70mm Unit-2
+ls "/Volumes/Base Photos/Light/2018-07-07/L16_02285.lri"   # 150mm Unit-2
+
+# ---- lri_process CLI (discovered) ----
+# Usage: lri_process <input.lri> <output> [--profile N]
+# (output path REQUIRED; --profile is an option AFTER positionals.)
+# NOTE: lri_process fails ("Cannot open") writing the .hdr onto the
+# /Volumes/Dev/L16-opus-quarantine worktree path -> render output goes to /tmp.
+
+# ---- per-zoom: generate .lldb via wrapper, then run lldb DIRECTLY with retry ----
+# The wrapper (run_one.sh) writes the per-zoom .lldb + uses lanebcap.py.
+# Direct lldb invocation (stdout to a file) is stable; the nested-subshell+tee
+# form triggers the intermittent "Cannot open" race, so we run lldb directly.
+
+ZOOM=28mm_L16_02130;  LRI="/Volumes/Base Photos/Light/2018-07-04/L16_02130.lri"
+ZOOM=35mm_L16_03041;  LRI="/Volumes/Base Photos/Light/2018-10-28/L16_03041.lri"
+ZOOM=70mm_L16_03434;  LRI="/Volumes/Base Photos/Light/2020-07-14/L16_03434.lri"
+ZOOM=150mm_L16_02285; LRI="/Volumes/Base Photos/Light/2018-07-07/L16_02285.lri"
+
+# (1) generate the per-zoom .lldb script:
+tools/lldb_probes/opus_pending/laneB_unit2_fourzoom/run_one.sh "$ZOOM" "$LRI"
+#     (run_one.sh also runs lldb itself with a retry loop; on this host the
+#      direct-from-Bash retry below is what reliably captured.)
+
+# (2) reliable capture loop (run from a clean shell, cwd=/tmp):
+cd /tmp
+RUNS=/Volumes/Dev/L16-opus-quarantine/runs/laneB_unit2_fourzoom
+for attempt in $(seq 1 8); do
+  arch -x86_64 lldb -b -s "$RUNS/${ZOOM}.lldb" > "$RUNS/${ZOOM}.log" 2>&1
+  grep -q '"coeff16": \[' "$RUNS/${ZOOM}_result.json" && { echo "CAPTURED $attempt"; break; }
+done
+cat "$RUNS/${ZOOM}_result.json"
+
+# ---- the .lldb each run executes (templated by run_one.sh) ----
+#   target create <lri_process>
+#   settings set target.env-vars DYLD_FRAMEWORK_PATH=<FW> DYLD_LIBRARY_PATH=<FW>
+#   breakpoint set --name main
+#   process launch -- "<LRI>" "/tmp/laneB_<ZOOM>_out.hdr" --profile 3
+#   command script import .../lanebcap.py
+#   script lanebcap.run(lldb, "<ZOOM>", "<LRI>", "<RESULT.json>")
+#   quit
+# lanebcap.run(): libcp_base -> anchor disasm @ base+0x3eced0 ->
+#   bare BP @ base+0x369fa4, delete main -> continue -> first-hit stop ->
+#   read 16 floats @ $rbp-0xa0 + regs + bt -> write RESULT json.
+
+# ---- comparison ----
+python3 -c 'see proof_or_disproof_plan.md for the exact 6-dp comparison snippet'

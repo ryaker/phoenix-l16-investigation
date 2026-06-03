@@ -1,0 +1,51 @@
+{
+  "lane": "B",
+  "topic": "Unit-2 four-zoom IRAMP accumulator coefficient cross-unit re-check",
+  "status": "NEEDS_CODEX_VALIDATION",
+  "created": "2026-06-02",
+  "authority": "none (quarantine research packet)",
+  "libcp_dylib": {
+    "path": "/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib",
+    "sha256": "b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9"
+  },
+  "lri_process": "/Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process",
+  "anchor": {
+    "va_offset": "0x3eced0",
+    "expected": "mulps -> maxps -> sqrtps",
+    "observed": "function prologue (pushq/movq/subq/.../callq)",
+    "anchorPassed": false,
+    "note": "spawn-prompt anchor offset does not match this libcp; 0x369fa4 probe target unaffected"
+  },
+  "bp": {
+    "va_offset": "0x369fa4",
+    "insn": "addps (%rdx,%rcx,4),%xmm1",
+    "role": "IRAMP accumulator (per spawn prompt)",
+    "coeff_read": "$rbp-0xa0, 16 x float32"
+  },
+  "unit2_seeds": {
+    "28mm": "/Volumes/Base Photos/Light/2018-07-04/L16_02130.lri",
+    "35mm": "/Volumes/Base Photos/Light/2018-10-28/L16_03041.lri",
+    "70mm": "/Volumes/Base Photos/Light/2020-07-14/L16_03434.lri",
+    "150mm": "/Volumes/Base Photos/Light/2018-07-07/L16_02285.lri"
+  },
+  "unit1_reference_hann16": [0.009607,0.084265,0.222215,0.402455,0.597545,0.777785,0.915735,0.990393,0.990393,0.915735,0.777785,0.597545,0.402455,0.222215,0.084265,0.009607],
+  "observed_per_zoom_match_to_6dp": {
+    "28mm": true,
+    "35mm": true,
+    "70mm": true,
+    "150mm": true
+  },
+  "render_mode": "sequential, one at a time",
+  "result_json": {
+    "28mm": "runs/laneB_unit2_fourzoom/28mm_L16_02130_result.json",
+    "35mm": "runs/laneB_unit2_fourzoom/35mm_L16_03041_result.json",
+    "70mm": "runs/laneB_unit2_fourzoom/70mm_L16_03434_result.json",
+    "150mm": "runs/laneB_unit2_fourzoom/150mm_L16_02285_result.json"
+  },
+  "raw_logs": {
+    "28mm": "runs/laneB_unit2_fourzoom/28mm_L16_02130.log",
+    "35mm": "runs/laneB_unit2_fourzoom/35mm_L16_03041.log",
+    "70mm": "runs/laneB_unit2_fourzoom/70mm_L16_03434.log",
+    "150mm": "runs/laneB_unit2_fourzoom/150mm_L16_02285.log"
+  }
+}
