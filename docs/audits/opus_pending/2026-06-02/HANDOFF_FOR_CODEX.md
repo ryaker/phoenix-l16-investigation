@@ -36,9 +36,14 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
 - **Clean-room LRI input map (wave 8):** per-capture **AWB/WB gains = Block 8 `B8.19.15`** =
   [R 1.7178, G 1.0, G 1.0, B 1.5888] (Bayer RGGB, global, distinct from Block-6 per-camera scalars/CCM; no
   standalone CCT). Full **11-block inventory**: Block 0+2 = raw sensor planes in the block *body* (pre
-  `msg_offset`; blk0 cams {0,4,6,8,9}, blk2 {1,2,3,5,7} = 10 fired cams @28mm); Block 4 = per-module cal,
-  Block 5 = vignetting/falloff. Block 0 LightHeader: f1/f2 = GUID (not timestamps), f3 = date submsg,
-  f5 = reference camera, f18 = hw_info; per-camera exposure/gain/focus (no plain EXIF scalars).
+  `msg_offset`; blk0 cams {0,4,6,8,9}, blk2 {1,2,3,5,7} = 10 fired cams @28mm). Block 0 LightHeader: f1/f2
+  = GUID (not timestamps), f3 = date submsg, f5 = reference camera, f18 = hw_info; per-camera exposure/
+  gain/focus (no plain EXIF scalars). **Block 4 = per-camera LENS-SHADING / color-shading correction grid**
+  (16 cams × 17×13=221 pts × a 4×4 near-identity channel-mixing matrix; 14144B=221×16 f32; radial
+  corner-rising; orchestrator-verified; per-body-constant, Unit-1≠Unit-2; 8/8 size tier = 2 lens families).
+  **Block 5 = global vignetting falloff** (28 radius samples; finder-only LEAD). Block 1 = ancillary
+  (f10/f18=1.5348). ⇒ **all 11 LRI blocks role-mapped; clean-room calibration parser spec complete**
+  (intrinsics, distortion+LUTs, per-camera CCM, spectral curves, lens-shading grid, vignetting, AWB, header).
 
 ### Runtime results (I ran renders — Codex offline, sequential, 28mm)
 - **`__bss 0x671980` post-merge "color matrix" is a FIXED CONSTANT** = Ohta/PCA **I1I2I3** orthonormal
