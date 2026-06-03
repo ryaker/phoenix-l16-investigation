@@ -1,0 +1,16 @@
+# Lane P — reproduction (deterministic; corpus must be mounted)
+# Confirm mount: ls "/Volumes/Base Photos/"
+
+# 1. Characterize the 182 unassigned (record counts, candidate signatures, dates, per-file detail)
+python3 docs/audits/opus_pending/2026-06-02/laneP_parser_gap_182/characterize_unassigned.py
+#   -> runs/laneP_parser_gap_182/characterize_report.txt
+#   expect: unassigned=182, no_blocks=4, max_field13=0 -> 178, candidate_sig empty
+
+# 2. Block-count distribution + walk-termination mechanism + robust re-parse
+#    (inline python in the packet's git history / README O2-O4); key results:
+#    - LELR-block-count of the 182: {0:4, 1:10, 2:26, 3:77, 4:65}; assigned L16_02130 has 12 blocks
+#    - mechanism: walked_all_present_blocks=92, walk_terminated_early(magic>walked)=90
+#    - robust LELR-magic-scan re-parse of all 182: still_unassigned=182, NOW_UNIT1=0, NOW_UNIT2=0,
+#      NEW_THIRD_SIG=0   <-- the integrity result: no third unit
+
+# Unit signatures (from the two-unit proof): Unit-1 722a6e721636c9c4, Unit-2 223961c6bce6153e

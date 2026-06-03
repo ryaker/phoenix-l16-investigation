@@ -1,0 +1,24 @@
+{
+  "topic": "laneP_parser_gap_182",
+  "lane": "P (two-unit corpus completeness; supports universality requirement)",
+  "status": "NEEDS_CODEX_VALIDATION",
+  "created": "2026-06-02",
+  "author": "opus (quarantine research manager; no ledger authority)",
+  "method": "deterministic corpus data analysis via tools/lri_field_inspect.py; no render, no disasm",
+  "corpus": "/Volumes/Base Photos/Light/*/*.lri (9390 files)",
+  "unit_signatures": {"unit1": "722a6e721636c9c4", "unit2": "223961c6bce6153e"},
+  "findings": {
+    "unassigned_total": 182,
+    "no_lelr_blocks": 4,
+    "blocks_but_no_16x_field13": 178,
+    "block_count_hist": {"0": 4, "1": 10, "2": 26, "3": 77, "4": 65},
+    "assigned_example_block_count": {"L16_02130": 12},
+    "mechanism": {"walk_terminated_early_magic_gt_walked": 90, "walked_all_present_blocks": 92},
+    "robust_magic_scan_reparse": {"still_unassigned": 182, "now_unit1": 0, "now_unit2": 0, "new_third_sig": 0},
+    "date_span": "2017-12-08..2021-03-06 (not early-firmware-only)",
+    "verified_example": "L16_00795.lri: 170MB, exactly 1 LELR magic in whole file, 1497B payload, no proto fields"
+  },
+  "integrity_conclusion": "the 182 unassigned yield NO calibration signature and NO third unit; the two-unit 'exactly two, no third' claim is not threatened. Gap is container-format/parser-coverage, not a distinct camera.",
+  "open": "whether the 182 carry per-camera calibration under a different proto field/structure (extended-parser assignment) is unresolved; not a third-unit risk",
+  "non_claims_ref": "non_claims.md"
+}

@@ -23,6 +23,8 @@
 
 | A5 | IRAMP post-merge output finalization | **Deterministic anchors:** edge-extend helper `0x3750a0` identified by embedded asserts `"Amount to extend must be positive"` / `"ROI must be within image!"` / `"ROI start must be non-negative!"`; resample helpers `0x2b2be0`+sibling `0x36f800` = 64-entry cubic-kernel LUT + recursive subdivision driver `0x5440`. Finalization tail `0x369ff2..0x36ae41` = **bounds-clamp → edge-pad → cubic resample to output**, NOT a quality gate. Only rejection = degenerate-rect skip `0x36a0eb/0x36a0ef jle 0x36a15b`. **Negative-shaped result for the acceptance/rejection blocker at THIS site** (no score gate in the finalization). Consistent with PROVEN `CLM-MERGE-002` (resample stage after the accumulator). **BYTE-VERIFIED kernel identity** (`kernel_identity.md`): `0x2b2be0` = cubic B-spline (B=1,C=0), `0x36f800` = Catmull-Rom (B=0,C=0.5), both 4-tap×64-phase, exact canonical match ≤3e-8 — parity-grade (reimplementable from formula). **APPLY (`apply_structure.md`, machine-anchored):** Q16.16 coords (scale `0x5abed8=65536.0`), `phase=(coord_q>>10)&0x3f` (64 phases), `srcIdx=coord_q>>16`, separable 4-tap `mulps`/`addps` (`0x2b3410..0x2b3435`) into dst view; leaf `0x6685b8+0x30=0x2b3180→0x2b31c0`. Complete clean-room resampler spec. | `31ef04e`→(+kernel)→(+apply) |
 
+| P | 182 unassigned LRIs (two-unit completeness) | **Deterministic.** The 182 corpus files unassigned by the two-unit partition yield **NO calibration signature and NO third unit** — even an exhaustive `LELR`-magic-scan re-parse assigns 0/182 with 0 third signatures. Split: 4 zero-block + 178 with 1–4 blocks but no 16×field-13 intrinsics (assigned files have ~12 blocks); mechanism = 90 early-walk-termination + 92 walk-complete; spans 2017–2021 (not early-firmware-only). **The "exactly two units, no third" claim is not threatened**; gap is container-format/parser-coverage. Open: whether they carry calibration under a different proto field (extended-parser assignment) — not a third-unit risk. | `laneP_parser_gap_182/` |
+
 ## Cross-cutting note for Codex (anchor spec)
 
 Lanes A1/A2/C reported `anchorPassed=TRUE`; Lane B reported `FALSE` — **not a conflict.** `0x3eced0`
@@ -37,7 +39,9 @@ is the enclosing **function prologue**; the `mulps → maxps → sqrtps` triplet
   sites, are unproven (Lane C proof plan §2/§3 — runtime).
 - Lane B observed only the FIRST accumulator hit per render (zero/early tiles); no non-zero
   multi-camera accumulation captured (the known probe-redesign gap from the prior 28mm decider).
-- 182/9390 corpus LRIs remain unassigned to a unit under the current parser (parser-coverage gap).
+- 182/9390 corpus LRIs remain unassigned to a unit under the current parser — **now characterized in
+  Lane P:** deterministically shown to yield no third-unit signature (container-format/parser-coverage
+  gap, not a hidden camera). Residual open: extended-parser assignment of those 182.
 - **Lane A3 decisive question is untraced:** the per-tile inner body `0x369320..0x369ec4` — SUM vs
   SELECT of coverage-passing contributors. Step 0 of A3's plan (static trace of that range) is the
   cheapest next move; no render needed. The `0x80000000` coverage sentinel is a candidate tile-level
