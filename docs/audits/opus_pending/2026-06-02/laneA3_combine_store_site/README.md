@@ -8,6 +8,9 @@
 
 > ⚠ **See `CORRECTION.md`** — the first commit's mechanism narrative was self-caught as wrong and
 > corrected. Read `observations.md` (corrected) and `CORRECTION.md` together; this summary is corrected.
+> ⚠ **See `LEDGER_RECONCILIATION.md`** — this packet does NOT contradict the PROVEN `CLM-MERGE-002`
+> accumulator claim; "cross-tile overlap-add, not cross-camera" is a placement note, not a denial of
+> the ledger's "multi-source weighted accumulator." The ledger wins.
 
 Machine-verified loop nest in `0x3661b0`: **tile-X `0x369140` → tile-Y `0x369160` → contributor loop
 `0x3692f0..0x369f24` (sentinel-gated `0x80000000` per-tile coverage) → single Hann overlap-add
