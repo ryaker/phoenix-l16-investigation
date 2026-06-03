@@ -32,6 +32,18 @@ establish (machine-verified): the nest shape, the per-tile sentinel `0x80000000`
 (a tile-level acceptance mechanism), and the shared loop-invariant output base. See
 `proof_or_disproof_plan.md` for the experiment that resolves sum-vs-select.
 
+## Step 0 update (`step0_inner_body.md`)
+
+Tracing the inner body added a machine-verified mechanism finding and refined the open question:
+- **NEW (deterministic):** the inner body does **per-contributor SAD block-match motion search**
+  (`mpsadbw` ×16 + `phminposuw` argmin, `0x3694b1..0x369643`) — each contributor is aligned before
+  combine. The merge is motion-compensated per contributor.
+- **Confirmed:** the Hann accumulate `0x369f80` runs once per tile (after the contributor loop), reading
+  per-contributor scratch `-0x4240` via `0x36e530`.
+- **Still OPEN (sum vs select):** whether `-0x4240` is accumulated (H-REDUCE) or overwritten
+  (H-SELECT, last-valid-wins) across contributors is **unresolved statically**; two automated traces
+  erred on this loop re-entry, so the arbiter is a **runtime watchpoint** (see `step0_inner_body.md`).
+
 ## Files
 
 - `observations.md`     — OBSERVED-from-disasm structure, exact VAs + quoted instruction lines.
