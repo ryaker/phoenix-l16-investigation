@@ -65,3 +65,10 @@ sub1 inner fields (the grid container):
 - No libcp disasm or LLDB tracing performed — proto FIELD NUMBERS for field 4 / sub1 are unmapped to source names; "lens-shading/vignetting" classification is inferred from value structure (4x4 near-identity, radial corner-rising, per-camera) not from a named symbol.
 - Only one LRI (28mm Unit-1) parsed; cross-zoom/cross-unit invariance of the 17x13x16 grid NOT checked.
 - Bayer channel ordering (which of R/Gr/Gb/B = ch0/5/10/15) is an assumption, not verified.
+
+## Universality self-check (orchestrator, OBSERVED)
+The 17x13x16 (14144B) grid holds across seeds; per-body-constant + Unit-1 != Unit-2:
+- U1 28mm (2018-07-23): first floats [1.00312, 0.00091, 1.00719(ch5), 1.01935(ch15)], range -0.0194/1.0314.
+- U1 150mm (2018-07-29): byte-identical first floats to U1 28mm => per-body-constant across zooms.
+- U2 28mm twin (2018-07-04): DIFFERENT [1.01342, 0.00830, 0.99987, 0.97445], range -0.0429/1.0474 => Unit-1 != Unit-2.
+Block INDEX shifts (Block 4 in 11-block seeds, Block 5 in 12-block seeds), tracking block-count not focal.
