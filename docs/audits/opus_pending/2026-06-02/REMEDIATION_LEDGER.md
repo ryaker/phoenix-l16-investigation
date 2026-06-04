@@ -3,7 +3,7 @@
 
 **Directive (Rich, 2026-06-03):** run the four-zoom playbook (see `../opus_findings_for_codex/README.md`)
 disciplined through EVERY finding doc from the last 2 days. None graduates to Tier 1 (findings_for_codex)
-until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 2 / 80 graduated** (W1 batch 1).
+until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 16 / 80 graduated** (W1: 2 render-findings; W3: 14 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
 
 Cadence is render-bound (4 sequential renders per data sweep, minutes each, one external disk under
 Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 4-render sweep with many
@@ -17,7 +17,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
   under Rosetta) ⇒ W1 must stop SELECTIVELY (1-2 stages/render) → even more render-bound.
 - **W1:** four-zoom DATA sweep #1 — merge/score/gates/CCM/undistort/resample/compositing (lane A/D/E + B2 color).
 - **W2:** four-zoom DATA sweep #2 — denoise/sharpen/CNR/bilateral + stereo cost (the new stages).
-- **W3:** 4-LRI re-parse — all Block-* calibration / distortion / depth-origin LRI docs (parse 4 LRIs, not 2).
+- **W3 (DONE):** 4-LRI re-parse — 14 calibration/distortion/color/AWB/header docs GRADUATED via consolidated finding; Claim-1 block-count correction (11 wide / 12 tele, role=payload-size not index); AWB=54B f19.15; depth-no-LRI confirmed 4-LRI. Block-4/5 internal grids + Unit-2 still owed.
 - **W4:** residual/single-claim docs + synthesis docs re-derived from graduated children.
 
 ## Ledger (all start STAGING / four-zoom OWED)
@@ -27,7 +27,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 1 | BLIND_SPOTS_discovered_stages.md | STAGING | OWED | - |
 | 2 | denoise_sharpen_kernel_math.md | STAGING | OWED | - |
 | 3 | denoise_sharpen_tone_stages_mapped.md | STAGING | OWED | - |
-| 4 | depth_stereo_no_lri_origin.md | STAGING | OWED | - |
+| 4 | depth_stereo_no_lri_origin.md | STAGING (LRI-side graduated) | W3: Claim6 four-LRI✓ (consolidated); runtime ctor part static | W3 |
 | 5 | laneA_prefusion_reducer_static/accumulate_search_216f60.md | STAGING | OWED | - |
 | 6 | laneA_prefusion_reducer_static/contributor_gate.md | STAGING | OWED | - |
 | 7 | laneA_prefusion_reducer_static/geom_record_consumer_static.md | STAGING | OWED | - |
@@ -58,32 +58,32 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 32 | laneA6_score_metric/score_completion_kraw_scales.md | STAGING | OWED | - |
 | 33 | laneA7_score_consumption/lane_semantics.md | STAGING | OWED | - |
 | 34 | laneB2_lri_calibration_origins/awb_consumption_runtime.md | STAGING | OWED | - |
-| 35 | laneB2_lri_calibration_origins/awb_wb_gains_block8.md | STAGING | OWED | - |
+| 35 | laneB2_lri_calibration_origins/awb_wb_gains_block8.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 36 | laneB2_lri_calibration_origins/block1_ancillary.md | STAGING | OWED | - |
 | 37 | laneB2_lri_calibration_origins/block4_lens_shading_grid.md | STAGING | OWED | - |
 | 38 | laneB2_lri_calibration_origins/block5_vignetting.md | STAGING | OWED | - |
-| 39 | laneB2_lri_calibration_origins/block6_519b_records.md | STAGING | OWED | - |
+| 39 | laneB2_lri_calibration_origins/block6_519b_records.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 40 | laneB2_lri_calibration_origins/block6_color_candidate.md | STAGING | OWED | - |
-| 41 | laneB2_lri_calibration_origins/block6_color_shading.md | STAGING | OWED | - |
-| 42 | laneB2_lri_calibration_origins/block6_f28_spectral_curves.md | STAGING | OWED | - |
-| 43 | laneB2_lri_calibration_origins/block6_grouping.md | STAGING | OWED | - |
+| 41 | laneB2_lri_calibration_origins/block6_color_shading.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
+| 42 | laneB2_lri_calibration_origins/block6_f28_spectral_curves.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
+| 43 | laneB2_lri_calibration_origins/block6_grouping.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 44 | laneB2_lri_calibration_origins/calibration_unknowns_block6.md | STAGING | OWED | - |
-| 45 | laneB2_lri_calibration_origins/camera_focal_map_excluded_pair.md | STAGING | OWED | - |
+| 45 | laneB2_lri_calibration_origins/camera_focal_map_excluded_pair.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 46 | laneB2_lri_calibration_origins/ccm_apply_site_located.md | STAGING (CORRECTED) | W1: 0xbfa20 first-hit=I1I2I3 not per-cam CCM; per-cam claim reopened | W1 |
 | 47 | laneB2_lri_calibration_origins/ccm_apply_site_static.md | STAGING | OWED | - |
 | 48 | laneB2_lri_calibration_origins/ccm_consumption_runtime_INCONCLUSIVE.md | STAGING | OWED | - |
 | 49 | laneB2_lri_calibration_origins/ccm_lri_residency_link.md | STAGING | OWED | - |
 | 50 | laneB2_lri_calibration_origins/cross_unit_values.md | STAGING | OWED | - |
-| 51 | laneB2_lri_calibration_origins/crosscorpus_distortion.md | STAGING | OWED | - |
-| 52 | laneB2_lri_calibration_origins/crosscorpus_focal_map_excluded_pair.md | STAGING | OWED | - |
-| 53 | laneB2_lri_calibration_origins/crosscorpus_spectral_f28.md | STAGING | OWED | - |
+| 51 | laneB2_lri_calibration_origins/crosscorpus_distortion.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
+| 52 | laneB2_lri_calibration_origins/crosscorpus_focal_map_excluded_pair.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
+| 53 | laneB2_lri_calibration_origins/crosscorpus_spectral_f28.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 54 | laneB2_lri_calibration_origins/distortion_apply_stage.md | STAGING | OWED | - |
-| 55 | laneB2_lri_calibration_origins/distortion_complexity_8_8_refuted.md | STAGING | OWED | - |
-| 56 | laneB2_lri_calibration_origins/distortion_lut_full_decode.md | STAGING | OWED | - |
-| 57 | laneB2_lri_calibration_origins/distortion_undistort_spec.md | STAGING | OWED | - |
+| 55 | laneB2_lri_calibration_origins/distortion_complexity_8_8_refuted.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
+| 56 | laneB2_lri_calibration_origins/distortion_lut_full_decode.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
+| 57 | laneB2_lri_calibration_origins/distortion_undistort_spec.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 58 | laneB2_lri_calibration_origins/four_zoom_two_unit.md | STAGING | OWED | - |
-| 59 | laneB2_lri_calibration_origins/lightheader_block0.md | STAGING | OWED | - |
-| 60 | laneB2_lri_calibration_origins/lri_block_inventory.md | STAGING | OWED | - |
+| 59 | laneB2_lri_calibration_origins/lightheader_block0.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
+| 60 | laneB2_lri_calibration_origins/lri_block_inventory.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 61 | → GRADUATED: opus_findings_for_codex/undistort_ordering_lut_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit; camera-group LUT split) | W1 |
 | 62 | laneB2_lri_calibration_origins/verified_field_map.md | STAGING | OWED | - |
 | 63 | laneC6_remaining/c6_grouptype2_survival.md | STAGING | OWED | - |
