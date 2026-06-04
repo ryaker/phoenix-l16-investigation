@@ -1,6 +1,14 @@
 # Lane A verdict — src1/src2 reducer mechanism (predict-then-verify result)
 
-**Status:** mixed. Claims I personally re-extracted from the binary = **OBSERVED**; claims that rest only on
+> **GRADUATED (2026-06-04) → `../../opus_findings_for_codex/terminal_merge_3661b0_FOURZOOM.md` (REDUCER
+> VERDICT banner).** Two-prong rule (N-accept + N→1-store) byte-re-extracted: prong-2 store chain
+> `0x36aa50 mulps → 0x36aa53 addps (%rsi,%rdi) → 0x36aa57 movaps store → 0x36aa5b incq` independently
+> confirmed from `b38dc4b3`; src1/src2=geometry (src2 dims-only `0x374b0a/0e`) confirmed; normalization
+> (1/Σscore), weight_vec4, score kernel, lane-3·0.2 all graduated (`merge_magnitudes` + `lane3_blend`).
+> Scoped OPENs (not blockers): coverage-sentinel SELECTION gate `0x36930f`/`0x80000000` runtime effect;
+> two-unit runtime. The "caught subagent error" lesson below stands.
+
+**Status:** GRADUATED → terminal_merge_3661b0_FOURZOOM (was mixed/NEEDS_CODEX_VALIDATION). Claims I personally re-extracted from the binary = **OBSERVED**; claims that rest only on
 the subagent (which made a verified error, see below) = **LEAD / down-weighted**. All `NEEDS_CODEX_VALIDATION`.
 Binary: `libcp.dylib` (file-offset==VA). Method: `arch -x86_64 lldb ... disassemble` (static).
 

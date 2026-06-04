@@ -1,5 +1,14 @@
 > GRADUATED to four-zoom OBSERVED (2026-06-03, W1c — four_zoom_data_W1c.md). N=5 contributors/tile all 4 tiers (ctx+0x18, N=(end-begin)/16 — corrects [rdi+0x8]); per-512x512-tile; lane3+B-spline fire 4-zoom. Scope=first-hit/tile/tier, Unit-1.
 > **Reduction MAGNITUDE = CAPTURED four-zoom (2026-06-04, W5+W5b — tool wall BROKEN; see `merge_magnitudes_FOURZOOM.md`).** Σscore→`0x36a938 rcpss`=1/Σscore soft-average normalizer, real accumulated denominators per tier: 28mm 0.25464→3.92627, 35mm 0.94357→1.05981, 70mm 0.39071→2.55957, 150mm 5.20000→0.19229 (orch bit-checked). Score `0x36cde0`=√(factorA·factorB), non-degenerate [0,1] all four tiers. No longer a residual.
+> **REDUCER VERDICT — two-prong satisfied, byte-re-extracted 2026-06-04 (graduates `reducer_verdict`).**
+> `0x3661b0` IS the **N→1 score-normalized weighted-average reducer**; **src1/src2 are GEOMETRY descriptors,
+> NOT image/weight buffers** (src2 read only for width/height at `0x374b0a`/`0x374b0e` → ROI clip box;
+> H1 "src2=Σweight buffer" REFUTED). Prong 1 **N-accept:** contributor loop iterates N=(end−begin)/16
+> scored contributors (two accumulation passes: score-weighted `0x36a8c0`, separable-weighted `0x36aa30`).
+> Prong 2 **N→1-store:** `0x36aa50 mulps`(weight·vec4) → `0x36aa53 addps (%rsi,%rdi)`(accumulate) →
+> `0x36aa57 movaps %xmm1,(%rsi,%rdi)`(store) → `0x36aa5b incq`(loop) — all re-extracted from `b38dc4b3`.
+> The `0x36aa42/0x36aa47` pair = **separable 2D weight** (row·col table lookups). Scoped OPENs: contributor
+> coverage-sentinel SELECTION gate (`0x36930f`/`0x80000000`) runtime effect; two-unit runtime.
 
 <!-- provenance: workflow wf_cb406491-3d3 (l16-prefusion-fanout-w4), 2026-06-03; finder+independent verifier; verifier reliable=True -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, weak-labeled, static disasm only).
