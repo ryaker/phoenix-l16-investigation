@@ -2,8 +2,14 @@
 **Status:** NEEDS_CODEX_VALIDATION — **GRADUATED to four-LRI OBSERVED** (Tier 1). For LRI-resident findings,
 re-parse across all four canonical LRIs IS the four-zoom rigor (these are deterministic file-structure facts,
 not render-path behavior). Tool: `tools/lri_field_inspect.py` (`scan_lri_blocks` + `parse_proto_fields`).
-**Scope: all four are Unit-1 → Unit-2 universality UNTESTED** (same-name twins `2018-07-04/L16_02130`,
-`2018-10-28/L16_03041`, `2020-07-14/L16_03434`, `2018-07-07/L16_02285` not parsed).
+**Scope (UPDATED 2026-06-03, `unit2_universality_calibration.md`): STRUCTURE = CROSS-UNIT (Unit-1 + Unit-2
+both parsed); VALUES = per-body** (Unit-1 `722a6e72…` ≠ Unit-2 `223961c6…`). The 7 structural claims below
+hold on BOTH bodies; any specific numeric value (fx, CCM entries, distortion k1/k2/k3, lens-shading content)
+is Unit-1-specific. NEW cross-unit invariants: **CCM row-sums [0.9642,1.0,0.8252]** and **Block-5 vignetting
+(byte-identical `37a0a85e` both bodies = shared/firmware constant, not per-body)**. ⚠ The documented Unit-2
+"twins" are really focals (28,70,150,150) not (28,35,70,150) — `2018-10-28/L16_03041` is f4=74, `2020-07-14/
+L16_03434` is f4=149 (orchestrator-verified); does not affect calibration universality (per-cam tables are
+focal-independent) but the CLAUDE.md corpus note is wrong on this.
 
 # L16 LRI calibration parser spec — four-LRI-confirmed (28/35/70/150, Unit-1)
 
