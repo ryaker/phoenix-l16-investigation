@@ -35,3 +35,13 @@ Predicted all 5 levels (0..4) fire as a Gaussian-octave pyramid with a cross-lev
   — "levels 2-4 never fire" is bound to THIS render. Did NOT cross the indirect dispatch to the recombine
   store; "no cross-level add" = observed-absent-in-traced-chain, not proven-absent. Did NOT re-verify the
   level-0 N→1 reduction here (only that level 0 routes to 0x3ec770 250×).
+
+## GENERALIZATION to 70mm (runtime probe acd4551d, single 70mm render L16_03434, OBSERVED)
+Same topology: level 0 = **221** hits (IRAMP merge), level 1 = **48** (resample), levels 2,3,4 = **0**.
+⇒ the level/octave structure is **zoom-independent** (resolution-support), NOT focal-tier-dependent. The
+L0/L1 ratio shifts (28mm 250:32≈7.8:1; 70mm 221:48≈4.6:1) — LEAD (plausibly tile-count/crop differences),
+not a finding. levels 2-4 (the 0x3d0650 rescale leaf) fire 0× on BOTH zooms ⇒ coarse dim-pyramid octaves
+appear cache-only / not rendered under bridge HDR. Lane E reframe: a single LRI render = one full bridge
+image; the "four zooms" are 4 separate captures (cross-validation), and within one capture the focal-spanning
+5+5+6 cameras combine via the **level-0 camera merge** (0x3661b0). Open: the L0/L1 tile-output recombine
+site (behind 0x3adf30 vtable dispatch). 70mm = Unit-1; Unit-2 twin + other profiles not tested.
