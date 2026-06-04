@@ -54,9 +54,26 @@ yet runtime-graduated.)
 f4 image_focal = 28/35/70/**149** (150mm stored as 149); f5 reference_camera = **0** (28/35) / **8** (70/150);
 f18 hw_info present all 4 (54 B wide / 48 B tele).
 
+## Block-4 lens-shading grid (GRADUATED — W3b, dims confirmed, correction)
+Payload 262968 → 16× field-13 (one per camera, ids {0..15} ALL present). Per-cam `f4→f1`: **rows=17, cols=13
+(=221 points) × a 4×4 channel-mixing matrix per point = 14144 B = 3536 f32**. Center point ≈ identity
+(diag [1.000,1.003,0.997,1.000]); corners rise (corner diag [1.026,0.978,0.989,0.949], off-diag ±0.018) =
+radial near-identity channel-mix. **CORRECTION: the old "hard-zeros at cams {3,6,9,12}" is REFUTED** — no cam
+is zero; **camids {1,15} are EXACT identity (no correction, sum 884=221×4), all other 14 carry real matrices.**
+This CORROBORATES the Block-6 excluded pair {1,15} (same two cams special across blocks). Byte-identical 4 LRIs
+(SHA-256 `f0c34433…`) = factory-constant.
+
+## Block-5 vignetting (GRADUATED — W3b, structure refined)
+Payload 1786 → single field-16 (GLOBAL, not per-camera) → f2 = header (`f1=42.0, f2=1023.0, f3=2.0`) + **28×
+field-4 entries**, index 100→775 step 25 (monotonic), each = scalar falloff `f3` (73.79→26.78, decreasing) +
+4 per-channel (R/Gr/Gb/B) 2-coeff polynomials. ⇒ richer than "radius→gain LUT": a **28-knot × 4-channel
+2-coeff-poly + scalar-falloff table.** Byte-identical 4 LRIs (SHA-256 `37a0a85e…`) = factory-constant.
+
 ## Residuals (still owed)
-- **Unit-2 universality** — all 4 here are Unit-1.
-- Block-4 lens-shading internal grid dims (16×17×13×4×4) and Block-5 vignetting internal grid NOT re-verified
-  by W3 (inventory-level only) — those staging docs stay Tier-0 pending an internal-grid 4-LRI pass.
+- **Unit-2 universality** — all parses here are Unit-1; factory-constant proven within one body across 4 focals,
+  NOT across bodies (identity camids {1,15}, corner magnitudes, AWB may differ on Unit-2).
+- Block-4 `f2` secondary 896/897-B table role; channel ordering (R/Gr/Gb/B by position, not proven); vignetting
+  index 100..775 semantics (ISO/radius?) inferred not proven.
+- How libcp CONSUMES these grids at render time (this is static LRI parse; runtime apply not in this doc).
 - Each filewide "ToF" ASCII hit's byte context not individually classified (proto-signature scan = 0 is the
   load-bearing negative).

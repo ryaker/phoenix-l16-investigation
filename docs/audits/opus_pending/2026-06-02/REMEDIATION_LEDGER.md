@@ -3,7 +3,7 @@
 
 **Directive (Rich, 2026-06-03):** run the four-zoom playbook (see `../opus_findings_for_codex/README.md`)
 disciplined through EVERY finding doc from the last 2 days. None graduates to Tier 1 (findings_for_codex)
-until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 16 / 80 graduated** (W1: 2 render-findings; W3: 14 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
+until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 18 / 80 graduated** (W1: 2 render-findings; W3: 14 + W3b: 2 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
 
 Cadence is render-bound (4 sequential renders per data sweep, minutes each, one external disk under
 Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 4-render sweep with many
@@ -60,8 +60,8 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 34 | laneB2_lri_calibration_origins/awb_consumption_runtime.md | STAGING | OWED | - |
 | 35 | laneB2_lri_calibration_origins/awb_wb_gains_block8.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 36 | laneB2_lri_calibration_origins/block1_ancillary.md | STAGING | OWED | - |
-| 37 | laneB2_lri_calibration_origins/block4_lens_shading_grid.md | STAGING | OWED | - |
-| 38 | laneB2_lri_calibration_origins/block5_vignetting.md | STAGING | OWED | - |
+| 37 | laneB2_lri_calibration_origins/block4_lens_shading_grid.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED: dims 16×17×13×4×4 confirmed; {1,15} identity (not {3,6,9,12}) | W3b |
+| 38 | laneB2_lri_calibration_origins/block5_vignetting.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED: 28-knot×4ch poly + falloff, global; confirmed | W3b |
 | 39 | laneB2_lri_calibration_origins/block6_519b_records.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 40 | laneB2_lri_calibration_origins/block6_color_candidate.md | STAGING | OWED | - |
 | 41 | laneB2_lri_calibration_origins/block6_color_shading.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
