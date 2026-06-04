@@ -51,3 +51,18 @@ accept (`0xf33d0`) or drop. The earlier `geom_record_consumer_static.md` view (r
 ## Next (clean upgrade LEAD→OBSERVED)
 BP `0x217ab9` on a 70mm render; read xmm0 (fraction) + which `jb/ja` branch is taken per candidate; confirm
 the 0.25 / 0.8 thresholds fire and tally accept vs reject counts. One render; breakpoints work.
+
+## LIVE CONFIRMATION (runtime probe a3d739f, single 70mm render) — gate is OBSERVED; gate1 = 0.25 CEILING
+BP `0x217ab9` fired **8×** in one 70mm render. Live fractions (xmm0): `0.0, 0.0013, 0.0, 0.9174, 0.2762,
+0.6656, 1.0, 0.8238`. Outcome via fall-through BPs (pass1=0x217acf, pass2=0x217adc, accept=0x217aff,
+call=0x217bbe): **gate1 rejected 5, gate2 rejected 0, gate3 rejected 0, accepted 3** (all 3 reached
+`0xf33d0`). accept:reject = **3:5**.
+- **CORRECTION to the earlier LEAD:** gate1 `0x217ac6 ucomiss %xmm0(frac),%xmm1(0.25); 0x217ac9 jb 0x217bf8`
+  ⇒ CF=1 when 0.25 < frac ⇒ **reject when fraction > 0.25**. It is a **CEILING, not a floor**: the 5 rejected
+  were exactly the 5 fractions >0.25; the 3 kept were the 3 ≤0.25. So low-fraction (consistent) candidates
+  survive; high-fraction (high threshold-exceed / disagreement) candidates are dropped.
+- Constants confirmed LIVE (read from process memory during render): `0x5a8200`=0.25, `0x5d5350`=0.8.
+- Gate2/gate3 executed but rejected 0 of the 3 survivors this run ⇒ their reject DIRECTION is present-but-
+  untriggered here (only gate1's reject was empirically exercised). Small sample (8), one 70mm Unit-1 seed.
+- Status upgrade: the gate location + gate1 threshold/direction are now **OBSERVED**; gate2/gate3 reject
+  semantics remain LEAD (untriggered).
