@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1d — four_zoom_data_W1d.md). sentinel 0x36930f fires 4-zoom; index-0=0x80000000 uniform all tiers. Scope=first-hit/firing/tier, Unit-1.
+
 <!-- provenance: workflow wf_4bb93945-fac (l16-prefusion-fanout), 2026-06-03; finder+independent verifier; verifier reliable=True -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, weak-labeled, static disasm/LRI-parse only).
 **Verifier reliability:** all load-bearing VAs independently re-extracted (PASS)

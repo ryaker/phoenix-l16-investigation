@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1d — four_zoom_data_W1d.md). runtime DepthCache/StereoLayer/upsample fire 4-zoom; depth-compute=4 src cams/tier; LRI-side (no depth origin) already graduated. Scope=first-hit/firing/tier, Unit-1.
+
 <!-- provenance: l16-investigator finder (LRI byte-parse + libcp disasm) + orchestrator RTTI/string re-extraction, 2026-06-03 -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine; finder + orchestrator-verified). RESOLVES the "depth/stereo
 LRI origin" blank with a decisive negative + a clean-room consequence. Binary `libcp.dylib`; LRIs 70mm

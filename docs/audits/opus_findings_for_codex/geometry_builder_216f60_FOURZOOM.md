@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1d — four_zoom_data_W1d.md). 0x216f60 fires 4-zoom; internal record semantics residual. Scope=first-hit/firing/tier, Unit-1.
+
 <!-- provenance: workflow wf_cb406491-3d3 (l16-prefusion-fanout-w4), 2026-06-03; finder+independent verifier; verifier reliable=False -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, weak-labeled, static disasm only).
 **Verifier reliability:** one item flagged (a movsd/cvtss2sd descriptor nuance OR an explicitly runtime-only LEAD) — core OBSERVED; see correction
