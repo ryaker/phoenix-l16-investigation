@@ -1,6 +1,12 @@
 # Lane B2 — RUNTIME: Block-8 AWB gains ARE consumed by the pixel path (as reciprocals, coupled into a color matrix)
 
-**Status:** `NEEDS_CODEX_VALIDATION`. Method: **runtime differential rendering** (`lri_process` render of
+> **GRADUATED four-zoom (2026-06-04) → `../../opus_findings_for_codex/color_consumption_FOURZOOM.md` §3.**
+> The 28mm result below is now confirmed on **35/70/150mm** too (u2-render Task A): forcing 1/R→0.125
+> saturates R and leaves G/B flat on every tier (R factor 3.82×/4.35×/4.54×) ⇒ WB=1/gain folded into the
+> demosaic color path, four-zoom. The consuming site is the per-channel `divss` triple in `0xa9340`
+> (`0xa9653/0xa9663/0xa9679`), reached from the CCM apply `0xa9f20`.
+
+**Status:** GRADUATED → color_consumption_FOURZOOM §3 (was NEEDS_CODEX_VALIDATION). Method: **runtime differential rendering** (`lri_process` render of
 28mm Unit-1 seed under LLDB; overwrite candidate heap values, re-render, compare DECODED-PIXEL SHA-256).
 Promotes Block-8 `B8.19.15` from "looks like WB gains" (LEAD) → **OBSERVED: consumed by the renderer**.
 

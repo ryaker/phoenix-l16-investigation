@@ -1,7 +1,8 @@
 <!-- GRADUATED finding. provenance: color-consumption render batch (color-render ab599958f3a679850) + orchestrator deterministic row-sum/I1I2I3 re-check, 2026-06-04. -->
 **Status:** NEEDS_CODEX_VALIDATION — **GRADUATED to four-zoom OBSERVED** (Tier 1) for the per-camera CCM
-apply; the CCM→payload writer is a narrowed scoped OPEN; AWB four-zoom is still OWED. Runtime LLDB read of
-the live matrix at the apply site, all four tiers; row-sums + I1I2I3-distinctness orchestrator-re-checked.
+apply AND the AWB reciprocal consumption (§3, now four-zoom 2026-06-04); the CCM→payload writer on the taken
+`eax==0` path is the one narrowed scoped OPEN. Runtime LLDB; row-sums + I1I2I3-distinctness + AWB arithmetic
+orchestrator-re-checked.
 
 # Color consumption — per-camera CCM `0xa9f20` is the LRI Block-6 CCM (four-zoom)
 
@@ -37,14 +38,19 @@ I1I2I3 decorrelation (`0xbfa20`).** This RESOLVES the residual that `merge_magni
 - **Scoped OPEN:** the exact store that copies the per-camera CCM into `+0x14` on the *taken* `eax==0` path was
   not isolated within budget. Whether `eax` encodes "I1I2I3 vs CCM mode" and the `0x264d90` LRI key are open.
 
-## 3. AWB reciprocal consumption (row34) — STILL OWED four-zoom (not fabricated)
-28mm was confirmed in a prior probe (large effect: R 150→249, G/B→0.06). The 35/70/150 perturbation was NOT
-completed — the probe (correctly) refused to guess: B8.19.15 is in the **LELR fixed-record container** (not
-protobuf at the header offset), so per-tier 1/R needs the Block-8/sub-19 record schema + the prior `0x390180`
-reciprocal-R heap-copy VAs (not in that probe's context). **Static lead (Hypothesis, not confirmation):** the
-per-pixel transform `0xa9340` (reached from `0xa9f20`) has a per-channel `divss` triple
-(`0xa9653/0xa9663/0xa9679` against `-0xd4/-0xd8/-0xdc(%rbp)`) — consistent with WB=1/gain folded into the same
-kernel as the CCM, but unproven. Re-run owed with the schema + `0x390180` VAs from `awb_consumption_runtime.md`.
+## 3. AWB reciprocal consumption (row34) — four-zoom CONFIRMED (2026-06-04, u2-render Task A)
+WB = 1/gain folded into the demosaic color path, confirmed all four tiers by perturbation (overwrite the
+1/R reciprocal heap copies → 0.125, re-render, decoded-pixel channel means vs same-tier baseline):
+| Tier | 1/R | baseline R/G/B | perturbed R/G/B | R factor |
+|---|---|---|---|---|
+| 28mm | (prior) | — | — | large (R 150→249, G/B→0.06) |
+| 35mm | 0.58170 | 0.1711/0.3340/0.2423 | 0.6525/0.4327/0.3039 | 3.82× R saturates |
+| 70mm | 0.55163 | 0.1038/0.2039/0.1125 | 0.4520/0.2081/0.1149 | 4.35× R saturates, G/B flat |
+| 150mm | 0.56702 | 0.1176/0.2371/0.1629 | 0.5342/0.2373/0.1625 | 4.54× R saturates, G/B flat |
+Forcing 1/R saturates R and leaves G/B essentially unchanged ⇒ the WB reciprocal is consumed per-channel in
+the demosaic/color path on every tier. The stable WB constants live at fixed low-heap addresses (the
+collapse magnitude was band-width-invariant, so attribution to the WB constant is sound). The mechanism site
+is the per-channel `divss` triple in `0xa9340` (`0xa9653/0xa9663/0xa9679`), reached from the CCM apply `0xa9f20`.
 
 ## Scope
 Single mid-render matrix read per tier (the slot is reused — constant heap addr within a tier). Unit-1 only.

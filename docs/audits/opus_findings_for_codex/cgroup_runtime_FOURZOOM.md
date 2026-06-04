@@ -47,6 +47,7 @@ is its static-init copy — note `0x671980` is zerofill so its *file* offset rea
 |---|---|---|---|
 | 28mm | 297–300 | 341–346 | 362–366 (2-run reproducible) |
 | 35mm | 232 | 280 | 232 |
+| 70mm | 220 | 266 | 246 (native re-measure 2026-06-04; prior 221/48/0 = python hit-drop) |
 | 150mm | 63 | 80 | 59 |
 **Collector** (`0x3bf820` per-tile result collector; `0x3bfc40` intrusive 0x80-byte-node list insert):
 | Tier | collector 0x3bf820 | node 0x3bfc40 |
@@ -56,7 +57,7 @@ is its static-init copy — note `0x671980` is zerofill so its *file* offset rea
 | 150mm | 60 | 101 |
 
 ## Scope / residuals
-- Tallies: 28/35/150 native for the dispatcher (70mm dispatcher = prior-suspect 221/48/0, **owed re-measure**
-  with the native counter); collector 35/70/150 native (28mm prior). Matrix/projection = single mid-render
+- Tallies: dispatcher native ALL FOUR tiers (70mm re-measured 2026-06-04 = 220/266/246, replacing the
+  python-hit-drop 221/48/0); collector 35/70/150 native (28mm prior). Matrix/projection = single mid-render
   read per tier. Unit-1 only. gate 150mm 0-hits is tier-conditional, not universal.
 - Did not investigate WHY L2-4 fires (only that it does); the pyramid-level semantics are a follow-on.

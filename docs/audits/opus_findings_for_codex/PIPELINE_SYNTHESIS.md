@@ -58,9 +58,11 @@ its own packet. This is the entry point for Codex's validation pass.
   `0xbfa20`=fixed I1I2I3, exclude-both→clean exit all four (per-camera-CCM CLOSED for this site). Remaining
   (non-load-bearing): full per-pixel distribution + total call-count censuses. read-watchpoints dead +
   differential defeated by nondeterminism remain the only verified limits.
-- **Unit-2 RUNTIME** untested (calibration cross-unit done; runtime findings Unit-1-only). ⚠ The documented
-  Unit-2 "twins" are focals (28,70,150,150) NOT (28,35,70,150) — no clean Unit-2 35mm in the corpus; CLAUDE.md
-  corpus note is wrong (flag).
+- **Unit-2 RUNTIME — now CONFIRMED for merge/score/CCM/I1I2I3** (`unit2_runtime_universality_FOURZOOM`):
+  body-2 (223961c6) at 28/70/150mm shows the same mechanisms (√(a·b), 1/Σscore, CCM row-sums [0.9642,1.0,
+  0.8252], bit-identical I1I2I3) with per-body CCM values ⇒ structure universal, values per-body. Other U2
+  runtime stages (depth/denoise/resample/gates/topology) not re-run. ⚠ The documented Unit-2 "twins" are
+  focals (28,70,150,150) NOT (28,35,70,150) — no clean Unit-2 35mm; CLAUDE.md corpus note is wrong (flag).
 - **Long-tail staging** (~28 docs remain, down from ~50): the verified static sub-mechanisms + magnitudes +
   LRI sub-facts graduated 2026-06-04. Still owed (per ledger): lane-A3 combine-store, lane-A5 kernel/bss
   dupes, lane-A6/A7 score-consumption runtime, several lane-B2 runtime-consumption (AWB/CCM differential),
@@ -70,7 +72,8 @@ its own packet. This is the entry point for Codex's validation pass.
   lens-shading {1,15} sub-grid on Unit-2; the CCM→payload+0x14 writer on the taken `eax==0` path (per-camera
   CCM *existence* now RESOLVED — it's `0xa9f20`/Block-6 f2.2); AWB 35/70/150 perturbation.
 
-> Count: REMEDIATION_LEDGER 59/80 graduated (78/80 resolved; 2 staging — AWB 35/70/150 owed, 1 corpus-capped). This synthesis covers the graduated subset; it is NOT a claim the whole pipeline is
+> Count: REMEDIATION_LEDGER 60/80 graduated (79/80 resolved; **1 staging** = row77, corpus-blocked — needs a
+> 182-class unassigned LRI not in the corpus). Unit-2 runtime universality now confirmed for merge/score/CCM. This synthesis covers the graduated subset; it is NOT a claim the whole pipeline is
 > validated — the residuals above are first-class open items.
 > **2026-06-04 corrections (see `cgroup_runtime_FOURZOOM`):** stage 10 pyramid-merge runs **L0+L1+L2-4 all
 > firing** (the prior "only L0/L1, L2-4=0" was a python-hit-drop artifact; counts are tier-VARYING);

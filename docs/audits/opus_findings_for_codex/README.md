@@ -41,6 +41,8 @@ Still `NEEDS_CODEX_VALIDATION` even here — Codex validates/upgrades to ledger 
 - **Undistort / calibration / accept / output:** `undistort_ordering_lut_FOURZOOM`,
   `lri_calibration_parser_FOURZOOM` (+ 2026-06-04 sub-facts addendum: Block-1 AE, cross-unit cam0, field map),
   `accept_reject_gate_FOURZOOM`, `final_compositing_consumer_FOURZOOM` (intrusive list, RB-tree refuted).
+- **Two-body universality:** `unit2_runtime_universality_FOURZOOM` (merge/score/CCM/I1I2I3 hold on body-2
+  223961c6 — structure universal, values per-body; closes the "every claim was on one body" gap).
 - **Static sub-mechanisms (byte-verified):** `static_submechanisms_verified_FOURZOOM` (13 lane-A/D/E/B2/C6
   VAs: src-boxing, resample-apply, detail-transfer, score closed-form, CCM apply-sites, undistort kernel,
   accept filter, level dispatcher, C6 key-15).
