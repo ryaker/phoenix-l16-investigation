@@ -1,5 +1,11 @@
 # Opus quarantine → Codex handoff (2026-06-03, waves 1–7)
 
+> ⚠ **RE-CHARGED 2026-06-03: this is NOT a finding handoff.** Per Rich's directive, this directory is Tier 0
+> staging ("quarantine²") — STATIC/single-zoom work that is NOT finding-grade. This file is now a **staging
+> inventory / pipeline map**, not a set of validated findings. Actual findings (four-zoom-upgraded) live in
+> `../opus_findings_for_codex/` (empty until the four-zoom playbook graduates them). See `STAGING_NOTICE.md`
+> and `REMEDIATION_LEDGER.md`. Do not hand this file's contents to Codex as findings.
+
 **Everything here is `NEEDS_CODEX_VALIDATION`** — quarantine, weak-labeled, never promoted to canonical.
 Method: static disasm + deterministic LRI byte-parse, via WSJF finder+independent-verifier Workflow
 fan-outs (7 waves). Authority = the ledger; this is input for your validation pass, not truth.
