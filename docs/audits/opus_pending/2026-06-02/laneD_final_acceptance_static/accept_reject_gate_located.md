@@ -66,3 +66,13 @@ call=0x217bbe): **gate1 rejected 5, gate2 rejected 0, gate3 rejected 0, accepted
   untriggered here (only gate1's reject was empirically exercised). Small sample (8), one 70mm Unit-1 seed.
 - Status upgrade: the gate location + gate1 threshold/direction are now **OBSERVED**; gate2/gate3 reject
   semantics remain LEAD (untriggered).
+
+## Reconciliation vs committed evidence (this ADVANCES PAST Codex's frontier — not a redo)
+Codex's committed `bundle_static_prefusion_sentinel_216f60_scan_count_window.md` maps `0x216f60` only over
+`0x216f60..0x217110` (the positive-(x,y)-pair SCAN-COUNT / sentinel-filter window) and explicitly states it
+"does NOT prove ... final acceptance / rejection semantics" (and `lldb_state_machine_return_runtime_four_zoom.md`:
+"does not prove that any State value is an acceptance, rejection ... acceptance/rejection policy"). The gate
+found here is at `0x217ab9..0x217af9` — AFTER `0x217110`, the next section — and the accept consumer is
+`0xf33d0` (CalibStage write). So this lane resolves the exact "final acceptance/rejection semantics" that
+Codex's committed evidence left OPEN: the post-scan argmax + 0.25 exceed-fraction ceiling (+2 gates) decides
+accept→write candidate into the current CalibStage vs reject→teardown. Codex to validate.
