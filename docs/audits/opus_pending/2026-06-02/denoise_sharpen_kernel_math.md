@@ -5,6 +5,12 @@ runtime pass before it counts as done. Binary `libcp.dylib` x86_64.
 
 # Denoise / sharpen kernel math + tuning defaults (STATIC decode — four-zoom pass OWED)
 
+> ⚠ **W0 four-zoom CORRECTIONS (2026-06-03, `four_zoom_firing_census_W0.md`):** (1) the **bilateral W3 worker
+> `0x2f6ad0` is DORMANT** at all four tiers — the launcher `0x2f6420` fires ~2,400–3,000× but dispatches to a
+> non-W3 window; the W3 math below is a dormant example, and W1 must identify the live W{5,7,9} worker.
+> (2) The sharpen factory ctor address is **`0x360a00`** (`push rbp` entry), NOT `~0x360b00` (which is `nop`
+> padding) — orchestrator-verified. CNR apply/worker/installer + sharpen ctor/method DO fire four-zoom.
+
 ## SHARPEN = UNSHARP MASK (VERIFIED static; NOT four-zoom)
 - Gaussian kernel generator `0x96980`: `coef = -0.5/σ²` (`mulss xmm0,xmm0` σ², `divss` by it), tap index lanes
   via `paddd`, `expf` (stubs `0x555f84`/`0x555eb2`) ⇒ `exp(-x²/(2σ²))` unnormalized Gaussian, taps 0..7.

@@ -10,7 +10,11 @@ Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 
 breakpoints captures per-tier data for many runtime docs at once, then those docs graduate together.
 
 ## Execution waves (WSJF; render-batched)
-- **W0 (running):** firing census (which stages fire at which tier) — scopes the data sweeps. NOT graduation.
+- **W0 (DONE — `four_zoom_firing_census_W0.md`):** four-zoom firing census. 19/21 stages fire all-tier; 2
+  dormant (bilateral W3 `0x2f6ad0`, stereo driver `0x2730c0`). Firing tier-invariant (5+5+6 does NOT gate
+  stereo-cost firing). Forced 3 corrections (stereo driver dormant→runPass path; bilateral W3 dormant; sharpen
+  ctor `0x360a00`). Floor only — scopes W1; NOT graduation. Method: "drain" harness (per-hit callbacks stall
+  under Rosetta) ⇒ W1 must stop SELECTIVELY (1-2 stages/render) → even more render-bound.
 - **W1:** four-zoom DATA sweep #1 — merge/score/gates/CCM/undistort/resample/compositing (lane A/D/E + B2 color).
 - **W2:** four-zoom DATA sweep #2 — denoise/sharpen/CNR/bilateral + stereo cost (the new stages).
 - **W3:** 4-LRI re-parse — all Block-* calibration / distortion / depth-origin LRI docs (parse 4 LRIs, not 2).

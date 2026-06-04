@@ -6,6 +6,13 @@ reimplementation reproduces it from this decode.
 
 # Stereo cost math — weighted truncated-L1 multi-view photo-consistency (DECODED)
 
+> ⚠ **W0 four-zoom CORRECTION (2026-06-03, `four_zoom_firing_census_W0.md`):** the `0x2730c0` driver below is
+> **DORMANT at runtime** (0 hits, all four tiers) — its "records>3 → calls `0x2732f0`" topology is NOT the
+> live bridge-HDR path. The `0x2730c0→0x2732f0` edge exists statically (`0x273103`) but never fires. The cost
+> body `0x2732f0` IS live (fires 4-zoom via `runPass 0x276790`; other static callers `0x272ca9`/`0x2773dc`/
+> `0x278a57`, `0x2773dc` in the runPass region). **The cost MATH below stands; the driver/gating section (§
+> "Multi-pass topology") is corrected — the live caller chain is runPass, not the driver.** W1 must capture it.
+
 ## Cost metric (OBSERVED, `0x2732f0`, per-depth-hypothesis kernel)
 For a candidate depth scalar `s` (= `[r13+4*i]`, per-pixel), project the reference pixel into each enabled
 source camera via that camera's 80-byte record (a 3×4 projection matrix), bilinear-sample the camera image,
