@@ -7,8 +7,11 @@
 > scored contributors (two accumulation passes: score-weighted `0x36a8c0`, separable-weighted `0x36aa30`).
 > Prong 2 **N→1-store:** `0x36aa50 mulps`(weight·vec4) → `0x36aa53 addps (%rsi,%rdi)`(accumulate) →
 > `0x36aa57 movaps %xmm1,(%rsi,%rdi)`(store) → `0x36aa5b incq`(loop) — all re-extracted from `b38dc4b3`.
-> The `0x36aa42/0x36aa47` pair = **separable 2D weight** (row·col table lookups). Scoped OPENs: contributor
-> coverage-sentinel SELECTION gate (`0x36930f`/`0x80000000`) runtime effect; two-unit runtime.
+> The `0x36aa42/0x36aa47` pair = **separable 2D weight** (row·col table lookups). **SELECTION prong now
+> DECODED** (`parked_residuals_decoded_FOURZOOM` §1): each contributor has a per-output-position index-map at
+> struct `+0x30` (8-byte `[index,paired]` entries); `0x36930f cmpl $0x80000000` SKIPS any (contributor,
+> position) whose map entry is the `0x80000000` no-coverage sentinel ⇒ contributor c contributes to pixel p
+> iff `indexmap[p] ≠ 0x80000000`. Two-unit runtime now confirmed (`unit2_runtime_universality_FOURZOOM`).
 
 <!-- provenance: workflow wf_cb406491-3d3 (l16-prefusion-fanout-w4), 2026-06-03; finder+independent verifier; verifier reliable=True -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, weak-labeled, static disasm only).

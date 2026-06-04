@@ -1,7 +1,10 @@
 <!-- provenance: confirm-subsumed read-only parent-coverage pass (a96cb1be9d86e3c58) + orchestrator, 2026-06-04. Captures the sub-mechanism residuals + flags that survive when 14 staging docs subsume into graduated parents — so nothing is silently dropped (Rich's rule). -->
-**Status:** RESIDUAL REGISTER (not a finding). When a staging doc subsumes into a graduated parent, any
-load-bearing detail the parent does NOT carry is recorded here so it is neither lost nor silently promoted.
-These are LEADs / sub-mechanism expansions, NOT graduated. Each names its source staging doc.
+**Status:** RESIDUAL REGISTER — **NOW DECODED (2026-06-04).** These were initially parked as LEADs; that was
+a deferral. Every one has since been decoded byte-exact in
+`../opus_findings_for_codex/parked_residuals_decoded_FOURZOOM.md`, and the full 19-row validate/invalidate
+audit is in `../opus_findings_for_codex/RESIDUAL_VALIDATION_LEDGER.md`. Decoding caught two further wrong
+claims (`0x1f0a00` "RB-tree" → intrusive list; `0x22f3fd` dispatcher conflation) and closed the merge
+SELECTION prong (`0x36930f`). The text below is the original parking note, kept for provenance.
 
 # Residuals surviving subsumption (14 docs → graduated parents)
 

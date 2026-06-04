@@ -43,6 +43,10 @@ Still `NEEDS_CODEX_VALIDATION` even here — Codex validates/upgrades to ledger 
   `accept_reject_gate_FOURZOOM`, `final_compositing_consumer_FOURZOOM` (intrusive list, RB-tree refuted).
 - **Two-body universality:** `unit2_runtime_universality_FOURZOOM` (merge/score/CCM/I1I2I3 hold on body-2
   223961c6 — structure universal, values per-body; closes the "every claim was on one body" gap).
+- **Non-graduated-row audit:** `RESIDUAL_VALIDATION_LEDGER` (the 19 subsumed/superseded/retracted rows, each
+  validated or invalidated to rigor) + `parked_residuals_decoded_FOURZOOM` (6 shed sub-mechanisms decoded
+  byte-exact: merge SELECTION gate `0x36930f`, State dispatcher `0x22f3fd`, CalibStage banks `0xf33d0`,
+  `0x1f0a00` intrusive walk, `0x29ed90` BilateralUpsample, `{flow,score}` tuple store).
 - **Static sub-mechanisms (byte-verified):** `static_submechanisms_verified_FOURZOOM` (13 lane-A/D/E/B2/C6
   VAs: src-boxing, resample-apply, detail-transfer, score closed-form, CCM apply-sites, undistort kernel,
   accept filter, level dispatcher, C6 key-15).
