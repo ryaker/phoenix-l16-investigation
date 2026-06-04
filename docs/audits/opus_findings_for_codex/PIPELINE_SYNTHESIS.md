@@ -15,7 +15,8 @@ its own packet. This is the entry point for Codex's validation pass.
    LRI origin); cost = weighted truncated-L1 multi-view photo-consistency (`0x2732f0` via runPass `0x276790`,
    live caller `0x276860`, NOT the dormant driver `0x2730c0`); **N=4 source cams, tier-invariant**. Depth feeds
    the merge warp (ledger CLM-WARP-003). Plane-sweep search+argmin = caller (tool-walled magnitude).
-4. **IRAMP terminal MERGE** (`terminal_merge_3661b0_FOURZOOM`, `merge_magnitudes_FOURZOOM`) — `0x3661b0`,
+4. **IRAMP terminal MERGE = `ImageResolutionAmp` (stage name), inside `PipelineCache::processLevel0`; caller
+   `0x365960`, output consumed by `0xd76a0` (per-channel square)** (`terminal_merge_3661b0_FOURZOOM`, `merge_magnitudes_FOURZOOM`) — `0x3661b0`,
    per 512×512 tile, **N=5 contributors** (ctx+0x18 vector, N=(end-begin)/16), tier-invariant; weighted
    soft-average **1/Σscore four-zoom-captured** (`0x36a938 rcpss`: Σscore 0.255/0.944/0.391/5.20 →
    3.93/1.06/2.56/0.192 for 28/35/70/150); score kernel `0x36cde0` = `sqrt(cs-SSIM × 4-scale wavelet)`,

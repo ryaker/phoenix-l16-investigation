@@ -1,16 +1,21 @@
 <!-- GRADUATED finding. provenance: C-group runtime render batch (cgroup-render a34f8fffd4305cdd8) using native drain-count + first-hit reads, all VAs on-disk-re-verified, 2026-06-04. Consolidates + graduates rows 12/67/70/73/76 and carries TWO load-bearing corrections. -->
 **Status:** NEEDS_CODEX_VALIDATION — **GRADUATED to four-zoom OBSERVED** (Tier 1). Runtime LLDB across the
 canonical tiers via the **native drain-count** harness (`breakpoint command add -o "continue"` → read
-`breakpoint list` hit-count) and first-hit reads. Method note: **python script-callback breakpoints that
-auto-continue SILENTLY DROP hits under Rosetta multi-thread** (report 0 where the real count is hundreds) —
-all tallies here use the native counter, which is reproducible across runs. Output via `.hdr`/`--profile 3`
-(full Renderer path, no `.lris` needed; `--export-fmt` is overridden by the output file extension).
+`breakpoint list` hit-count) and first-hit reads. **METHOD CORRECTION (2026-06-04, supersedes the original
+"python drops hits" note):** the earlier 0-counts were a **breakpoint-BINDING artifact, not a python-callback
+flaw** — BPs set on raw **file VAs** never bound through the ASLR slide (lldb "unresolved, hit count 0"). Set
+**module-relative** (`breakpoint set --shlib libcp.dylib --address 0xVA`), even a python in-frame callback
+captures every hit with ZERO drops. The reusable rule: **always set BPs module-relative** so they bind through
+ASLR; a raw `--address` on this PIE dylib silently fails and looks like "doesn't fire." (Native-vs-python is
+NOT the proven discriminator.) Output via `.hdr`/`--profile 3` (full Renderer; `--export-fmt` is overridden by
+the output file extension).
 
 # C-group runtime — four-zoom (merge-projection, gates, calib-link, lane-E topology)
 
 ## ⚠ TWO CORRECTIONS (prior claims REFUTED)
 1. **Level L2-4 (`0x3d0650`) FIRES on every tier — the "L2-4=0 / only L0,L1 / zoom-independent" claim is
-   REFUTED.** It came from the hit-dropping python harness. Native counts (reproducible): see §4. The merge
+   REFUTED.** The prior 0 came from UNBOUND breakpoints (raw file-VA, not bound through ASLR — see method
+   correction above), not a real absence. Native counts (reproducible): see §4. The merge
    runs a genuine multi-level pyramid (L0+L1+L2-4), and the counts are **tier-VARYING**, not invariant.
 2. **gate2/gate3 (`0x217acf`/`0x217ae3`, inside `0x216f60`) DO FIRE — refutes W1b "untriggered at 28mm."**
    28mm=3/3, 35mm=3/3, 70mm=4/4 hits; 150mm=0/0 (that render took a notably shorter ~3s path) — scope-bound

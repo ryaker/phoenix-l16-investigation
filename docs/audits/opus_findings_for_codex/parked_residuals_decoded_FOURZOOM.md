@@ -74,14 +74,39 @@ orchestrator is not the verdict on truth; Codex validates.**
 ## CORRECTIONS + new candidate decodes (2nd pass, 2026-06-04) — and an OPEN contradiction
 A second static pass (`decode-remainders`) refined items the first pass got wrong and surfaced a discrepancy
 that proves these are candidates, not verdicts:
-- **⚠ OPEN CONTRADICTION — State machine `0x22f0f0` structure.** Pass-1 (#2 above) read the next-state functor
-  at tree-node `+0x50` (`0x22f3fd`). Pass-2 reads the current functor at **`this+0x90`** (invoked
-  `(*0x90)→vtable+0x30`), with `+0x6c`=current-state int, `+0x68`=terminal, and `+0x58`/`+0xa0` a
-  `std::vector<{state_int, elapsed_double}>` PROFILING log (the "tree insert" = its push_back grow), plus an
-  "state function has not been registered" throw. **The two passes disagree on the functor location and on
-  whether `+0x58` is a functor tree or a profiling vector. NOT resolved by these two static passes — I am
-  resolving it now (decode the State registration/construction + a live state-sequence trace), not leaving
-  it.** Both agree the next-state binding is populated at State construction time.
+- **State machine `0x22f0f0` — RESOLVED (candidate); both prior passes were each HALF right.** RTTI-proven
+  `lt::StateMachine<lt::CalibDataProcessor::State>` running inside `CalibDataProcessor::runReferenceGroupCams()`
+  (typeinfo at `0x6675a0`; per-state functors `runReferenceGroupCams()::$_0..$_6` at `0x6583a0..`). The two
+  passes described DIFFERENT co-existing fields of the same object — neither wrong: **`+0x58`** = root of an
+  intrusive RB-tree `{state_int(+0x20) → node}`, node `+0x50` = per-state action functor `function<State()>`
+  (Pass-1 ✓; the `node+0x50→vtable+0x30` call at `0x22f3fd` produces the next state → `[+0x6c]`); **`+0x90`** =
+  the guard functor `function<bool()>` (Pass-2 ✓; `(*0x90)→vtable+0x30` at `0x22f286`, early-abort); **`+0xa0`**
+  = the `std::vector<{state_int, elapsed_double}>` profiling log (Pass-2 ✓ but it MISLOCATED this at `+0x58` —
+  the vector is `+0xa0`, distinct from the state tree at `+0x58`). `+0x68`=terminal state **9**, `+0x6c`=current
+  (init **0**). **Live-adjudicated** (render `--profile 3`, BP set MODULE-RELATIVE): two State instances ran;
+  state-int sequences `0→2→3→6→4→7→8→9` and `0→1→3→6→5→8→9`; the profiling vector grew **+1 per iteration**
+  (confirms push-back log, not a tree walk); 14 distinct live action-functor VAs (`0x229df0..0x22e1d0`). Enum
+  ints 0..9, terminal 9. (Candidate; the action-functor semantics per state not yet decoded.)
+- **CalibStage bank census (`0xf33d0`, 10 static call sites, r8d all immediate):** 9 sites pass **r8d=1 =
+  current bank** (`+0x12c`); exactly ONE — `0x1f1328` — passes **r8d=0 = factory bank** (`+0x180`), immediately
+  paired with a current read at `0x1f134b` (a factory-vs-current comparison in one function).
+- **Merge `0x3661b0` is named `ImageResolutionAmp` / `processLevel0` (naming enrichment, NOT a contradiction).**
+  A trace of `0x3661b0`'s only caller `0x365960` found it = `ImageResolutionAmp` (error string "ImageResolutionAmp
+  did not create image of correct size!") inside `PipelineCache::processLevel0` ("Requested processLevel0
+  before initResamp()!"), and read `0x3661b0`'s entry as a tiled ROI-resample — raising "is `0x3661b0` the
+  merge or a resampler?" **Resolved deterministically:** `0x3661b0` (extent +0..+21155) **calls the score
+  kernel `0x36cde0` at `+0x369e3f` (+15503) and computes 1/Σscore `rcpss 0x36a938` (+18312) IN-BODY** — it IS
+  the score-weighted merge; the ROI rect is its per-tile (512×512) input and `ImageResolutionAmp` is the
+  super-resolution-merge STAGE NAME. Its output is consumed by `0xd76a0` which **squares every channel**
+  (`mulps %xmm0,%xmm0`) — a per-pixel energy/magnitude op downstream (candidate role).
+- **METHOD CORRECTION (supersedes the "python callbacks drop hits" claim).** The earlier "L2-4=0 / gate2/3
+  untriggered" 0-counts were a **breakpoint-binding artifact, not python**: BPs set on raw **file VAs** never
+  bound through the ASLR slide (lldb "unresolved, hit count 0"). Set **module-relative** (`breakpoint set
+  --shlib libcp.dylib --address 0xVA`), the same python in-frame callback captured all 40 loop iterations with
+  ZERO drops. ⇒ the reusable lesson is **always set BPs module-relative so they bind through ASLR** — a raw
+  `--address` on this PIE dylib silently fails and looks like "doesn't fire." Python-callback-vs-native is NOT
+  the proven discriminator. (The positive corrections — L2-4 fires, gate2/3 fire, the native tallies — STAND;
+  only their EXPLANATION changes from "python drops" to "earlier BPs were unbound.")
 - **Bilateral kernel (real body `0x29f070`, NOT `0x5dcf40` which is `__const`):** range weight =
   **Gaussian `exp(−1.5·d²/σ²)`** via inline branchless `exp2f` (4th-order minimax `2^x` poly coeffs
   `0x5dae2c..` ≈ {0.078,0.226,0.696,0.99993}; `pslld $0x17` exponent pack; clamp ±126/128) — NOT a rational
