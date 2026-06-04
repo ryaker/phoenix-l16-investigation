@@ -1,4 +1,5 @@
-> GRADUATED to four-zoom OBSERVED (2026-06-03, W1c — four_zoom_data_W1c.md). N=5 contributors/tile all 4 tiers (ctx+0x18, N=(end-begin)/16 — corrects [rdi+0x8]); per-512x512-tile; lane3+B-spline fire 4-zoom. Scope=first-hit/tile/tier, Unit-1. Reduction MAGNITUDE = Rosetta tool-limited (residual).
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1c — four_zoom_data_W1c.md). N=5 contributors/tile all 4 tiers (ctx+0x18, N=(end-begin)/16 — corrects [rdi+0x8]); per-512x512-tile; lane3+B-spline fire 4-zoom. Scope=first-hit/tile/tier, Unit-1.
+> **Reduction MAGNITUDE = CAPTURED four-zoom (2026-06-04, W5+W5b — tool wall BROKEN; see `merge_magnitudes_FOURZOOM.md`).** Σscore→`0x36a938 rcpss`=1/Σscore soft-average normalizer, real accumulated denominators per tier: 28mm 0.25464→3.92627, 35mm 0.94357→1.05981, 70mm 0.39071→2.55957, 150mm 5.20000→0.19229 (orch bit-checked). Score `0x36cde0`=√(factorA·factorB), non-degenerate [0,1] all four tiers. No longer a residual.
 
 <!-- provenance: workflow wf_cb406491-3d3 (l16-prefusion-fanout-w4), 2026-06-03; finder+independent verifier; verifier reliable=True -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, weak-labeled, static disasm only).

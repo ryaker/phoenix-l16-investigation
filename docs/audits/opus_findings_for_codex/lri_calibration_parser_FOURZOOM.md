@@ -75,6 +75,27 @@ field-4 entries**, index 100→775 step 25 (monotonic), each = scalar falloff `f
 4 per-channel (R/Gr/Gb/B) 2-coeff polynomials. ⇒ richer than "radius→gain LUT": a **28-knot × 4-channel
 2-coeff-poly + scalar-falloff table.** Byte-identical 4 LRIs (SHA-256 `37a0a85e…`) = factory-constant.
 
+## Verified sub-facts addendum (2026-06-04, deterministic four-LRI re-parse — `bbatch-lri`)
+Independently re-parsed across all four canonical LRIs (+ Unit-2 28mm twin for cross-unit); all PASS.
+- **Block-1 = per-capture AE (NEW — not a calibration block):** `msg_type 1`, fields **f10=f18=analog gain
+  (f32)**, **f11=f19=exposure_µs (varint)**, f16=status; f10≡f18 and f11≡f19 bit-identical every file.
+  28mm gain=1.5348/exp=14646091; 35mm 1.0/2616931; 70mm 1.0/1768733; 150mm 1.0002/510859 (exposure
+  monotone-decreasing with focal; gain≈1.0 except the bright 28mm day-shot). Scene-dependent per capture.
+- **Block-6 triad order confirmed {2,0,6}** (sizes `{1472:14, 519:28}`): first three records =
+  (1472,f2.1=2,has f2.8)=True, (519,0)=False, (519,6)=False — `f2.8` spectral curve only on the 1472/f2.1=2
+  record; identical all four zooms. `f3.2` scalars 28mm: inst0 f1=818.0, inst1 f1=1500.0.
+- **Cross-unit cam0 (values per-body, schema identical):** U1-28mm fx=fy=3375.884, cx=2084.516, cy=1541.342,
+  dist=[0.03264,0.15008,0,0,−0.57745]; **U2-28mm** fx=fy=3372.511, cx=2088.966, cy=1551.829,
+  dist=[0.03309,0.14954,0,0,−0.56928]. Every value differs; identical 9-field K `[fx 0 cx;0 fy cy;0 0 1]` +
+  5-coeff Brown-Conrady with p1=p2=0.
+- **Block-3 cam0 field map (28mm) fully resolves:** f3.3.2.5 LUT=101 pts (x 0→2.8907; y non-monotone, max
+  31.6512), f3.3.2.6 LUT=30 pts, f3.4=(−1.0,−1.0), f3.5=(100.0,54000.0), f7 calib date = 2017-11-04 17:47:16.
+  (⚠ method note: the K and f3.4/f3.5 sub-messages are proper nested protobuf sub-fields — reading them as
+  packed-f32 blobs yields garbage; the documented nesting paths are correct.)
+- **LELR block count (assigned corpus):** 28mm=11, 35mm=11, 70mm=12, 150mm=12, U2-28mm=11 — **wide=11 /
+  tele=12** (corrects any "12 for all" prose; the wide-tier seeds are 11). The "182 unassigned use 0–4
+  blocks" claim is untestable here (no unassigned file in the 8-seed corpus) — flagged scope limit.
+
 ## Residuals (still owed)
 - **Unit-2 universality** — all parses here are Unit-1; factory-constant proven within one body across 4 focals,
   NOT across bodies (identity camids {1,15}, corner magnitudes, AWB may differ on Unit-2).

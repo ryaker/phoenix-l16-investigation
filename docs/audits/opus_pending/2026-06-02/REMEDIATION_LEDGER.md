@@ -3,7 +3,7 @@
 
 **Directive (Rich, 2026-06-03):** run the four-zoom playbook (see `../opus_findings_for_codex/README.md`)
 disciplined through EVERY finding doc from the last 2 days. None graduates to Tier 1 (findings_for_codex)
-until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 28 / 80 graduated** (W1: 2 + W1b: 4 render-findings; W3: 14 + W3b: 2 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
+until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 48 / 80 graduated** (+3 subsumed-corrected, +1 superseded, 28 still STAGING/OWED). Jump 28→48 = 2026-06-04: tool wall BROKEN (W5+W5b → 4-tier merge/score/CCM magnitudes, 3 docs via `merge_magnitudes_FOURZOOM`); 13 static sub-mechanism docs byte-verified (`static_submechanisms_verified_FOURZOOM`); 4 LRI sub-fact docs re-parsed (`lri_calibration_parser_FOURZOOM` addendum). Earlier: W1:2 + W1b:4 render + W3:14 + W3b:2 LRI-calibration.
 
 Cadence is render-bound (4 sequential renders per data sweep, minutes each, one external disk under
 Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 4-render sweep with many
@@ -39,29 +39,29 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 11 | laneA_prefusion_reducer_static/matrix_36acf0_decode.md | STAGING | OWED | - |
 | 12 | laneA_prefusion_reducer_static/merge_projection_radial_identity.md | STAGING | OWED | - |
 | 13 | laneA_prefusion_reducer_static/reducer_verdict.md | STAGING | W1c: accepts N=5 4-zoom (CANDIDATE, not full reducer verdict; body unverified) | W1c |
-| 14 | laneA_prefusion_reducer_static/score_kernel_36cde0_two_factors.md | STAGING→graduating | W5: √(a·b) magnitudes captured 28/70 (0.62859/0.78014/0.78062); 35/150 in flight W5b | W5/W5b |
-| 15 | laneA_prefusion_reducer_static/score_production.md | STAGING→graduating | W5: Σscore real magnitudes 28/70 (0.39071→2.55957, 0.25464→3.92627); 35/150 in flight W5b | W5/W5b |
+| 14 | → GRADUATED(merge_magnitudes_FOURZOOM) | **GRADUATED** | score `0x36cde0`=√(a·b) non-degenerate 4-tier: 28=.78062, 35=.34404/.29467, 70=.62859/.78014, 150=.98853 (orch bit-checked) | W5/W5b |
+| 15 | → GRADUATED(merge_magnitudes_FOURZOOM) | **GRADUATED** | Σscore `0x36a938`=1/Σ 4-tier: 28 .2546→3.926, 35 .9436→1.060, 70 .3907→2.560, 150 5.20→.1923 | W5/W5b |
 | 16 | laneA_prefusion_reducer_static/score_q1q2_lineage.md | STAGING | OWED | - |
-| 17 | laneA_prefusion_reducer_static/src2_box_role.md | STAGING | OWED | - |
-| 18 | laneA_prefusion_reducer_static/src2_callback_374ac0.md | STAGING | OWED | - |
+| 17 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | src2 box→margin zero-fill in 0x374ac0, dead in 0x3661b0; byte-verified | Bstatic |
+| 18 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | 0x374ac0 = 4×__bzero margin clear via std::function sink; byte-verified | Bstatic |
 | 19 | → GRADUATED: opus_findings_for_codex/terminal_merge_3661b0_FOURZOOM.md | **GRADUATED** | four-zoom structure (magnitude tool-limited) | W1c |
 | 20 | laneA3_combine_store_site/CORRECTION.md | STAGING | OWED | - |
 | 21 | laneA3_combine_store_site/LEDGER_RECONCILIATION.md | STAGING | OWED | - |
 | 22 | laneA3_combine_store_site/step0_inner_body.md | STAGING | OWED | - |
 | 23 | laneA3_combine_store_site/step0_reconciliation.md | STAGING | OWED | - |
-| 24 | laneA5_output_finalization/apply_structure.md | STAGING | OWED | - |
+| 24 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | resample APPLY Q16.16/64-phase/4-tap MAC; 0x5abed8=65536.0; byte-verified | Bstatic |
 | 25 | laneA5_output_finalization/colormatrix_runtime_const_RESOLVED.md | STAGING (RESOLVER) | 0x671980 = fixed I1I2I3 const, static-init (write-wp 0 hits 28mm + recognizable 1/√3,1/√2,1/√6 + single __const writer 0x374505). Static-init ⇒ tier-invariant; 35/70/150+U2 = low-risk confirm | W1/W5 |
-| 26 | laneA5_output_finalization/guided_detail_transfer.md | STAGING | OWED | - |
+| 26 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | detail-transfer out=(B+C)+clamp((A−B)·2·C.l3,±0.1); consts byte-verified | Bstatic |
 | 27 | laneA5_output_finalization/kernel_identity.md | STAGING | OWED | - |
 | 28 | laneA5_output_finalization/matrix_36acf0_bss_storage.md | STAGING | OWED | - |
 | 29 | laneA5_output_finalization/post_blend_color_matrix.md | **SUPERSEDED** | "runtime/per-LRI matrix" REFUTED by row 25 + W5 §3 (it's fixed I1I2I3 const). Banner added; reference-only, NOT finding-grade | 2026-06-04 |
-| 30 | laneA6_score_metric/closed_form_stage1.md | STAGING | OWED | - |
-| 31 | laneA6_score_metric/closed_form_stage2.md | STAGING | OWED | - |
-| 32 | laneA6_score_metric/score_completion_kraw_scales.md | STAGING | OWED | - |
+| 30 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | q1 SSIM-cs closed form 0x36cea6; consts byte-verified | Bstatic |
+| 31 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | q2 wavelet 0x371730 (3.1722686); score=√(q1·q2) 0x36e511/15 | Bstatic |
+| 32 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | dyadic 1:2:4:8 (0x5fdb10), all 4 slots kept, K raw not (KL)² | Bstatic |
 | 33 | laneA7_score_consumption/lane_semantics.md | STAGING | OWED | - |
 | 34 | laneB2_lri_calibration_origins/awb_consumption_runtime.md | STAGING | OWED | - |
 | 35 | laneB2_lri_calibration_origins/awb_wb_gains_block8.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
-| 36 | laneB2_lri_calibration_origins/block1_ancillary.md | STAGING | OWED | - |
+| 36 | → GRADUATED(lri_calibration_parser_FOURZOOM addendum) | **GRADUATED** | Block-1=per-capture AE (f10/18 gain, f11/19 exp_µs); 4-LRI values | Blri |
 | 37 | laneB2_lri_calibration_origins/block4_lens_shading_grid.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED: dims 16×17×13×4×4 confirmed; {1,15} identity (not {3,6,9,12}) | W3b |
 | 38 | laneB2_lri_calibration_origins/block5_vignetting.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED: 28-knot×4ch poly + falloff, global; confirmed | W3b |
 | 39 | laneB2_lri_calibration_origins/block6_519b_records.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
@@ -69,17 +69,17 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 41 | laneB2_lri_calibration_origins/block6_color_shading.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 42 | laneB2_lri_calibration_origins/block6_f28_spectral_curves.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 43 | laneB2_lri_calibration_origins/block6_grouping.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
-| 44 | laneB2_lri_calibration_origins/calibration_unknowns_block6.md | STAGING | OWED | - |
+| 44 | → GRADUATED(lri_calibration_parser_FOURZOOM addendum) | **GRADUATED** | Block-6 triad (2, 0, 6), f3.2 818/1500; 4-LRI re-parse | Blri |
 | 45 | laneB2_lri_calibration_origins/camera_focal_map_excluded_pair.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
-| 46 | laneB2_lri_calibration_origins/ccm_apply_site_located.md | STAGING (CORRECTED) | W1: 0xbfa20 first-hit=I1I2I3 not per-cam CCM; per-cam claim reopened | W1 |
-| 47 | laneB2_lri_calibration_origins/ccm_apply_site_static.md | STAGING | OWED | - |
+| 46 | → GRADUATED(merge_magnitudes_FOURZOOM) | **GRADUATED** | `0xbfa20`=fixed I1I2I3; exclude-both→clean exit ALL 4 tiers ⇒ per-camera-CCM CLOSED for this site | W5/W5b |
+| 47 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | CCM apply 0xbfa20(4×4)/0x300980(3×3); D50 row-sums 0.9642/0.8252=0 hits | Bstatic |
 | 48 | laneB2_lri_calibration_origins/ccm_consumption_runtime_INCONCLUSIVE.md | STAGING | OWED | - |
 | 49 | laneB2_lri_calibration_origins/ccm_lri_residency_link.md | STAGING | OWED | - |
-| 50 | laneB2_lri_calibration_origins/cross_unit_values.md | STAGING | OWED | - |
+| 50 | → GRADUATED(lri_calibration_parser_FOURZOOM addendum) | **GRADUATED** | cross-unit cam0 K+dist differ per-body (U1 3375.9 vs U2 3372.5); schema identical | Blri |
 | 51 | laneB2_lri_calibration_origins/crosscorpus_distortion.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 52 | laneB2_lri_calibration_origins/crosscorpus_focal_map_excluded_pair.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 53 | laneB2_lri_calibration_origins/crosscorpus_spectral_f28.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
-| 54 | laneB2_lri_calibration_origins/distortion_apply_stage.md | STAGING | OWED | - |
+| 54 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | 0x261940 undistort = pure 4096-LUT radial (1 sqrt/1 load/2 mul), no Horner | Bstatic |
 | 55 | laneB2_lri_calibration_origins/distortion_complexity_8_8_refuted.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 56 | laneB2_lri_calibration_origins/distortion_lut_full_decode.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 57 | laneB2_lri_calibration_origins/distortion_undistort_spec.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
@@ -87,22 +87,22 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 59 | laneB2_lri_calibration_origins/lightheader_block0.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 60 | laneB2_lri_calibration_origins/lri_block_inventory.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 61 | → GRADUATED: opus_findings_for_codex/undistort_ordering_lut_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit; camera-group LUT split) | W1 |
-| 62 | laneB2_lri_calibration_origins/verified_field_map.md | STAGING | OWED | - |
-| 63 | laneC6_remaining/c6_grouptype2_survival.md | STAGING | OWED | - |
+| 62 | → GRADUATED(lri_calibration_parser_FOURZOOM addendum) | **GRADUATED** | cam0 Block-3 field map fully resolves (101/30-pt LUTs, date 2017-11-04); 4-LRI | Blri |
+| 63 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED**(static) | C6 clear-guard keys CONTAINER +0x44 not item key; 58 f2720 sites; +0x44 runtime value still owed | Bstatic |
 | 64 | laneD_final_acceptance_static/accept_consumer_calibstage.md | STAGING | OWED | - |
 | 65 | → GRADUATED: opus_findings_for_codex/accept_reject_gate_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 66 | laneD_final_acceptance_static/acceptance_gate_location.md | STAGING | OWED | - |
 | 67 | laneD_final_acceptance_static/calib_to_merge_link_LEAD.md | STAGING | OWED | - |
-| 68 | laneD_final_acceptance_static/e6ba0_not_accumulator.md | STAGING | OWED | - |
-| 69 | laneD_final_acceptance_static/final_acceptance_filter.md | STAGING | OWED | - |
+| 68 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | 0xe6ba0 = keyed SELECT-ONE, 0 FP-arith ops (verified) | Bstatic |
+| 69 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | 0x218b30 stat reducer (mean+exceed-frac); <8 pairs→skip (0x2170d1) | Bstatic |
 | 70 | laneD_final_acceptance_static/gate2_gate3_reject_semantics.md | STAGING | W1b: gate1 fires 4-zoom; gate2/3 still untriggered | W1b |
 | 71 | → GRADUATED: opus_findings_for_codex/final_compositing_consumer_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
-| 72 | laneE_fourzoom_topology/level_dispatcher_topology.md | STAGING | OWED | - |
+| 72 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | level dispatcher 0x3ec9dc: L0=0x3ec770/L1=0x3ebb80/L2-4=0x3d0650; vtable+0x30 | Bstatic |
 | 73 | laneE_fourzoom_topology/level_fire_runtime_28mm.md | STAGING | OWED | - |
 | 74 | laneE_fourzoom_topology/output_producer_static.md | A→SUBSUMED+CORRECTED | producer path OBSERVED; "RB-tree" REFUTED (libc++ symbol scan: __tree/map/set/list all 0); final-compositing question CLOSED by graduated final_compositing_consumer_FOURZOOM. Correction banner added | 2026-06-04 |
 | 75 | → GRADUATED: opus_findings_for_codex/resample_kernels_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 76 | laneE_fourzoom_topology/scheduler_recombine_runtime.md | STAGING (CORRECTED) | dispatch tally OBSERVED 28mm; "RB-tree/list insert" REFUTED (intrusive 0x80-node list); correction banner added. Tally 35/70/150mm still owed (C, runtime) | 2026-06-04 |
-| 77 | laneP_parser_gap_182/residual_alternate_container.md | STAGING | OWED | - |
+| 77 | laneP_parser_gap_182/residual_alternate_container.md | STAGING (PARTIAL) | assigned LELR count verified (wide=11/tele=12; prose off-by-one fixed); unassigned-file 0–4 claim untestable in corpus | Blri |
 | 78 | MERGE_MECHANISM_SYNTHESIS.md | A→SUBSUMED+CORRECTED | synthesis of graduated children; stale "runtime-populated color matrix" corrected → fixed I1I2I3 const (rows 25/W5) | 2026-06-04 |
 | 79 | MERGE_PIPELINE.md | A→SUBSUMED+CORRECTED | navigational table; stage-10 "runtime/per-LRI color-correction" corrected → fixed I1I2I3 const | 2026-06-04 |
 | 80 | → GRADUATED: opus_findings_for_codex/stereo_cost_math_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit; caller 0x276860, N=4 all tiers, layout corrected) | W1 |

@@ -1,7 +1,13 @@
 <!-- provenance: l16-investigator W5 mid-render magnitude capture (ae7b8ff22388c7f26) + orchestrator arithmetic check, 2026-06-03/04 -->
-**Status:** NEEDS_CODEX_VALIDATION. **The "Kth-hit uncapturable under Rosetta" tool wall is BROKEN.** Method:
-LLDB ignore-count + conditional breakpoints (core-handled, NO Python per-hit callback) reach mid-render hits in
-~11–50 s, no stampede. Magnitudes captured 28mm+70mm (35/150 → W5b). read-watchpoints stay dead (not needed).
+**Status:** GRADUATED → `../../opus_findings_for_codex/merge_magnitudes_FOURZOOM.md` (was NEEDS_CODEX_VALIDATION).
+**The "Kth-hit uncapturable under Rosetta" tool wall is BROKEN; the four-tier set is now COMPLETE** — W5b
+(a18096c1c6a5289b5) added 35mm+150mm. See the graduated doc for the consolidated 28/35/70/150 tables (this is
+the original 28/70 working log). Method: LLDB ignore-count + conditional breakpoints (core-handled, NO Python
+per-hit callback) reach mid-render in ~11–50 s, no stampede. read-watchpoints stay dead (not needed).
+**W5b additions:** score 35mm 0.34404/0.29467, 150mm 0.98853 (150mm #2001 = genuine zero-factor pixel,
+re-sampled); Σscore 35mm 0.94357→1.05981, 150mm 5.20000→0.19229; CCM exclude-both → clean exit BOTH tiers
+(four-zoom CCM-uniformity closed). All orch bit-checked relerr ≤ 1e-4. ⚠ `0xbfa20` called <2000×/render ⇒
+`-i 2000` overshoots; use first-hit there.
 
 # W5 — data-dependent magnitudes captured (wall broken)
 

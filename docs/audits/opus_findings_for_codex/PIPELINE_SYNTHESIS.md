@@ -15,19 +15,24 @@ its own packet. This is the entry point for Codex's validation pass.
    LRI origin); cost = weighted truncated-L1 multi-view photo-consistency (`0x2732f0` via runPass `0x276790`,
    live caller `0x276860`, NOT the dormant driver `0x2730c0`); **N=4 source cams, tier-invariant**. Depth feeds
    the merge warp (ledger CLM-WARP-003). Plane-sweep search+argmin = caller (tool-walled magnitude).
-4. **IRAMP terminal MERGE** (`terminal_merge_3661b0_FOURZOOM`) — `0x3661b0`, per 512×512 tile, **N=5
-   contributors** (ctx+0x18 vector, N=(end-begin)/16), tier-invariant; weighted soft-average (1/Σscore); score
-   kernel `0x36cde0` = `sqrt(cs-SSIM × 4-scale wavelet)`; lane-3 detail-transfer `0x36aa30` (recip·0.2);
-   contributor sentinel `0x36930f`. **Reduction MAGNITUDE tool-walled.** B-spline resample is merge-interior.
+4. **IRAMP terminal MERGE** (`terminal_merge_3661b0_FOURZOOM`, `merge_magnitudes_FOURZOOM`) — `0x3661b0`,
+   per 512×512 tile, **N=5 contributors** (ctx+0x18 vector, N=(end-begin)/16), tier-invariant; weighted
+   soft-average **1/Σscore four-zoom-captured** (`0x36a938 rcpss`: Σscore 0.255/0.944/0.391/5.20 →
+   3.93/1.06/2.56/0.192 for 28/35/70/150); score kernel `0x36cde0` = `sqrt(cs-SSIM × 4-scale wavelet)`,
+   non-degenerate [0,1] all four tiers; lane-3 detail-transfer `0x36aa30` (recip·0.2); contributor sentinel
+   `0x36930f`. **Reduction MAGNITUDE now CAPTURED four-zoom (W5+W5b, tool wall broken).** B-spline resample is
+   merge-interior.
 5. **RESAMPLE** (`resample_kernels_FOURZOOM`) — B-spline `0x2b2be0` (merge-interior) + Catmull-Rom `0x36f800`
    (separate stage `0x3d0650`); both 4-tap 64-phase LUT builders.
 6. **DENOISE** (`denoise_sharpen_stages_FOURZOOM`, `denoise_sharpen_kernel_math_FOURZOOM`) — ColorNoiseReduction
    (`0x34b3f0`, covariance/multi-scale, registers before CCM); bilateral active window **W5** (`0x2f78e0`,
    TENT range weight); NLM/PatchNLM<4> (`0x3070e0`, TENT, 4×4 SAD patch). **All denoise weights tent/covariance
    — none exponential.** CNR params 1.0/1.0 four-zoom.
-7. **COLOR** — CCM 4×4 apply `0xbfa20` is a GENERIC apply; first-hit = fixed **I1I2I3 decorrelation** (NOT
-   per-camera CCM — that claim reopened, staging); AWB reciprocals folded in (28mm-only runtime); fixed I1I2I3
-   basis confirmed 3× (`0x5f2380`).
+7. **COLOR** — CCM 4×4 apply `0xbfa20` = fixed **I1I2I3 decorrelation** (Ohta 1/√3,1/√2,1/√6), **NOT
+   per-camera CCM — now four-zoom-CLOSED** (`merge_magnitudes_FOURZOOM`: exclude-both-matrices conditional →
+   clean render exit on all 28/35/70/150, matrix bit-identical all tiers); AWB reciprocals folded in
+   (28mm-only runtime); fixed I1I2I3 basis written once at static-init from `__const` (`0x5f2380`/`0x374505`),
+   `__bss 0x671980` (write-wp 0 hits) — also resolves the post-merge `0x36acf0` matrix (same I1I2I3 const).
 8. **SHARPEN / tone-adjust** (`denoise_sharpen_kernel_math_FOURZOOM`) — symmetric 7-tap Gaussian-FIR unsharp
    (`0x3588f0` + gen `0x96980`); separate Laplacian-pyramid clarity path (undecoded).
 9. **CALIB accept/reject gate** (`accept_reject_gate_FOURZOOM`) — `0x216f60`/`0x217ac6`, 0.25 ceiling, fires
@@ -44,19 +49,24 @@ its own packet. This is the entry point for Codex's validation pass.
   [0.9642,1.0,0.8252] + Block-5 vignetting (byte-identical = firmware constant).
 
 ## RESIDUALS for Codex
-- **Data-dependent MAGNITUDES (merge reduction, score/Σscore, per-camera CCM later-hit):** first-hit is
-  degenerate (zero/boundary/0.2 const) — these need a MID-RENDER (Kth) hit. NOT confirmed uncapturable: only
-  per-hit Python-callback/auto-continue (which stampede) were tried; **LLDB ignore-count (`-i N`) + conditional
-  breakpoints are untested and being attempted (W5)** — they stop in the debugger core (no Python), so they may
-  reach a mid-render hit without the stampede. (read-watchpoints dead + differential defeated by nondeterminism
-  ARE verified limits.) Structure graduated; values pending W5.
+- **Data-dependent MAGNITUDES — RESOLVED four-zoom (W5+W5b, `merge_magnitudes_FOURZOOM`).** The "Kth-hit
+  uncapturable under Rosetta" wall is BROKEN: LLDB ignore-count (`-i N`) + conditional (`-c`) breakpoints are
+  core-handled (no Python), reach mid-render in ~11–50s, no stampede. Captured all four tiers: score
+  `0x36cde0`=√(a·b) non-degenerate [0,1]; merge Σscore `0x36a938`=1/Σ soft-average normalizer; CCM
+  `0xbfa20`=fixed I1I2I3, exclude-both→clean exit all four (per-camera-CCM CLOSED for this site). Remaining
+  (non-load-bearing): full per-pixel distribution + total call-count censuses. read-watchpoints dead +
+  differential defeated by nondeterminism remain the only verified limits.
 - **Unit-2 RUNTIME** untested (calibration cross-unit done; runtime findings Unit-1-only). ⚠ The documented
   Unit-2 "twins" are focals (28,70,150,150) NOT (28,35,70,150) — no clean Unit-2 35mm in the corpus; CLAUDE.md
   corpus note is wrong (flag).
-- **Long-tail staging** (~50 docs): lane-A score/output sub-mechanisms, CCM-static, BLIND_SPOTS, synthesis —
-  many covered by graduated parents; per-doc four-zoom still owed per the ledger.
+- **Long-tail staging** (~28 docs remain, down from ~50): the verified static sub-mechanisms + magnitudes +
+  LRI sub-facts graduated 2026-06-04. Still owed (per ledger): lane-A3 combine-store, lane-A5 kernel/bss
+  dupes, lane-A6/A7 score-consumption runtime, several lane-B2 runtime-consumption (AWB/CCM differential),
+  lane-D/E runtime tallies, BLIND_SPOTS. Many are subsumed by graduated parents; the genuinely-owed remainder
+  is mostly RUNTIME (differential-render / Unit-2) not static.
 - **Decode gaps:** unsharp combine VA; Laplacian-pyramid clarity kernel; NLM search radius (runtime param);
   per-camera CCM existence; lens-shading {1,15} sub-grid on Unit-2.
 
-> Count: REMEDIATION_LEDGER 28/80 graduated. This synthesis covers the graduated subset; it is NOT a claim
-> the whole pipeline is validated — the residuals above are first-class open items.
+> Count: REMEDIATION_LEDGER 48/80 graduated (+3 subsumed, +1 superseded, 28 staging). This synthesis covers
+> the graduated subset; it is NOT a claim the whole pipeline is validated — the residuals above are
+> first-class open items.

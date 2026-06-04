@@ -11,7 +11,8 @@ Comparing a representative unassigned file to an assigned one (first 32 header b
 scan):
 
 - **Assigned `L16_02130`** (`2018-07-23`): header `LELR`, `total_len@4 = 0x04d625ef = 81,143,279`;
-  there IS a `LELR` magic at exactly offset `81,143,279`; 12 `LELR` blocks total; the block chain walks.
+  there IS a `LELR` magic at exactly offset `81,143,279`; **11** `LELR` blocks total (deterministic
+  `scan_lri_blocks` re-count 2026-06-04 — corrects the earlier "12"; wide-tier=11, tele-tier=12); chain walks.
 - **Unassigned `L16_00795`** (`2017-12-09`): header `LELR`, `total_len@4 = 0x05100020 = 84,934,688`
   (≈ half the 170,203,529-byte file); there is **no** `LELR` magic at `84,934,688`; **only 1 `LELR` in
   the entire file**. First block's `msg_len = 1497`, payload parses to no recognized proto fields.

@@ -18,7 +18,26 @@ A staging packet graduates into this directory only after:
 3. **Per-tier verified** — the claim holds (or is scope-bound / corrected) at every tier it's asserted for.
 4. **Packet rewritten** to four-zoom OBSERVED with explicit per-tier data + scope; tool limits (Rosetta
    read-watchpoints dead) stated per-datum, never used to downgrade the whole finding.
-5. **`git mv`** staging → here, and the REMEDIATION_LEDGER row flipped to GRADUATED.
+5. **`git mv`** staging → here (or **consolidate** many staging docs into one parent finding — the calibration,
+   static-submechanism, and magnitude parents each absorb 3–14 staging docs), and the REMEDIATION_LEDGER row
+   flipped to GRADUATED. For pure-static / LRI-resident claims, "four-zoom" = **deterministic re-extraction**
+   (byte-exact re-disasm of the VAs, or re-parse of all four LRIs) — the code/rodata is identical regardless of
+   which LRI renders, so re-extraction IS the rigor (it does not require four separate renders).
 
 Still `NEEDS_CODEX_VALIDATION` even here — Codex validates/upgrades to ledger truth. This tier only means
 "done to the rigor that makes it worth his time."
+
+## Graduated index (entry points for Codex; start with PIPELINE_SYNTHESIS)
+- **PIPELINE_SYNTHESIS.md** — end-to-end 10-stage graduated picture (READ FIRST).
+- **Merge / fusion core:** `terminal_merge_3661b0_FOURZOOM` (N=5 soft-average), `lane3_blend_FOURZOOM`
+  (detail-transfer), `merge_magnitudes_FOURZOOM` (4-tier score √(a·b) / Σscore 1/Σ / CCM=fixed I1I2I3 —
+  closes the former Rosetta tool wall), `geometry_builder_216f60_FOURZOOM`, `contributor_gate_FOURZOOM`.
+- **Depth / stereo:** `depth_stereo_no_lri_origin_FOURZOOM`, `stereo_cost_math_FOURZOOM`.
+- **Resample / denoise / sharpen:** `resample_kernels_FOURZOOM`, `denoise_sharpen_stages_FOURZOOM`,
+  `denoise_sharpen_kernel_math_FOURZOOM`.
+- **Undistort / calibration / accept / output:** `undistort_ordering_lut_FOURZOOM`,
+  `lri_calibration_parser_FOURZOOM` (+ 2026-06-04 sub-facts addendum: Block-1 AE, cross-unit cam0, field map),
+  `accept_reject_gate_FOURZOOM`, `final_compositing_consumer_FOURZOOM` (intrusive list, RB-tree refuted).
+- **Static sub-mechanisms (byte-verified):** `static_submechanisms_verified_FOURZOOM` (13 lane-A/D/E/B2/C6
+  VAs: src-boxing, resample-apply, detail-transfer, score closed-form, CCM apply-sites, undistort kernel,
+  accept filter, level dispatcher, C6 key-15).
