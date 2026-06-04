@@ -88,8 +88,32 @@ Block-6 CCM consumption + variant{0,2,6} selection remain UNRESOLVED (entry-time
 parsed mid-render; needs break inside `setColorCorrection`/`ImageApplyColorMatrix` = native-arm64/single-step).
 All 3 variants share row-sums [0.9642,1.0,0.8252] (don't distinguish them); `setColorCorrection` exists (LEAD CCM IS used).
 
-## Boundary
-The high-value statically/LRI-tractable surface for both blockers is comprehensively covered. Remaining
-merge-core unknowns are all runtime (your domain); remaining LRI items are lower-marginal or runtime. The
-spectral-curve + full per-camera-calibration map is a substantial clean-room asset ready for your
-validation when you return (2026-06-07).
+## Wave 10 + Lane E (un-fenced 2026-06-03 — items I'd wrongly deferred, now investigated)
+- **Four-zoom topology (Lane E)** — substantially mapped. PipelineCache level dispatcher `0x3ec960`
+  (tile+0x18 level field): level0→`0x3ec770` IRAMP camera merge, level1→`0x3ebb80` resample, levels2-4→
+  `0x3d0650` rescale. RUNTIME: only levels 0+1 fire (28mm L0=250/L1=32; 70mm L0=221/L1=48; levels2-4=0,
+  zoom-independent). Driver = work-queue scheduler `0x3adf30` → producer `0x41a7d0` (per-tile render/mode
+  dispatch) + level-keyed collector `0x3bf820` (gather into level+priority container, NOT a merge). **No
+  global Laplacian/cross-resolution add on the bridge path.** A single LRI render = one full bridge image ⇒
+  the "four zooms" are 4 separate captures (cross-validation); within a capture the focal-spanning cameras
+  fuse via the level-0 merge. Final pixel-assembly one layer deeper (`0x41a7d0→0x3c6ac0`), uncrossed.
+- **C6 (`CLM-C6-001`)** — static: classifier `0xf6c60` maps key-15→camera-group-type-2 (mask 0xfc00, btl),
+  which SURVIVES the `0x3c90a5` `+0x30` clear and IS consumed at decision points. (C6 image-CONTRIBUTION
+  still open; a differential render is low-EV — one camera's effect likely below the ~0.034-count
+  nondeterminism floor, same limit that left Codex's watchpoints inconclusive.)
+- **CCM apply** — `ImageApplyColorMatrix`/`setColorCorrection` bodies located; the D50 row-sums have ZERO
+  f32 hits in the binary ⇒ the CCM is parsed from LRI Block-6 and handed to libcp as a `ColorCorrection`
+  struct: **libcp APPLIES, the LRI/parse SELECTS**. Clean-room: Phoenix parses+applies.
+- **Geom builder consumer** — `0x216f60` has 2 callers (State ops `0x22aaf0`, `0x22d250`); it receives its
+  State, doesn't own it; tail indirect dispatch still uncrossed.
+
+## Status (not a "boundary" — investigation continues)
+All 5 parity blockers + the clean-room LRI parser have been investigated across static disasm, LRI parse,
+AND runtime renders (no modality is off-limits while you're offline). What's mapped: the merge mechanism,
+the complete per-camera LRI calibration/input parser (incl. spectral curves + lens-shading grid), the
+four-zoom level topology, C6 group-type survival, the CCM apply/select split. What remains is genuinely
+deeper/lower-EV, not off-limits: the per-tile final-pixel-assembly layer (`0x3c6ac0`); the Lane D accept/
+reject gate consumer (`0x218e20` behind `__const 0x6580e0` — runtime-resolvable); C6 image-CONTRIBUTION
+(differential render is low-EV vs the nondeterminism floor); exact mid-render CCM-variant selection
+(needs single-step). I am continuing to work these by WSJF, not holding. The spectral-curve + full
+per-camera-calibration map is a substantial clean-room asset ready for your validation (2026-06-07).
