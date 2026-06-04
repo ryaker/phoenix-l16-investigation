@@ -105,11 +105,11 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
    `0x3ec960`). Motion-compensated, index-validity-gated contributors, **1/Σscore-normalized soft weighted
    average** (`rcpss 0x36a938`), wavelet-domain SSIM-class score `0x36cde0`. Driven by a tiled work-queue
    scheduler `0x3adf30` (producer `0x41a7d0` + level-keyed collector `0x3bf820`); no global Laplacian add.
-4. **RESAMPLE** — **cubic B-spline `0x2b2be0` CONFIRMED** (consts 1/6, 3, −6, 4, 6, 2 = textbook basis;
-   `laneE_fourzoom_topology/resample_kernels_constants.md`). ⚠ The prior **"Catmull-Rom `0x36f800`" label is
-   REFUTED** by its constants `{1/6, 9, ±15, −3, −12, 116/3, 1/64, 0.075274}` — neither Catmull-Rom (no
-   −0.5/2.5/−4) nor cubic B-spline; it IS a 1/6-normalized piecewise-polynomial spline of unidentified order
-   (LEAD: higher-order spline / B-spline derivative). Exact identity = residual.
+4. **RESAMPLE** — TWO 4-tap, 64-phase kernel-LUT builders, both CONFIRMED by full reconstruction
+   (`laneE_fourzoom_topology/resample_kernels_constants.md`): **cubic B-spline `0x2b2be0`** (consts 1/6,3,−6,4
+   = textbook basis) and **Catmull-Rom `0x36f800`** (Keys a=−0.5: piece-1 `(9d³−15d²+6)/6 = 1.5d³−2.5d²+1`,
+   piece-2 `(−3d³+15d²−24d+12)/6 = −0.5d³+2.5d²−4d+2`; the /6 normalization + ×64 index scaling hid the
+   classic coefficients). Each builds a 64-sub-phase LUT of the 4 neighbor taps {1+a,a,1−a,2−a}.
 5. **COLOR/SHAPING** — lane-3 detail-transfer; fixed **I1I2I3** decorrelation matrix (corroborated TWICE:
    `__bss 0x671980` and global `0x670b00` from consts `0x5f2380` = Ohta basis, applied via 3×3 path `0x300570`
    — a DECOY, not the per-camera CCM); **per-camera CCM apply site now LOCATED**
