@@ -3,6 +3,13 @@
 investigation has NEVER covered** — not "located but undecoded," but "present in the binary and never looked
 at." Found by symbol/string sweep; NOT yet decoded or runtime-confirmed. Binary `libcp.dylib`.
 
+> **FOLLOW-UP 2026-06-03 (same day): these blind spots are now PARTIALLY MAPPED.** See
+> `denoise_sharpen_tone_stages_mapped.md` — ColorNoiseReduction fully mapped (covariance multi-scale chroma-NR,
+> body `0x34b3f0`, registers before CCM), bilateral mapped (`0x2f6420`, W∈{3,5,7,9}), sharpen structural
+> (SharpenLineFactory + Laplacian-pyramid clarity). KEY: all config/tuning-profile driven, NOT LRI (item-#27
+> class). And `depth_stereo_no_lri_origin.md` — the depth/stereo subsystem is runtime-stereo-matched (no LRI
+> origin); its cost math remains undecoded.
+
 # BLIND SPOTS — whole pipeline stages missing from the current map
 
 Context: asked "what is TRULY unknown (no candidate to evaluate)?", a sweep for denoise/sharpen/tone stages
