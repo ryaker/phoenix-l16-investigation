@@ -44,10 +44,12 @@ its own packet. This is the entry point for Codex's validation pass.
   [0.9642,1.0,0.8252] + Block-5 vignetting (byte-identical = firmware constant).
 
 ## RESIDUALS for Codex
-- **TOOL WALL (Rosetta x86_64; no native-arm64):** merge reduction MAGNITUDE, score/Σscore VALUES, per-camera
-  CCM later-hit — uncapturable at first-hit; Kth-hit re-triggers the stampede; read-watchpoints dead;
-  differential defeated by libcp output nondeterminism. Need native-arm64 single-step / instrumented build /
-  Codex tooling. (Structure graduated; values open.)
+- **Data-dependent MAGNITUDES (merge reduction, score/Σscore, per-camera CCM later-hit):** first-hit is
+  degenerate (zero/boundary/0.2 const) — these need a MID-RENDER (Kth) hit. NOT confirmed uncapturable: only
+  per-hit Python-callback/auto-continue (which stampede) were tried; **LLDB ignore-count (`-i N`) + conditional
+  breakpoints are untested and being attempted (W5)** — they stop in the debugger core (no Python), so they may
+  reach a mid-render hit without the stampede. (read-watchpoints dead + differential defeated by nondeterminism
+  ARE verified limits.) Structure graduated; values pending W5.
 - **Unit-2 RUNTIME** untested (calibration cross-unit done; runtime findings Unit-1-only). ⚠ The documented
   Unit-2 "twins" are focals (28,70,150,150) NOT (28,35,70,150) — no clean Unit-2 35mm in the corpus; CLAUDE.md
   corpus note is wrong (flag).
