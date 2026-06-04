@@ -1,3 +1,10 @@
+> **GRADUATED (2026-06-04) → `../../opus_findings_for_codex/color_consumption_FOURZOOM.md` §1.** The CCM
+> consumption is NO LONGER inconclusive: `0xa9f20` was read live on all 4 tiers and carries a REAL per-camera
+> 3×3 CCM, row-sums EXACTLY [0.9642,1.0,0.8252] (= LRI Block-6 f2.2), NOT I1I2I3. The earlier entry-time
+> (`0x390180`) perturbation was inert because the CCM is delivered via payload+0x14, not the entry proto
+> buffer. The §1 multithread-nondeterminism finding (spike-acceptance: validate statistically not by hash)
+> remains a first-class keeper.
+>
 > **UPDATE 2026-06-03 — the CCM apply site is now LOCATED statically** (`ccm_apply_site_located.md`): per-camera
 > CCM = 4×4 apply `0xbfa20` via `setColorCorrection $_58 0x3466d0` → `0xa9f20`; matrix = `*[BayerPipelinePayload
 > +0]+0x14` delivered through the closure capture (+0x20), NOT the render-entry proto buffer — which is exactly

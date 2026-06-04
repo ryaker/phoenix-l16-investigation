@@ -3,7 +3,7 @@
 
 **Directive (Rich, 2026-06-03):** run the four-zoom playbook (see `../opus_findings_for_codex/README.md`)
 disciplined through EVERY finding doc from the last 2 days. None graduates to Tier 1 (findings_for_codex)
-until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 57 / 80 graduated** (+14 subsumed, +3 subsumed-corrected, +1 superseded, +1 retracted = **76/80 resolved**; 4 STAGING). Jump 28→57 = 2026-06-04: tool wall BROKEN (W5+W5b → 4-tier merge/score/CCM magnitudes via `merge_magnitudes_FOURZOOM` + weight_vec4 §1b + reducer two-prong verdict); 13 static sub-mechanism docs byte-verified; LRI sub-facts (8-seed two-unit intrinsics) re-parsed; 15 subsumption-confirmed (residuals → `SUBSUMPTION_RESIDUALS.md`); **C-group runtime batch graduated 6 (`cgroup_runtime_FOURZOOM`) with TWO corrections: L2-4 FIRES (refutes 'L2-4=0' python-hit-drop artifact) + gate2/3 FIRE (refutes 'untriggered')**. **4 STAGING remain:** 34/48/49 in the color-consumption render batch (`NEXT_RENDER_BATCH.md`, in flight), 77 corpus-capped (needs a 182-class unassigned LRI not in corpus). Plus owed re-measures: 70mm dispatcher tally (native), Unit-2 runtime (corpus lacks clean U2 35mm). Earlier: W1:2 + W1b:4 render + W3:14 + W3b:2 LRI-calibration.
+until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 59 / 80 graduated** (+14 subsumed, +3 subsumed-corrected, +1 superseded, +1 retracted = **78/80 resolved**; 2 STAGING). Jump 28→59 = 2026-06-04: tool wall BROKEN (W5+W5b → 4-tier merge/score/CCM magnitudes + weight_vec4 + reducer two-prong); 13 static byte-verified; LRI 8-seed two-unit intrinsics; 15 subsumption-confirmed (→`SUBSUMPTION_RESIDUALS.md`); C-group runtime 6 (`cgroup_runtime_FOURZOOM`, corrections: L2-4 FIRES, gate2/3 FIRE); **color-consumption 2 (`color_consumption_FOURZOOM`): per-camera CCM RESOLVED four-zoom — `0xa9f20` reads the LRI Block-6 f2.2 CCM (row-sums [0.9642,1.0,0.8252]), distinct from I1I2I3 `0xbfa20` ⇒ color = per-cam CCM THEN I1I2I3**. **2 STAGING:** 34 (AWB 35/70/150 OWED — probe refused to guess the B8.19.15 LELR schema; re-run with schema+`0x390180` VAs), 77 corpus-capped (needs a 182-class unassigned LRI). Owed re-measures: 70mm dispatcher (native), Unit-2 runtime universality. Earlier: W1:2 + W1b:4 + W3:14 + W3b:2.
 
 Cadence is render-bound (4 sequential renders per data sweep, minutes each, one external disk under
 Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 4-render sweep with many
@@ -59,7 +59,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 31 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | q2 wavelet 0x371730 (3.1722686); score=√(q1·q2) 0x36e511/15 | Bstatic |
 | 32 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | dyadic 1:2:4:8 (0x5fdb10), all 4 slots kept, K raw not (KL)² | Bstatic |
 | 33 | → GRADUATED(merge_magnitudes_FOURZOOM §1b) | **GRADUATED** | weight_vec4=(score+2·max(score−0.5,0),s,s,s) byte-re-extracted (−0.5 const 0x5a8120 confirmed); denom=Σ raw score; 1/Σ at 0x36a938 | Bstatic |
-| 34 | laneB2_lri_calibration_origins/awb_consumption_runtime.md | STAGING | OWED | - |
+| 34 | laneB2_lri_calibration_origins/awb_consumption_runtime.md | STAGING (28mm only) | AWB four-zoom OWED: 35/70/150 perturbation not done (probe refused to guess B8.19.15 LELR schema). Lead: 0xa9340 per-channel divss triple. Re-run w/ schema+0x390180 VAs | C-owed |
 | 35 | laneB2_lri_calibration_origins/awb_wb_gains_block8.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 36 | → GRADUATED(lri_calibration_parser_FOURZOOM addendum) | **GRADUATED** | Block-1=per-capture AE (f10/18 gain, f11/19 exp_µs); 4-LRI values | Blri |
 | 37 | laneB2_lri_calibration_origins/block4_lens_shading_grid.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED: dims 16×17×13×4×4 confirmed; {1,15} identity (not {3,6,9,12}) | W3b |
@@ -73,8 +73,8 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 45 | laneB2_lri_calibration_origins/camera_focal_map_excluded_pair.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 46 | → GRADUATED(merge_magnitudes_FOURZOOM) | **GRADUATED** | `0xbfa20`=fixed I1I2I3; exclude-both→clean exit ALL 4 tiers ⇒ per-camera-CCM CLOSED for this site | W5/W5b |
 | 47 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | CCM apply 0xbfa20(4×4)/0x300980(3×3); D50 row-sums 0.9642/0.8252=0 hits | Bstatic |
-| 48 | laneB2_lri_calibration_origins/ccm_consumption_runtime_INCONCLUSIVE.md | STAGING | OWED | - |
-| 49 | laneB2_lri_calibration_origins/ccm_lri_residency_link.md | STAGING | OWED | - |
+| 48 | → GRADUATED(color_consumption_FOURZOOM §1) | **GRADUATED** | CCM consumption RESOLVED: 0xa9f20 reads REAL per-camera CCM live 4-tier, row-sums [0.9642,1.0,0.8252]=Block-6 f2.2, NOT I1I2I3. (nondeterminism §1 = spike-acceptance keeper) | Crender |
+| 49 | → GRADUATED(color_consumption_FOURZOOM §2) | **GRADUATED** | LRI→runtime CCM link confirmed: payload+0x14=Block-6 f2.2 (4-tier); written at construction (0x3184d0), not render. OPEN: exact eax==0-path writer store | Crender |
 | 50 | → GRADUATED(lri_calibration_parser_FOURZOOM addendum) | **GRADUATED** | cross-unit cam0 K+dist differ per-body (U1 3375.9 vs U2 3372.5); schema identical | Blri |
 | 51 | laneB2_lri_calibration_origins/crosscorpus_distortion.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |
 | 52 | laneB2_lri_calibration_origins/crosscorpus_focal_map_excluded_pair.md | **GRADUATED**(→lri_calibration_parser_FOURZOOM) | four-LRI OBSERVED (Unit-1) | W3 |

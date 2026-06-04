@@ -81,8 +81,11 @@ orthonormal ⇒ inverse=transpose). **Four-zoom exclusion test:** conditional ex
 covers M1+M2) → **full render to 100%, clean exit (status 0), conditional never fired, on ALL FOUR tiers**
 (28/70 W5, 35/150 W5b). ⇒ no LRI-derived per-camera 3×3 is promoted to 4×4 at this site on any tier; the
 reopened per-camera-CCM question is closed for `0xbfa20`: it is the **fixed I1I2I3 decorrelation**,
-data-independent, tier-uniform. (A per-camera CCM at some OTHER VA, and the `[rdi+0x8]` matrix producer,
-NOT investigated = residual.)
+data-independent, tier-uniform. **RESOLVED (2026-06-04, `color_consumption_FOURZOOM`):** the per-camera CCM
+DOES exist, at the OTHER site **`0xa9f20`** (matrix `*[payload+0]+0x14`, row-sums [0.9642,1.0,0.8252] = LRI
+Block-6 f2.2, four-zoom), distinct + not call-linked to `0xbfa20`. Color pipeline = per-camera CCM
+(`0xa9f20`) THEN I1I2I3 (`0xbfa20`). The `+0x14` writer (construction-time, taken `eax==0` branch) is the
+one narrowed open.
 
 ## Scope / residuals (do not over-read)
 - Single mid-render sample per tier (score: 2nd sample on 28/35/70). Proves non-degenerate magnitudes + the

@@ -28,11 +28,13 @@ its own packet. This is the entry point for Codex's validation pass.
    (`0x34b3f0`, covariance/multi-scale, registers before CCM); bilateral active window **W5** (`0x2f78e0`,
    TENT range weight); NLM/PatchNLM<4> (`0x3070e0`, TENT, 4×4 SAD patch). **All denoise weights tent/covariance
    — none exponential.** CNR params 1.0/1.0 four-zoom.
-7. **COLOR** — CCM 4×4 apply `0xbfa20` = fixed **I1I2I3 decorrelation** (Ohta 1/√3,1/√2,1/√6), **NOT
-   per-camera CCM — now four-zoom-CLOSED** (`merge_magnitudes_FOURZOOM`: exclude-both-matrices conditional →
-   clean render exit on all 28/35/70/150, matrix bit-identical all tiers); AWB reciprocals folded in
-   (28mm-only runtime); fixed I1I2I3 basis written once at static-init from `__const` (`0x5f2380`/`0x374505`),
-   `__bss 0x671980` (write-wp 0 hits) — also resolves the post-merge `0x36acf0` matrix (same I1I2I3 const).
+7. **COLOR — TWO transforms** (`color_consumption_FOURZOOM`): (a) **per-camera CCM `0xa9f20`** = the LRI
+   **Block-6 f2.2** 3×3 (row-sums [0.9642,1.0,0.8252], read live four-zoom; matrix `*[payload+0]+0x14`,
+   written at construction `0x3184d0` not render) — the per-camera-CCM question is RESOLVED; THEN (b) **fixed
+   I1I2I3 decorrelation `0xbfa20`** (Ohta 1/√3,1/√2,1/√6; exclude-both → clean exit all tiers; bit-identical
+   four-zoom; static-init `__const 0x5f2380`/`0x374505`→`__bss 0x671980`, write-wp 0 hits — also = the
+   post-merge `0x36acf0` matrix). `0xa9f20` and `0xbfa20` are distinct + not call-linked. AWB reciprocals
+   folded into the demosaic color matrix (28mm runtime confirmed; 35/70/150 OWED — lead: `0xa9340` divss triple).
 8. **SHARPEN / tone-adjust** (`denoise_sharpen_kernel_math_FOURZOOM`) — symmetric 7-tap Gaussian-FIR unsharp
    (`0x3588f0` + gen `0x96980`); separate Laplacian-pyramid clarity path (undecoded).
 9. **CALIB accept/reject gate** (`accept_reject_gate_FOURZOOM`) — `0x216f60`/`0x217ac6`, 0.25 ceiling, fires
@@ -65,10 +67,10 @@ its own packet. This is the entry point for Codex's validation pass.
   lane-D/E runtime tallies, BLIND_SPOTS. Many are subsumed by graduated parents; the genuinely-owed remainder
   is mostly RUNTIME (differential-render / Unit-2) not static.
 - **Decode gaps:** unsharp combine VA; Laplacian-pyramid clarity kernel; NLM search radius (runtime param);
-  per-camera CCM existence; lens-shading {1,15} sub-grid on Unit-2.
+  lens-shading {1,15} sub-grid on Unit-2; the CCM→payload+0x14 writer on the taken `eax==0` path (per-camera
+  CCM *existence* now RESOLVED — it's `0xa9f20`/Block-6 f2.2); AWB 35/70/150 perturbation.
 
-> Count: REMEDIATION_LEDGER 57/80 graduated (76/80 resolved; 4 staging — 3 in the color-consumption render
-> batch, 1 corpus-capped). This synthesis covers the graduated subset; it is NOT a claim the whole pipeline is
+> Count: REMEDIATION_LEDGER 59/80 graduated (78/80 resolved; 2 staging — AWB 35/70/150 owed, 1 corpus-capped). This synthesis covers the graduated subset; it is NOT a claim the whole pipeline is
 > validated — the residuals above are first-class open items.
 > **2026-06-04 corrections (see `cgroup_runtime_FOURZOOM`):** stage 10 pyramid-merge runs **L0+L1+L2-4 all
 > firing** (the prior "only L0/L1, L2-4=0" was a python-hit-drop artifact; counts are tier-VARYING);

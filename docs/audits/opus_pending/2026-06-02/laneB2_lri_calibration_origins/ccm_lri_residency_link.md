@@ -1,5 +1,12 @@
 <!-- provenance: l16-investigator finder (static disasm + byte-search) + orchestrator re-extraction, 2026-06-03 -->
-**Status:** NEEDS_CODEX_VALIDATION (quarantine, STATIC; finder + orchestrator-verified). ADVANCES but does NOT
+> **GRADUATED (2026-06-04) → `../../opus_findings_for_codex/color_consumption_FOURZOOM.md` §2.** Link
+> runtime-confirmed: `*[payload+0]+0x14` read live at the apply (all 4 tiers) IS the Block-6 f2.2 per-camera
+> CCM (row-sums [0.9642,1.0,0.8252]); written at CONSTRUCTION inside factory `0x3184d0` (NOT during render —
+> write-watchpoint confirmed); LRI-doubles→float convert at `0x318dfc–0x318ea8` (getter `0x264d90`). NARROWED
+> OPEN: convert gated `eax==2`; profile-3 takes `eax==0` (`0x318ebf`), whose exact `+0x14` store was not
+> isolated. Residency+delivery graduates; the taken-path writer instruction is the one open.
+
+**Status:** GRADUATED → color_consumption_FOURZOOM §2 (was STATIC NEEDS_CODEX_VALIDATION). ADVANCES but does NOT
 fully close the LRI Block-6 → runtime CCM link from `ccm_apply_site_located.md` — the actual `+0x14` writer
 stays OPEN (runtime). Binary `libcp.dylib`.
 

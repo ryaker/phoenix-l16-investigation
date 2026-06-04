@@ -35,6 +35,9 @@ Still `NEEDS_CODEX_VALIDATION` even here — Codex validates/upgrades to ledger 
 - **Depth / stereo:** `depth_stereo_no_lri_origin_FOURZOOM`, `stereo_cost_math_FOURZOOM`.
 - **Resample / denoise / sharpen:** `resample_kernels_FOURZOOM`, `denoise_sharpen_stages_FOURZOOM`,
   `denoise_sharpen_kernel_math_FOURZOOM`.
+- **Color (two transforms):** `color_consumption_FOURZOOM` (per-camera CCM `0xa9f20` = LRI Block-6 f2.2, then
+  fixed I1I2I3 `0xbfa20`); runtime corrections in `cgroup_runtime_FOURZOOM` (L2-4 fires, gate2/3 fire,
+  merge-projection ≈identity, I1I2I3 const bit-verified, calib≠merge object).
 - **Undistort / calibration / accept / output:** `undistort_ordering_lut_FOURZOOM`,
   `lri_calibration_parser_FOURZOOM` (+ 2026-06-04 sub-facts addendum: Block-1 AE, cross-unit cam0, field map),
   `accept_reject_gate_FOURZOOM`, `final_compositing_consumer_FOURZOOM` (intrusive list, RB-tree refuted).
