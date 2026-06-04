@@ -90,8 +90,12 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
    (poly vs LUT); Block-8 AWB gains (being mapped next, LRI-side).
 
 ## Pipeline ordering — now mapped end-to-end (quarantine synthesis, NEEDS_CODEX_VALIDATION)
-1. **Per-camera UNDISTORT** — `lt::LensUndistortCRA::operator()` `0x261940`, pure LUT-indexed radial (LUT
-   built at config from LRI Block-3 coeffs), inside per-camera `SourceImageCache`, via `ImageWarpClamped`.
+1. **Per-camera UNDISTORT** — `lt::LensUndistortCRA::operator()` `0x261940`, pure LUT-indexed radial (4096-entry
+   radius LUT at `this+0x10`, radius clamped [0,4095]; 3×3 projective pre-map + (cx,cy) + scale). **Pre-merge
+   ordering now OBSERVED at runtime** (70mm: 25 undistort hits before first merge hit) — see
+   `laneB2_lri_calibration_origins/undistort_ordering_lut_runtime.md`. Live LUT = a real ±0.18% radial curve
+   (NOT identity; pincushion→barrel). LUT-origin = LRI Block-3 f3.3.2.5 radius map (OPEN, not refuted: the raw
+   "0 floats near 1.0" scan was range-limited — f3.3.2.5 holds 0..31 px-radius values, not ~1.0 multipliers).
    UPSTREAM of the merge (so the merge projection's radial is identity).
 2. **Per-render CALIBRATION/ALIGNMENT refinement** (separate subsystem) — `0x23faf0`/`0x216f60`
    `CalibDataProcessor::State`: build candidates → parallel-score → accept/reject gate `0x217ab9` (0.25
@@ -106,8 +110,14 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
    runtime-constant); per-camera **CCM** parsed from LRI Block-6 + applied (`ImageApplyColorMatrix`); **AWB**
    gains (Block-8) applied as reciprocals folded into the demosaic; spectral curves (Block-6 f2.8); per-camera
    lens-shading grid (Block-4).
-6. **OUTPUT ASSEMBLY** — per-tile outputs gathered into level-keyed containers; final compositing one layer
-   below `0x41a7d0`/`0x3c6ac0` (not yet crossed).
+6. **OUTPUT ASSEMBLY** — **final compositing consumer now CROSSED** (`laneE_fourzoom_topology/
+   final_compositing_consumer.md`): orchestrator `0x3bca90` join-waits `0x3c25a0`, then **gather `0x3bfe60`**
+   drains the level-keyed tile container (a **priority-sorted doubly-linked list at `RendererPrivate+0x260`** —
+   the prior "RB-tree" anchor is **REFUTED**: 0 `_Rb_tree_increment` binary-wide) into a `vector<TileUpdate>`,
+   then filters by level/type and writes each tile via per-tile ImagePyramid/Image-buffer virtual processors
+   (`0x401ab0`) — **per-region placement**, not a single N→1 blend at this level (a separate blend path exists
+   at cstring "blending weight…<128_u8" file `0x633da7`). Collector `0x3bf820`=requestRenderROI lambda;
+   producer `0x41a7d0`=exportImage lambda.
 
 ## ⚠ SPIKE-CRITICAL: libcp output is NONDETERMINISTIC
 5 baseline renders of the same 28mm seed → ≥3 distinct decoded-pixel hashes (~48% of pixels differ;
