@@ -66,8 +66,37 @@ per-output-pixel **3-channel {flow_x, flow_y, score}** record — the motion-vec
 only: where fx/fy are produced + whether this map is consumed by the accumulator vs emitted as an aux buffer.)
 
 ## What this answers
-These were findable static decodes, not blockers — parking them was a deferral. Decoding them: (a) closes
-the merge SELECTION prong (#1) that the graduated reducer verdict had left OPEN; (b) corrected two more wrong
-claims (#2 conflation, #4 "RB-tree"); (c) confirmed #3/#5/#6 byte-exact. The genuinely runtime-only remainders
-(state-enum values, bilateral per-tile kernel, flow-map producer/consumer) are noted per item — those, not
-the static structure, are the real residuals.
+These were findable static decodes, not blockers — parking them was a deferral. Decoding them advances the
+merge SELECTION prong (#1), corrected two wrong claims (#2 conflation, #4 "RB-tree"), and read #3/#5/#6. **None
+of this is "truth" — it is candidate disassembly at investigation-rigor, all `NEEDS_CODEX_VALIDATION`. The
+orchestrator is not the verdict on truth; Codex validates.**
+
+## CORRECTIONS + new candidate decodes (2nd pass, 2026-06-04) — and an OPEN contradiction
+A second static pass (`decode-remainders`) refined items the first pass got wrong and surfaced a discrepancy
+that proves these are candidates, not verdicts:
+- **⚠ OPEN CONTRADICTION — State machine `0x22f0f0` structure.** Pass-1 (#2 above) read the next-state functor
+  at tree-node `+0x50` (`0x22f3fd`). Pass-2 reads the current functor at **`this+0x90`** (invoked
+  `(*0x90)→vtable+0x30`), with `+0x6c`=current-state int, `+0x68`=terminal, and `+0x58`/`+0xa0` a
+  `std::vector<{state_int, elapsed_double}>` PROFILING log (the "tree insert" = its push_back grow), plus an
+  "state function has not been registered" throw. **The two passes disagree on the functor location and on
+  whether `+0x58` is a functor tree or a profiling vector. NOT resolved here — flagged for Codex.** Both agree
+  the next-state binding is populated at State construction time (the enum→functor table is construction data).
+- **Bilateral kernel (real body `0x29f070`, NOT `0x5dcf40` which is `__const`):** range weight =
+  **Gaussian `exp(−1.5·d²/σ²)`** via inline branchless `exp2f` (4th-order minimax `2^x` poly coeffs
+  `0x5dae2c..` ≈ {0.078,0.226,0.696,0.99993}; `pslld $0x17` exponent pack; clamp ±126/128) — NOT a rational
+  `1/(1+d²k)`. Bilinear-weighted taps, scale 1/3.
+- **Flow producers (`0x369ce4/0x369cf8`, the store `0x369e7e` was the OUT not the producer):** {fx,fy} =
+  **sub-pixel registration offsets from a 2×2 Cramer's-rule quadratic peak-fit** of the `0x36cde0` score
+  field (validity-clamped to 0), ×tile-scale, then used as **Q16.16 (65536) warp coordinates** — registration
+  vectors, NOT dense optical flow.
+- **Flow buffer:** a **caller-provided output image** (assembled in caller `0x365960` at `0x365e9c`, passed as
+  a pointer field into the single caller `0x365f4b`) — survives the call ⇒ consumed downstream (exact reader
+  one frame up, not chased). Candidate, not confirmed.
+- **`0xf33d0` (10 call sites):** A/B = 36-byte **9-field calibration-refinement blocks** (8 float + 1 int),
+  C = 3 ints; representative caller `0x217bbe` passes `r8d=1` (current bank) after the accept gate (floor
+  `0.25` + must-beat-incumbent × `0.8`). Not a full 3×3 CCM — per-camera refinement deltas.
+- **`0x1f0a00` record identity (RTTI-resolved) — NEW:** the two records are
+  **`std::shared_ptr<MirrorSysParam<double>>`** (0xe8) and **`std::shared_ptr<MirrorActuatorMapping<double>>`**
+  (0x220, transform-type 1/2 else "Unrecognized Variable Transform Type!"). ⇒ the L16 **folded-optics
+  moving-mirror system parameters + actuator-position→deflection mapping** — a calibration object class not
+  previously surfaced. Candidate; Codex to validate the mirror-model role.

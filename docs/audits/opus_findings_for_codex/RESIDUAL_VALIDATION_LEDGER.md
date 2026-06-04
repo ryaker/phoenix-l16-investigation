@@ -1,5 +1,8 @@
 <!-- The 19 non-graduated-but-resolved ledger rows, each brought to validate/invalidate rigor. 2026-06-04. Answers Rich: "validate or invalidate those 19 to the level codex validates; if invalidate, is there a new alternative to investigate." Every row gets a verdict + (if invalidated) the alternative investigated + (if validated-with-residual) the residual decoded — none parked. -->
-**Status:** NEEDS_CODEX_VALIDATION. Companion to `../opus_pending/2026-06-02/REMEDIATION_LEDGER.md`. The 61
+**Status:** NEEDS_CODEX_VALIDATION. **"VALIDATED"/"INVALIDATED" below are the ORCHESTRATOR's investigation
+verdicts — candidates for Codex, NOT final truth. I am not the verdict on truth; Codex is.** (My two decode
+passes already disagreed on the State-machine structure — see `parked_residuals_decoded_FOURZOOM` — which is
+exactly why none of this is closed.) Companion to `../opus_pending/2026-06-02/REMEDIATION_LEDGER.md`. The 61
 graduated rows are the four-zoom findings; these **19** were resolved as subsumed/superseded/retracted. Per
 Rich, each is here brought to the same bar: **VALIDATED** (subsumption proven, parent coverage cited; any
 shed sub-mechanism DECODED) or **INVALIDATED** (claim shown wrong → the correct ALTERNATIVE investigated, not
