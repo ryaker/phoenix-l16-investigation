@@ -81,6 +81,26 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
 6. Illuminant enum `f2.f1∈{0,2,6}` → which illuminant (A/D50/D65); libcp's actual undistort eval order
    (poly vs LUT); Block-8 AWB gains (being mapped next, LRI-side).
 
+## Pipeline ordering — now mapped end-to-end (quarantine synthesis, NEEDS_CODEX_VALIDATION)
+1. **Per-camera UNDISTORT** — `lt::LensUndistortCRA::operator()` `0x261940`, pure LUT-indexed radial (LUT
+   built at config from LRI Block-3 coeffs), inside per-camera `SourceImageCache`, via `ImageWarpClamped`.
+   UPSTREAM of the merge (so the merge projection's radial is identity).
+2. **Per-render CALIBRATION/ALIGNMENT refinement** (separate subsystem) — `0x23faf0`/`0x216f60`
+   `CalibDataProcessor::State`: build candidates → parallel-score → accept/reject gate `0x217ab9` (0.25
+   exceed-fraction ceiling) → accept writes `0xf33d0` into current/factory CalibStage. (NOT the pixel merge;
+   does NOT directly feed the merge projection — REFUTED at runtime.)
+3. **PIXEL N→1 MERGE** — IRAMP `0x3661b0` (level 0 only; levels 1-4 are resample octaves via dispatcher
+   `0x3ec960`). Motion-compensated, index-validity-gated contributors, **1/Σscore-normalized soft weighted
+   average** (`rcpss 0x36a938`), wavelet-domain SSIM-class score `0x36cde0`. Driven by a tiled work-queue
+   scheduler `0x3adf30` (producer `0x41a7d0` + level-keyed collector `0x3bf820`); no global Laplacian add.
+4. **RESAMPLE** — B-spline `0x2b2be0` / Catmull-Rom `0x36f800` (parity-grade kernels).
+5. **COLOR/SHAPING** — lane-3 detail-transfer; fixed **I1I2I3** decorrelation matrix (`__bss 0x671980`,
+   runtime-constant); per-camera **CCM** parsed from LRI Block-6 + applied (`ImageApplyColorMatrix`); **AWB**
+   gains (Block-8) applied as reciprocals folded into the demosaic; spectral curves (Block-6 f2.8); per-camera
+   lens-shading grid (Block-4).
+6. **OUTPUT ASSEMBLY** — per-tile outputs gathered into level-keyed containers; final compositing one layer
+   below `0x41a7d0`/`0x3c6ac0` (not yet crossed).
+
 ## ⚠ SPIKE-CRITICAL: libcp output is NONDETERMINISTIC
 5 baseline renders of the same 28mm seed → ≥3 distinct decoded-pixel hashes (~48% of pixels differ;
 per-channel mean stable only to ~0.034 counts) — multithreaded merge/accumulation-order nondeterminism.
