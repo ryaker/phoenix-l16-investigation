@@ -1,6 +1,13 @@
 # Lane A7 addendum — weight_vec4 lane semantics (WSJF #1, partial)
 
-**Status:** `NEEDS_CODEX_VALIDATION`. Resolves the normalization/lane structure of the first weighted-add;
+> **GRADUATED (2026-06-04) → `../../opus_findings_for_codex/merge_magnitudes_FOURZOOM.md` §1b.** The full
+> weight_vec4 + normalization formula was **independently re-extracted byte-exact** by the orchestrator from
+> `b38dc4b3` (no longer LLM-read): accumulate `0x36a8c0`, scalar Σscore denominator `0x36a8fe addss`
+> (xmm3=−0x4300=raw score), normalize `0x36a938 rcpss`=1/Σscore (the W5-captured site), and the lane-0 boost
+> `0x36a852–0x36a878` with const `0x5a8120`=`0xbf000000`=**−0.5** byte-confirmed ⇒ **weight_vec4 =
+> (score+2·max(score−0.5,0), score,score,score)**. Lane-0 physical identity stays a LEAD.
+
+**Status:** GRADUATED → merge_magnitudes_FOURZOOM §1b (was NEEDS_CODEX_VALIDATION). Resolves the normalization/lane structure of the first weighted-add;
 the physical channel identity of lane 0 remains open. Instructions OBSERVED (deterministic). VA == file
 offset, `libcp.dylib` sha256 `b38dc4b3…`.
 

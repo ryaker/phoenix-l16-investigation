@@ -38,6 +38,23 @@ Return chain `0x36e511 mulss %xmm1,%xmm0` (xmm0=factorA, xmm1=factorB) → `0x36
 sample, not garbage); re-sampled with `xmm0≠0 && xmm1≠0` for the representative value. Genuine
 per-contributor scores in [0,1] (wavelet-SSIM-style) on every tier — NOT the degenerate 0/1/0.2 first-hit.
 
+## 1b. Merge weighting FORMULA (static, byte-re-extracted 2026-06-04 — graduates `lane_semantics`)
+The first weighted-add (`0x36a8b0` loop) is a **score-weighted average** `Σ(w·src)/Σscore`. Independently
+re-disassembled from `b38dc4b3`:
+- **per-contributor accumulate** `0x36a8c0`: `movaps src(%rcx,%rdi),%xmm1; mulps %xmm0(=weight_vec4),%xmm1;
+  addps dest(%rdx,%rdi),%xmm1; movaps %xmm1,(%rdx,%rdi)`.
+- **denominator = Σ raw score (scalar)** `0x36a8fe addss %xmm3,%xmm2` with `%xmm3 = -0x4300 = score` (NOT the
+  boosted lane-0 weight) → normalized `0x36a934 shufps $0; 0x36a938 rcpss` = **1/Σscore** (the same site
+  whose magnitude §2 captures).
+- **weight_vec4 construction** (`0x36a852–0x36a878`, byte-verified incl. the constant):
+  `xmm1 = score + (−0.5)` (`addss [0x5a8120]`, read = `0xbf000000` = **−0.5**) → `xorps %xmm0` (=0) →
+  `maxss` ⇒ `max(score−0.5, 0)` → `addss %xmm0,%xmm0` (**×2**) → `blendps`(lane0 only) → `addps`(+broadcast
+  score) ⇒ **`weight_vec4 = (score + 2·max(score−0.5,0), score, score, score)`**.
+⇒ lanes 1–3 = plain score-weighted mean; **lane 0 super-linearly over-weights high-similarity contributors
+(score > 0.5)**. Combined with the score kernel (§1, zeros below cs-SSIM≈0.8): poorly-matched contributors
+contribute ≈nothing; well-matched ones average, lane 0 favoring the best. (Physical identity of lane 0 —
+color vs luma vs weight channel — remains a LEAD; the `-0x1260`/`-0x1230` descriptor layout is not decoded.)
+
 ## 2. Merge Σscore `0x36a938 rcpss` (inside terminal merge `0x3661b0`) — real accumulated denominators
 `0x36a934 shufps $0,%xmm2` broadcasts the accumulated Σscore → `0x36a938 rcpss %xmm2,%xmm2` = 1/Σscore
 soft-average normalizer. (common-0.2 skipped via `-c (*(int*)&$xmm2) != 0x3e4ccccd`.)

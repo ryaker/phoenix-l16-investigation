@@ -95,6 +95,14 @@ Independently re-parsed across all four canonical LRIs (+ Unit-2 28mm twin for c
 - **LELR block count (assigned corpus):** 28mm=11, 35mm=11, 70mm=12, 150mm=12, U2-28mm=11 — **wide=11 /
   tele=12** (corrects any "12 for all" prose; the wide-tier seeds are 11). The "182 unassigned use 0–4
   blocks" claim is untestable here (no unassigned file in the 8-seed corpus) — flagged scope limit.
+- **Intrinsics block — full 8-seed (four-zoom × two-unit) confirmation (graduates `four_zoom_two_unit`):**
+  all 8 seeds carry the 16×field-13 intrinsics block with the 5+5+6 layout. **Per-body constant** — within a
+  unit the payload + unit-sig + tier fx are identical across all four zoom captures (intrinsics are
+  focal-independent factory calib). **Two units differ:** U1 fx[cam0/5/10]=`3376/8283/18795` (sig
+  `722a6e72…`, payload 32832 B); U2 `3373/8281/18684` (sig `223961c6…`, payload 32833 B). **Block index
+  varies** (blk3 or blk4 per file) ⇒ the "smallest 16×f13 block" selection heuristic is necessary (a fixed
+  index mis-selects). (U1 fx corroborates Claim 2 above; U2 cam0 3373 corroborates the cross-unit cam0
+  re-parse. U2 cam5/cam10 = the tool's deterministic parse, not separately spot-checked.)
 
 ## Residuals (still owed)
 - **Unit-2 universality** — all parses here are Unit-1; factory-constant proven within one body across 4 focals,

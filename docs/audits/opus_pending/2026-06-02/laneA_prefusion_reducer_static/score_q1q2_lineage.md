@@ -1,5 +1,13 @@
 <!-- provenance: workflow wf_3fc00563-7ce (l16-prefusion-fanout-w2), 2026-06-03; finder+independent verifier; verifier reliable=True -->
-**Status:** NEEDS_CODEX_VALIDATION (quarantine, weak-labeled, static disasm/LRI-parse only).
+> **RETRACTED-on-subsumption (2026-06-04) — central claim REFUTED.** This doc's load-bearing claim — that the
+> two multiplicands at `0x36e511` are BOTH wavelet horizontal-minima (NOT one SSIM + one wavelet) — is
+> **refuted** by the byte-verified graduated parent `../../opus_findings_for_codex/
+> static_submechanisms_verified_FOURZOOM.md`, which re-extracts score = √(**q1 = cs-SSIM term `0x36cea6`** ·
+> **q2 = wavelet statistic `0x371730`**) instruction-for-instruction. The parent (deterministic re-extraction)
+> wins. **Surviving novel contribution (PRESERVED + confirmed by parent):** "K is added RAW, no `(K·L)²`
+> square." See `../SUBSUMPTION_RESIDUALS.md`. Not finding-grade; reference-only.
+
+**Status:** RETRACTED-on-subsumption → see `static_submechanisms_verified_FOURZOOM` (was NEEDS_CODEX_VALIDATION; quarantine, weak-labeled, static disasm/LRI-parse only).
 **Verifier reliability:** all load-bearing VAs independently re-extracted (PASS)
 
 ## Score fn 0x36cde0: backward-trace of the two factors at 0x36e511
