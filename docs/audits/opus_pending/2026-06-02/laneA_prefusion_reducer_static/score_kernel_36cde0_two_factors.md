@@ -49,11 +49,24 @@ where `cs = (2σXY+C2)/(σX²+σY²+C2)`, C2=0.03, over a 16×16 window, and `wa
 (1:2:4:8) high-pass |detail| agreement. Then per-pixel output = `Σ w_i·p_i / Σ w_i`. The constants
 (C2=0.03, 0.8 floor, 0.19 span, 1/192 base scale) are libcp's; a clean-room impl derives/justifies its own.
 
+## Cross-check vs COMMITTED evidence (verify-before-trust — PASS)
+Codex's committed `docs/evidence/bundle_lldb_iramp_36cde0_scalar.md` independently corroborates this decode:
+returns `sqrt(xmm0·xmm1)` (its line 13/171/209) = my `sqrt(factor1·factor2)`; SAME constants `0x5fdc50`=
+`(0.01,0.03,0.03,1.0)` and `0x5fdc60`=`(-0.8,…)` (its line 128-129); "after the first statistics stage, the
+body calls **two internal helpers on the `r14` patch**" + "absolute-value reductions, repeated patch-statistics
+blocks" (its line 137/146) = my factor-2 (helpers `0x371730`/`0x371a90` on r14, abs-mask Σ|coef|); "non-negative
+**variance-like and covariance-like** terms… clamps/scales" (its line 207) = my σX²/σY²/σXY cs term. **No
+contradiction.** This packet ADDS the exact arithmetic Codex left as "variance-like/clamped": the explicit
+`(2σXY+C2)/(σX²+σY²+C2)` cs form, C2=0.03, the alpha-mean weight, and the 1:2:4:8 dyadic factor-2 weights.
+Note: Codex deliberately did NOT assert the public name "SSIM" — factor-1 is identified here as the SSIM
+contrast-structure form by **mathematical recognition of the decoded formula**, not by any symbol string.
+
 ## Residuals (NEEDS_CODEX_VALIDATION)
-- Exact factor-2 per-scale combine arithmetic (the 4-scale reduction → single [0,1] value) — form OBSERVED,
-  exact formula LEAD.
-- Whether factor-2 uses X, Y, or both patches (helpers shown operating on `r14`=Y; cross-patch detail
-  comparison not fully traced).
-- Single-scale vs the wavelet: factor-1 is single-scale on the raw patch (OBSERVED); only factor-2 is
+- Exact factor-2 per-scale combine arithmetic (the 4-scale reduction → single [0,1] value) — form OBSERVED
+  (separable high-pass + abs Σ + dyadic weights), exact closed formula LEAD. Codex's extra filter consts
+  `0x5cc010`=−0.882911, `0x5cc040`=0.869864 are the helper low-pass taps (its line 158/161).
+- factor-2 input = **r14 (Y patch)** — RESOLVED by Codex line 137 (helpers operate on r14); cross-patch
+  detail comparison (vs X) not separately traced.
+- Single-scale vs multi-scale: factor-1 is single-scale on the raw patch (OBSERVED); only factor-2 is
   multi-scale. (Corrects any prior phrasing implying BOTH factors are multi-scale wavelet.)
 - All static; no runtime confirmation of the score values for a live contributor.
