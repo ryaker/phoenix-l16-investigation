@@ -74,7 +74,10 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
 3. ~~`__bss 0x671980` color matrix constant-vs-computed~~ — **RESOLVED by runtime probe: fixed I1I2I3
    constant (see Runtime results above).**
 4. Score final-operand certification at `0x36e511` (low marginal; static structure already strong).
-5. `0x218e20` gate consumer behind `__const 0x6580e0` indirect dispatch.
+5. ~~`0x218e20` gate consumer behind indirect dispatch~~ — **RESOLVED (runtime): it's a pooled parallel-for
+   task body; the accept/reject GATE is in spawner `0x216f60` `0x217ab9..0x217af9` — gate1 = 0.25 CEILING on
+   the threshold-exceed fraction (reject frac>0.25, OBSERVED live 70mm, accept:reject 3:5), gate2/gate3
+   present (untriggered); accept→`0xf33d0`. See `laneD_final_acceptance_static/accept_reject_gate_located.md`.**
 6. Illuminant enum `f2.f1∈{0,2,6}` → which illuminant (A/D50/D65); libcp's actual undistort eval order
    (poly vs LUT); Block-8 AWB gains (being mapped next, LRI-side).
 
