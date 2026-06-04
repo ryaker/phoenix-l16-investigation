@@ -1,5 +1,10 @@
 <!-- provenance: runtime probe agent abfeafab (single 28mm render), 2026-06-03 -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, runtime LLDB, single 28mm profile-3 render). OBSERVED dispatch tally + static classification of targets; deeper pixel-assembly layer NOT crossed (bounded).
+> **CORRECTION (2026-06-04):** "RB-tree/list insert" (`0x3bfc40`) wording below is **REFUTED** — libc++-correct
+> symbol scan (sha256 `b38dc4b3…`): `__tree`/map/set/`std::list`/forward_list all **0** binary-wide. The
+> 0x80-byte-node insert is a **hand-rolled/intrusive level+priority-keyed list** (next/prev fields), drained
+> by `0x3bfe60` (graduated `opus_findings_for_codex/final_compositing_consumer_FOURZOOM.md`). Tally is single-
+> tier 28mm; 35/70/150mm still owed.
 
 # Lane E — RUNTIME: the tiled work-queue scheduler + where tile outputs gather
 

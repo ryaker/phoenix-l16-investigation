@@ -18,7 +18,7 @@ that packet's confidence. The ledger/`CLM-*` references cite existing canonical 
 | 7 | Weighted accumulator | `0x369fa1..0x369fa8` (Hann 16×16 separable, weights `rbp-0xa0`) | weighted accumulate into shared output base `-0x1710` | **ledger `CLM-MERGE-002` PROVEN/SPEC_READY** (Hann-weight ID is A3/Lane-B LEAD) |
 | 8 | Finalization — edge-pad | `0x3750a0` (×2, extend=2) | border replication of the merged views | A5 (assert-string anchored) |
 | 9 | Finalization — resample | `0x2b2be0` (cubic **B-spline**) / `0x36f800` (**Catmull-Rom**); Q16.16, 64-phase, separable 4-tap; driver `0x5440` | resample merged result to output | A5 `kernel_identity.md` / `apply_structure.md` (byte-verified kernels) |
-| 10 | Post-merge color | `0x36acf0` per-pixel 3×3 matrix `out.rgb=M·in.rgb` | M from `__bss` (`0x671980..`) = **runtime/per-LRI color-correction**, not a constant | A5 `post_blend_color_matrix.md` (section-map deterministic; values runtime/deferred) |
+| 10 | Post-merge color | `0x36acf0` per-pixel 3×3 matrix `out.rgb=M·in.rgb` | M from `__bss` (`0x671980..`) = **fixed Ohta/PCA `I1I2I3` decorrelation const** (1/√3,1/√2,1/√6), written once at static-init from `__const`; NOT per-LRI (`__bss`≠per-render) | A5 `colormatrix_runtime_const_RESOLVED.md` (runtime write-wp 0 hits + static single-writer; supersedes `post_blend_color_matrix.md`) |
 
 ## How this answers the parity blockers (scope-bound)
 

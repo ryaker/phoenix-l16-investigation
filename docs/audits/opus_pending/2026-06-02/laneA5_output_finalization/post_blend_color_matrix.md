@@ -1,6 +1,15 @@
 # Lane A5 addendum — post-merge per-pixel 3×3 matrix (`0x36acf0`) is RUNTIME-populated
 
-**Status:** `NEEDS_CODEX_VALIDATION`. Structural finding (deterministic section mapping); the matrix
+> **SUPERSEDED (2026-06-04) — DO NOT CITE the "runtime/per-LRI" conclusion.** This doc's central inference
+> ("matrix is in `__bss` ⇒ runtime-populated ⇒ LRI-derived color-correction") is **REFUTED** by
+> `colormatrix_runtime_const_RESOLVED.md` (row 25) + `four_zoom_data_W5_magnitudes.md` §3: the matrix is the
+> **fixed Ohta/PCA `I1I2I3` decorrelation basis** (1/√3, 1/√2, 1/√6), written ONCE at C++ static-init from
+> `__const` literals (`0x374505` global ctor), **zero render-time write-watchpoint hits** (28mm). `__bss`
+> residence does NOT imply per-render — a global ctor writes `__bss` once at load. The OBSERVED disassembly
+> below (the `0x36ad08` matmul + `__bss` section-map) is correct; only the *runtime/LRI-derived* conclusion
+> is wrong. Kept as a tracked refuted-hypothesis, reference-only, not finding-grade.
+
+**Status:** `SUPERSEDED → colormatrix_runtime_const_RESOLVED.md` (was `NEEDS_CODEX_VALIDATION`). Structural finding (deterministic section mapping); the matrix
 *values* require a runtime read (deferred). Binary `libcp.dylib` sha256 `b38dc4b3…`.
 
 ## What it is (OBSERVED)

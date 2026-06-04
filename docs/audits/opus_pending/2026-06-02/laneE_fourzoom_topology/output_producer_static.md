@@ -1,6 +1,12 @@
 <!-- provenance: orchestrator static disasm of 0x41a7d0/0x3c6ac0, 2026-06-03 -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, static disasm). Producer path OBSERVED; final compositing
-location OPEN (post-collection container consumer, not in this path).
+location now LOCATED (see graduated parent).
+> **CORRECTION (2026-06-04):** the "RB-tree container" wording below is **REFUTED** and the open
+> "final compositing NOT here" question is **CLOSED** by graduated `opus_findings_for_codex/
+> final_compositing_consumer_FOURZOOM.md` (consumer = `0x3bfe60` ring-walk gather). The container is **NOT an
+> RB-tree** — libc++-correct symbol scan: `__tree`/map/set/`std::list` all **0** binary-wide (sha256
+> `b38dc4b3…`, orchestrator-verified) ⇒ hand-rolled/intrusive pointer-walk (0x80-byte node), not a tree.
+> Read "RB-tree" below as "the intrusive level/priority-keyed tile container."
 
 # Lane E — output PRODUCER path (per-tile), and where final compositing is NOT
 `0x41a7d0` (per-tile render producer, mode `0x774(%rbx)`):

@@ -45,7 +45,13 @@ assembly.) A distinct blend path exists elsewhere (cstring "blending weight has 
 file `0x633da7`, ref ~`0x38b5bf`/`0x38b8d9`) — NOT inside this gather/orchestrator.
 
 ## Verification (orchestrator independent re-extraction — PASS)
-- `_Rb_tree_increment` = **0 occurrences** binary-wide (nm + strings) ⇒ RB-tree refutation confirmed.
+- RB-tree refutation confirmed by the **libc++-correct** symbol family (this dylib links `libc++.1`,
+  `std::__1`, sha256 `b38dc4b3…`): `__tree` helpers = **0**, `std::__1::map/set/multimap/multiset` = **0**,
+  AND `std::__1::list/forward_list` = **0** (nm + c++filt, orchestrator-re-extracted 2026-06-04). (The earlier
+  `_Rb_tree_increment`=0 check used the **libstdc++** name — 0 here by construction, right conclusion / wrong
+  symbol family; superseded by this libc++ check.) ⇒ the container is neither an RB-tree NOR a `std::list` —
+  it is a **hand-rolled/intrusive pointer-walk** (next/prev in the 0x80-byte node), consistent with the
+  `0x3bfe60` ring-walk + `0x3bfc40` 0x80-byte-node insert.
 - "Tile update has incorrect level!" present at file `0x634d39` (exact).
 - `0x3bfe60` ring-walk / gather / unlink-delete disassembly matches the finder claim instruction-for-
   instruction (`0x3bfeb8`/`0x3bfebc`/`0x3bff08` walk; `0x3f0130`/`0x3c0c70` append; `0x55638c` delete).

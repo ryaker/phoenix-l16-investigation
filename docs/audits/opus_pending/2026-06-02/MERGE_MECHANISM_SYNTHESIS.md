@@ -57,8 +57,10 @@ State/prefusion path, Codex's `0x23faf0` thread); do not assert it feeds the IRA
   not hard select.** (H1 "src1/src2 = value/weight pair + per-pixel divide" REFUTED.)
 - **Output shaping tail:** lane-3 (the `recip·0.2`) is used as a per-pixel gain on a `2.0`-scaled detail
   delta, clamped ±0.1, added (the A5 guided-detail-transfer), then a **3×3 matrix at `0x36acf0` loaded
-  from `__DATA,__bss 0x671980` (S_ZEROFILL, runtime-populated)** — classified (on Codex's committed
-  runtime values) as an orthonormal color-decorrelation/PCA rotation — then lane-3 forced to 1.0.
+  from `__DATA,__bss 0x671980`** = the **fixed Ohta/PCA `I1I2I3` orthonormal decorrelation basis**
+  (1/√3, 1/√2, 1/√6), written ONCE at C++ static-init from `__const` literals (`0x374505` global ctor),
+  **NOT runtime/per-LRI** — `__bss` residence does not imply per-render (runtime write-watchpoint = 0 hits,
+  28mm; see `laneA5_output_finalization/colormatrix_runtime_const_RESOLVED.md`) — then lane-3 forced to 1.0.
 
 ## Acceptance / rejection (Lane D)
 `0x218b30` is a **statistics reducer** (mean clamped score → `*(%r14)`; threshold-exceed fraction →
@@ -72,8 +74,9 @@ the merge body.
 2. `0x216f60` geometry-record consumer + record-count==N — runtime (Codex `0x23faf0` thread).
 3. Final `sqrt` operand certification at `0x36e511` — runtime tag (low marginal value; static structure
    already strong).
-4. `__bss 0x671980` color matrix: written once at init (constant) vs per-image — runtime write-watchpoint
-   (clean-room relevance: constant ⇒ calibration; per-image ⇒ Phoenix computes it).
+4. `__bss 0x671980` color matrix: **RESOLVED** — written once at init = fixed I1I2I3 const (constant, NOT
+   per-image; write-watchpoint 0 hits 28mm). Residual: re-confirm at 35/70/150mm + Unit-2 (static-init const
+   ⇒ tier-invariant by construction, so this is a low-risk confirmation, not an open question).
 5. `0x218e20` gate consumer behind the `__const 0x6580e0` indirect dispatch — runtime.
 
 **Boundary statement:** the statically-tractable merge-mechanism surface is now comprehensively mapped;

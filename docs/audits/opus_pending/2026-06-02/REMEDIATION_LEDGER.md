@@ -50,11 +50,11 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 22 | laneA3_combine_store_site/step0_inner_body.md | STAGING | OWED | - |
 | 23 | laneA3_combine_store_site/step0_reconciliation.md | STAGING | OWED | - |
 | 24 | laneA5_output_finalization/apply_structure.md | STAGING | OWED | - |
-| 25 | laneA5_output_finalization/colormatrix_runtime_const_RESOLVED.md | STAGING | OWED | - |
+| 25 | laneA5_output_finalization/colormatrix_runtime_const_RESOLVED.md | STAGING (RESOLVER) | 0x671980 = fixed I1I2I3 const, static-init (write-wp 0 hits 28mm + recognizable 1/√3,1/√2,1/√6 + single __const writer 0x374505). Static-init ⇒ tier-invariant; 35/70/150+U2 = low-risk confirm | W1/W5 |
 | 26 | laneA5_output_finalization/guided_detail_transfer.md | STAGING | OWED | - |
 | 27 | laneA5_output_finalization/kernel_identity.md | STAGING | OWED | - |
 | 28 | laneA5_output_finalization/matrix_36acf0_bss_storage.md | STAGING | OWED | - |
-| 29 | laneA5_output_finalization/post_blend_color_matrix.md | STAGING | OWED | - |
+| 29 | laneA5_output_finalization/post_blend_color_matrix.md | **SUPERSEDED** | "runtime/per-LRI matrix" REFUTED by row 25 + W5 §3 (it's fixed I1I2I3 const). Banner added; reference-only, NOT finding-grade | 2026-06-04 |
 | 30 | laneA6_score_metric/closed_form_stage1.md | STAGING | OWED | - |
 | 31 | laneA6_score_metric/closed_form_stage2.md | STAGING | OWED | - |
 | 32 | laneA6_score_metric/score_completion_kraw_scales.md | STAGING | OWED | - |
@@ -99,10 +99,10 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 71 | → GRADUATED: opus_findings_for_codex/final_compositing_consumer_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 72 | laneE_fourzoom_topology/level_dispatcher_topology.md | STAGING | OWED | - |
 | 73 | laneE_fourzoom_topology/level_fire_runtime_28mm.md | STAGING | OWED | - |
-| 74 | laneE_fourzoom_topology/output_producer_static.md | STAGING | OWED | - |
+| 74 | laneE_fourzoom_topology/output_producer_static.md | A→SUBSUMED+CORRECTED | producer path OBSERVED; "RB-tree" REFUTED (libc++ symbol scan: __tree/map/set/list all 0); final-compositing question CLOSED by graduated final_compositing_consumer_FOURZOOM. Correction banner added | 2026-06-04 |
 | 75 | → GRADUATED: opus_findings_for_codex/resample_kernels_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
-| 76 | laneE_fourzoom_topology/scheduler_recombine_runtime.md | STAGING | OWED | - |
+| 76 | laneE_fourzoom_topology/scheduler_recombine_runtime.md | STAGING (CORRECTED) | dispatch tally OBSERVED 28mm; "RB-tree/list insert" REFUTED (intrusive 0x80-node list); correction banner added. Tally 35/70/150mm still owed (C, runtime) | 2026-06-04 |
 | 77 | laneP_parser_gap_182/residual_alternate_container.md | STAGING | OWED | - |
-| 78 | MERGE_MECHANISM_SYNTHESIS.md | STAGING | OWED | - |
-| 79 | MERGE_PIPELINE.md | STAGING | OWED | - |
+| 78 | MERGE_MECHANISM_SYNTHESIS.md | A→SUBSUMED+CORRECTED | synthesis of graduated children; stale "runtime-populated color matrix" corrected → fixed I1I2I3 const (rows 25/W5) | 2026-06-04 |
+| 79 | MERGE_PIPELINE.md | A→SUBSUMED+CORRECTED | navigational table; stage-10 "runtime/per-LRI color-correction" corrected → fixed I1I2I3 const | 2026-06-04 |
 | 80 | → GRADUATED: opus_findings_for_codex/stereo_cost_math_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit; caller 0x276860, N=4 all tiers, layout corrected) | W1 |
