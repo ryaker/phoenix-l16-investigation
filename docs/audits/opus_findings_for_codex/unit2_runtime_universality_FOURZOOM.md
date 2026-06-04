@@ -1,7 +1,8 @@
 <!-- GRADUATED finding. provenance: u2-render batch (abd0602fce0f53a51) + orchestrator deterministic re-check, 2026-06-04. Closes the standing "every four-zoom runtime claim was on ONE body" open. -->
-**Status:** NEEDS_CODEX_VALIDATION — **GRADUATED to two-body OBSERVED** (Tier 1). First runtime confirmation
-that the merge / score / CCM / I1I2I3 mechanisms hold on the **second physical L16 body** (Unit-2, intrinsics
-sig `223961c6…`), not just Unit-1 (`722a6e72…`). The probe validated against Unit-1 28mm known values first
+**Status:** NEEDS_CODEX_VALIDATION — **two-body OBSERVED** (Tier 1 candidate). First runtime confirmation that
+the pipeline mechanisms hold on the **second physical L16 body** (Unit-2, intrinsics sig `223961c6…`), not just
+Unit-1 (`722a6e72…`): merge/score/CCM/I1I2I3 with magnitudes (below), AND stereo/denoise/resample/gates/lane-E
+topology by fire+entry-structure (see "Other stages on Unit-2"). The probe validated against Unit-1 28mm known values first
 (CCM, I1I2I3 bits, 1/Σ, √(a·b) all reproduced exactly) before the U2 runs. All values orchestrator-re-checked.
 
 # Unit-2 runtime universality — structure universal, values per-body
@@ -32,6 +33,23 @@ clean U2 35mm in the corpus (see corpus correction), so U2 was tested at three t
 CCM/I1I2I3 mechanisms: the algorithm is body-invariant; only the LRI-resident calibration values differ.
 Consistent with the calibration-side cross-unit result (`lri_calibration_parser_FOURZOOM`: structure
 cross-unit, values per-body).
+
+## Other stages on Unit-2 (2026-06-04) — fire + entry-structure, all match Unit-1
+Extends the above beyond merge/score/CCM. Module-relative BPs (bound `nlocs=1` every tier), one-shot
+fire-confirmation + first-hit struct (auto-continue drain was non-terminating for per-pixel stages). U2 at
+28/70/150mm; every stage that fires on U1 also fires on U2 with byte-identical entry/struct signatures:
+- **Stereo:** runPass `0x276790`, caller `0x276860` (**rdx=N=4 source cams**, config `+0x14=4,+0x18=2.0,
+  +0x2c=24.0,+0x40=2.0,+0x44=0.5` byte-identical U2-28/70/150 AND U1), cost `0x2732f0` (`+0x20/+0x24=16.0f`,
+  `+0x40=0x00060602`).
+- **Denoise:** CNR `0x34b3f0` FIRE; NLM `0x3070e0` FIRE; bilateral `0x2f78e0` **no-fire (= same as U1; a
+  profile/config gate, NOT a U2 divergence)**.
+- **Resample:** B-spline `0x2b2be0` + Catmull-Rom `0x36f800` FIRE.
+- **Accept gates:** gate1 `0x217ab9` / gate2 `0x217acf` / gate3 `0x217ae3` all FIRE (rdi=0x100 signature).
+- **Lane-E topology:** L0 `0x3ec770` / L1 `0x3ebb80` / L2-4 `0x3d0650` + collector `0x3bf820` all FIRE.
+⇒ structural universality across both bodies now covers the WHOLE pipeline, not just merge/score/CCM.
+Scope: fire + entry-signature/first-hit-struct equivalence — NOT exact hit counts and NOT full-body N→1
+proof per stage (auto-continue drain abandoned as non-terminating). bilateral no-fire cross-checked vs U1-28
+only. No clean U2 35mm (three U2 tiers).
 
 ## Scope / residuals
 Single mid-render sample per mechanism per tier (one camera-pair / one merge tile / one CCM apply) — confirms
