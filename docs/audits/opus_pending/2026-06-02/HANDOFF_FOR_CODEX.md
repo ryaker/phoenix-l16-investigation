@@ -11,8 +11,12 @@ Two-stage split:
 - **`0x3661b0` = terminal pixel N→1 merge** (OBSERVED): contributors from the source-image vector,
   index-validity gate (`0x36930f` `0x80000000`), motion-compensated, **`1/Σscore`-normalized SOFT
   weighted average** (`rcpss 0x36a938`; no maxps/blendvps ⇒ not hard select) → tile → alpha-blend into
-  output image `[arg0+0x38]`. Score `0x36cde0 = sqrt(hmin·hmin)`, **multi-scale wavelet-domain SSIM-class**
-  (4 dyadic scales, raw K=0.01, affine remap `(ssim−0.8)/0.19`). lane-3 `=recip·0.2` → guided
+  output image `[arg0+0x38]`. Score `0x36cde0 = sqrt(factor1·factor2)` — **two factors now decoded**
+  (`laneA_prefusion_reducer_static/score_kernel_36cde0_two_factors.md`): **factor1 = single-scale SSIM
+  contrast-structure term** `(2σXY+C2)/(σX²+σY²+C2)`, C2=0.03, over a 16×16 window, weighted by the alpha/
+  coverage channel mean, affine-remapped `(x−0.8)·(1/0.19)` clamp[0,1] (NO luminance term — not full SSIM);
+  **factor2 = 4-scale (1:2:4:8 dyadic, weights `0x5fdb10`) wavelet-detail |Σ|coef|| agreement**, separable
+  high-pass helpers `0x371730`/`0x371a90`, abs-mask `0x5a81f0`. lane-3 `=recip·0.2` → guided
   detail-transfer; 3×3 color matrix from `__bss 0x671980`.
 - **`0x216f60` = geometry/warp-record builder** (CANDIDATE), no pixels. **Its consumer + the IRAMP source/
   warp producer are NOT `0x216f60`** — your committed `lldb_src2_descriptor_origin_four_zoom.md` resolves
@@ -76,8 +80,12 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
 4. Score final-operand certification at `0x36e511` (low marginal; static structure already strong).
 5. ~~`0x218e20` gate consumer behind indirect dispatch~~ — **RESOLVED (runtime): it's a pooled parallel-for
    task body; the accept/reject GATE is in spawner `0x216f60` `0x217ab9..0x217af9` — gate1 = 0.25 CEILING on
-   the threshold-exceed fraction (reject frac>0.25, OBSERVED live 70mm, accept:reject 3:5), gate2/gate3
-   present (untriggered); accept→`0xf33d0`. See `laneD_final_acceptance_static/accept_reject_gate_located.md`.**
+   the threshold-exceed fraction (reject frac>0.25, OBSERVED live 70mm, accept:reject 3:5); **gate2/gate3 now
+   decoded statically** (`laneD_final_acceptance_static/gate2_gate3_reject_semantics.md`): selector = argMIN of
+   the score array; accept iff `B[sel]≤0.25` AND `B[sel]≤B[incumbent]` (gate2, exceed-frac) AND `A[sel]≤0.8·
+   A[incumbent]` (gate3, ≥20%-better score, guarded by a positive candidate count) — i.e. absolute floor +
+   must-clearly-beat-incumbent; gate2/gate3 still UNTRIGGERED at runtime (static-only). accept→`0xf33d0`. See
+   `laneD_final_acceptance_static/accept_reject_gate_located.md`.**
 6. Illuminant enum `f2.f1∈{0,2,6}` → which illuminant (A/D50/D65); libcp's actual undistort eval order
    (poly vs LUT); Block-8 AWB gains (being mapped next, LRI-side).
 
