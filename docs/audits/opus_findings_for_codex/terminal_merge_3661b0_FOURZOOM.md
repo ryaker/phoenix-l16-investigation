@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1c — four_zoom_data_W1c.md). N=5 contributors/tile all 4 tiers (ctx+0x18, N=(end-begin)/16 — corrects [rdi+0x8]); per-512x512-tile; lane3+B-spline fire 4-zoom. Scope=first-hit/tile/tier, Unit-1. Reduction MAGNITUDE = Rosetta tool-limited (residual).
+
 <!-- provenance: workflow wf_cb406491-3d3 (l16-prefusion-fanout-w4), 2026-06-03; finder+independent verifier; verifier reliable=True -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, weak-labeled, static disasm only).
 **Verifier reliability:** all load-bearing VAs independently re-extracted (PASS)

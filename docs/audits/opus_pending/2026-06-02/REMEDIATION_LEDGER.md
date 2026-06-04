@@ -3,7 +3,7 @@
 
 **Directive (Rich, 2026-06-03):** run the four-zoom playbook (see `../opus_findings_for_codex/README.md`)
 disciplined through EVERY finding doc from the last 2 days. None graduates to Tier 1 (findings_for_codex)
-until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 22 / 80 graduated** (W1: 2 + W1b: 4 render-findings; W3: 14 + W3b: 2 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
+until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 24 / 80 graduated** (W1: 2 + W1b: 4 render-findings; W3: 14 + W3b: 2 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
 
 Cadence is render-bound (4 sequential renders per data sweep, minutes each, one external disk under
 Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 4-render sweep with many
@@ -16,6 +16,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
   ctor `0x360a00`). Floor only — scopes W1; NOT graduation. Method: "drain" harness (per-hit callbacks stall
   under Rosetta) ⇒ W1 must stop SELECTIVELY (1-2 stages/render) → even more render-bound.
 - **W1:** four-zoom DATA sweep #1 — merge/score/gates/CCM/undistort/resample/compositing (lane A/D/E + B2 color).
+- **TOOL WALL (Rosetta):** merge reduction magnitude / score magnitude / per-camera-CCM later-hit need native-arm64 or differential-render (Kth-hit uncapturable under Rosetta). Tracked per-datum on affected docs.
 - **W2:** four-zoom DATA sweep #2 — denoise/sharpen/CNR/bilateral + stereo cost (the new stages).
 - **W3 (DONE):** 4-LRI re-parse — 14 calibration/distortion/color/AWB/header docs GRADUATED via consolidated finding; Claim-1 block-count correction (11 wide / 12 tele, role=payload-size not index); AWB=54B f19.15; depth-no-LRI confirmed 4-LRI. Block-4/5 internal grids + Unit-2 still owed.
 - **W4:** residual/single-claim docs + synthesis docs re-derived from graduated children.
@@ -32,17 +33,17 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 6 | laneA_prefusion_reducer_static/contributor_gate.md | STAGING | OWED | - |
 | 7 | laneA_prefusion_reducer_static/geom_record_consumer_static.md | STAGING | OWED | - |
 | 8 | laneA_prefusion_reducer_static/geometry_builder_216f60.md | STAGING | OWED | - |
-| 9 | laneA_prefusion_reducer_static/lane3_blend.md | STAGING | OWED | - |
+| 9 | → GRADUATED: opus_findings_for_codex/lane3_blend_FOURZOOM.md | **GRADUATED** | four-zoom structure (magnitude tool-limited) | W1c |
 | 10 | laneA_prefusion_reducer_static/matrix_36acf0_bss_storage.md | STAGING | OWED | - |
 | 11 | laneA_prefusion_reducer_static/matrix_36acf0_decode.md | STAGING | OWED | - |
 | 12 | laneA_prefusion_reducer_static/merge_projection_radial_identity.md | STAGING | OWED | - |
-| 13 | laneA_prefusion_reducer_static/reducer_verdict.md | STAGING | OWED | - |
+| 13 | laneA_prefusion_reducer_static/reducer_verdict.md | STAGING | W1c: accepts N=5 4-zoom (CANDIDATE, not full reducer verdict; body unverified) | W1c |
 | 14 | laneA_prefusion_reducer_static/score_kernel_36cde0_two_factors.md | STAGING | W1: firing✓ magnitude-owed (degenerate first-hit) | W1 |
-| 15 | laneA_prefusion_reducer_static/score_production.md | STAGING | OWED | - |
+| 15 | laneA_prefusion_reducer_static/score_production.md | STAGING | W1c: firing 4-zoom; Σscore magnitude degenerate first-hit (Rosetta tool limit) | W1c |
 | 16 | laneA_prefusion_reducer_static/score_q1q2_lineage.md | STAGING | OWED | - |
 | 17 | laneA_prefusion_reducer_static/src2_box_role.md | STAGING | OWED | - |
 | 18 | laneA_prefusion_reducer_static/src2_callback_374ac0.md | STAGING | OWED | - |
-| 19 | laneA_prefusion_reducer_static/terminal_merge_3661b0.md | STAGING | OWED | - |
+| 19 | → GRADUATED: opus_findings_for_codex/terminal_merge_3661b0_FOURZOOM.md | **GRADUATED** | four-zoom structure (magnitude tool-limited) | W1c |
 | 20 | laneA3_combine_store_site/CORRECTION.md | STAGING | OWED | - |
 | 21 | laneA3_combine_store_site/LEDGER_RECONCILIATION.md | STAGING | OWED | - |
 | 22 | laneA3_combine_store_site/step0_inner_body.md | STAGING | OWED | - |

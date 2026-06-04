@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1c — four_zoom_data_W1c.md). 0x36aa30 fires 4-zoom; recip*0.2 detail-transfer constant live all tiers. Scope=first-hit/tile/tier, Unit-1. Reduction MAGNITUDE = Rosetta tool-limited (residual).
+
 <!-- provenance: workflow wf_4bb93945-fac (l16-prefusion-fanout), 2026-06-03; finder+independent verifier; verifier reliable=True -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, weak-labeled, static disasm/LRI-parse only).
 **Verifier reliability:** all load-bearing VAs independently re-extracted (PASS)
