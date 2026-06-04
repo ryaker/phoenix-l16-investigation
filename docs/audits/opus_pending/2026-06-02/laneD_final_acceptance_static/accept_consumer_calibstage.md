@@ -49,3 +49,16 @@ known OPEN closure point. Coherent chain: accept-gate refines per-group alignmen
 CalibStage → consumed by runReferenceGroupCams/runHigherGroupCams (group processing) → aligned/undistorted
 sources → IRAMP merge. (Answers "where the accept-gate calib goes" at the consumer level; the final
 group-runner→merge byte-level closure remains the `0x22f3ff` open point Codex tracks.)
+
+## The 0x22f3ff dispatcher = group-runner orchestrator (static, OBSERVED 2026-06-03)
+Disasm of the `0x22f3ff` region: a map/tree-walk (`0x22f3b0`: `cmpl 0x20(rax)` key compare → left child
+`(rax)` / right child `0x8(rax)`) looks up a per-group State, then `0x22f3f9 movq 0x30(%rax),%rax; 0x22f3fd
+callq *%rax` invokes that State's `operator()` (the group-runner, vtable+0x30 — committed runtime resolves
+these to the `0x229df0..0x22e1d0` runReferenceGroupCams/runHigherGroupCams family), times it via
+`mach_absolute_time`, and stores a double result at `0xa8(%r14)`. ⇒ `0x22f3ff` is the **group-runner
+ORCHESTRATOR**: iterate camera groups → look up each group's State → run it → collect. The accept-gate
+calibration (current CalibStage) is consumed by these group-runners here. The remaining byte-level closure
+(group-runner body → the IRAMP merge's source vector) lives INSIDE the large group-runner bodies
+(`0x229df0..0x22e1d0`) — the deep open closure Codex actively works (`callq *%rax` at `0x22f3fd` is the
+indirect dispatch; static cannot pick the body without the runtime-confirmed vtable, which committed
+evidence supplies).
