@@ -6,6 +6,14 @@ exact breakpoint targets and explains why the entry-time proto perturbation was 
 
 # Lane B2 — CCM apply site located: per-camera 4×4 path + the fixed-I1I2I3 decoy
 
+> ⚠ **W1 four-zoom CORRECTION (2026-06-03, `four_zoom_data_W1_batch1.md`):** runtime first-hit shows `0xbfa20`'s
+> matrix `[rdi+0x8]` = the **fixed I1I2I3 decorrelation basis, byte-identical at all four tiers** — NOT a
+> per-camera CCM. So `0xbfa20` is a **GENERIC 4×4 apply** whose FIRST use is the constant I1I2I3 rotation. The
+> "per-camera CCM apply site = `0xbfa20`" framing below is DOWNGRADED: the `setColorCorrection $_58 → 0xa9f20 →
+> 0xbfa20`, matrix=`BayerPayload+0x14` chain is a real static caller edge but is NOT the first-hit invocation
+> and is **unconfirmed at runtime**. OPEN: whether any LATER `0xbfa20` hit applies a per-camera CCM (needs a
+> skip-first-hits W-pass). This packet stays Tier-0 STAGING, corrected — it does NOT graduate.
+
 ## Breakpoint targets for Codex (apply lambda invoke entries)
 | Apply | Invoke ENTRY (BP here) | Per-pixel multiply | Matrix source |
 |---|---|---|---|

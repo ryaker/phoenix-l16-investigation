@@ -6,6 +6,12 @@ are now decoded. Binary: `libcp.dylib` Mach-O x86_64.
 
 # Lane A — merge score kernel `0x36cde0`: the two quality factors decoded
 
+> ◑ **W1 four-zoom note (2026-06-03, `four_zoom_data_W1_batch1.md`):** the kernel FIRES at all four tiers and
+> the `sqrt(xmm0·xmm1)` return is re-confirmed at `0x36e511`. BUT first-hit scores are **degenerate 0.0 at every
+> tier** (the first contributor pairs against a boundary/zero patch), so per-tier score MAGNITUDE is NOT yet
+> captured. Formula + four-zoom firing = OBSERVED; magnitude owed (skip-degenerate-hits W-pass). Stays Tier-0
+> STAGING until magnitude is captured.
+
 The per-contributor merge weight is a **geometric mean of two agreement scores**, each clamped to [0,1]:
 one **structural-similarity (SSIM contrast-structure) term** and one **multi-scale wavelet-detail term**.
 This is the weight that feeds the `1/Σscore`-normalized soft average in the terminal merge `0x3661b0`.

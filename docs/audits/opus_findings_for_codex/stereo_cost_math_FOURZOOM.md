@@ -13,6 +13,15 @@ reimplementation reproduces it from this decode.
 > `0x278a57`, `0x2773dc` in the runPass region). **The cost MATH below stands; the driver/gating section (§
 > "Multi-pass topology") is corrected — the live caller chain is runPass, not the driver.** W1 must capture it.
 
+> ✅ **GRADUATED to four-zoom OBSERVED (2026-06-03, `four_zoom_data_W1_batch1.md`).** First-hit at all 4 tiers:
+> live caller = `0x276860` (runPass family), dormant `0x2730c0` ruled out 4-zoom; record vector is
+> DOUBLE-indirect (`vecobj=[rdi+0x10]; begin=[vecobj]; end=[vecobj+8]`, stride 0x50=80 — corrects the body's
+> direct `[rdi+0x10]` read); **record N=4 at every tier** (the 5+5+6 split is NOT here — it's the disparity
+> grid `[rdi+0x18]`: 188 wide / 368 tele); 80-byte records = per-camera near-identity affine/homography. Cost
+> MATH (truncated-L1 etc.) = static-decoded + structure now 4-zoom-confirmed. Scope = first-hit/tier, Unit-1.
+> Residual (deeper W-pass): per-tier cost VALUES (first-hit pre-accumulation); outer plane-sweep range+argmin
+> (caller); per-camera weight source.
+
 ## Cost metric (OBSERVED, `0x2732f0`, per-depth-hypothesis kernel)
 For a candidate depth scalar `s` (= `[r13+4*i]`, per-pixel), project the reference pixel into each enabled
 source camera via that camera's 80-byte record (a 3×4 projection matrix), bilinear-sample the camera image,

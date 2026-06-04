@@ -3,7 +3,7 @@
 
 **Directive (Rich, 2026-06-03):** run the four-zoom playbook (see `../opus_findings_for_codex/README.md`)
 disciplined through EVERY finding doc from the last 2 days. None graduates to Tier 1 (findings_for_codex)
-until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 0 /       80 graduated.**
+until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 2 / 80 graduated** (W1 batch 1).
 
 Cadence is render-bound (4 sequential renders per data sweep, minutes each, one external disk under
 Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 4-render sweep with many
@@ -37,7 +37,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 11 | laneA_prefusion_reducer_static/matrix_36acf0_decode.md | STAGING | OWED | - |
 | 12 | laneA_prefusion_reducer_static/merge_projection_radial_identity.md | STAGING | OWED | - |
 | 13 | laneA_prefusion_reducer_static/reducer_verdict.md | STAGING | OWED | - |
-| 14 | laneA_prefusion_reducer_static/score_kernel_36cde0_two_factors.md | STAGING | OWED | - |
+| 14 | laneA_prefusion_reducer_static/score_kernel_36cde0_two_factors.md | STAGING | W1: firing✓ magnitude-owed (degenerate first-hit) | W1 |
 | 15 | laneA_prefusion_reducer_static/score_production.md | STAGING | OWED | - |
 | 16 | laneA_prefusion_reducer_static/score_q1q2_lineage.md | STAGING | OWED | - |
 | 17 | laneA_prefusion_reducer_static/src2_box_role.md | STAGING | OWED | - |
@@ -69,7 +69,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 43 | laneB2_lri_calibration_origins/block6_grouping.md | STAGING | OWED | - |
 | 44 | laneB2_lri_calibration_origins/calibration_unknowns_block6.md | STAGING | OWED | - |
 | 45 | laneB2_lri_calibration_origins/camera_focal_map_excluded_pair.md | STAGING | OWED | - |
-| 46 | laneB2_lri_calibration_origins/ccm_apply_site_located.md | STAGING | OWED | - |
+| 46 | laneB2_lri_calibration_origins/ccm_apply_site_located.md | STAGING (CORRECTED) | W1: 0xbfa20 first-hit=I1I2I3 not per-cam CCM; per-cam claim reopened | W1 |
 | 47 | laneB2_lri_calibration_origins/ccm_apply_site_static.md | STAGING | OWED | - |
 | 48 | laneB2_lri_calibration_origins/ccm_consumption_runtime_INCONCLUSIVE.md | STAGING | OWED | - |
 | 49 | laneB2_lri_calibration_origins/ccm_lri_residency_link.md | STAGING | OWED | - |
@@ -84,7 +84,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 58 | laneB2_lri_calibration_origins/four_zoom_two_unit.md | STAGING | OWED | - |
 | 59 | laneB2_lri_calibration_origins/lightheader_block0.md | STAGING | OWED | - |
 | 60 | laneB2_lri_calibration_origins/lri_block_inventory.md | STAGING | OWED | - |
-| 61 | laneB2_lri_calibration_origins/undistort_ordering_lut_runtime.md | STAGING | OWED | - |
+| 61 | → GRADUATED: opus_findings_for_codex/undistort_ordering_lut_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit; camera-group LUT split) | W1 |
 | 62 | laneB2_lri_calibration_origins/verified_field_map.md | STAGING | OWED | - |
 | 63 | laneC6_remaining/c6_grouptype2_survival.md | STAGING | OWED | - |
 | 64 | laneD_final_acceptance_static/accept_consumer_calibstage.md | STAGING | OWED | - |
@@ -103,4 +103,4 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 77 | laneP_parser_gap_182/residual_alternate_container.md | STAGING | OWED | - |
 | 78 | MERGE_MECHANISM_SYNTHESIS.md | STAGING | OWED | - |
 | 79 | MERGE_PIPELINE.md | STAGING | OWED | - |
-| 80 | stereo_cost_math_decoded.md | STAGING | OWED | - |
+| 80 | → GRADUATED: opus_findings_for_codex/stereo_cost_math_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit; caller 0x276860, N=4 all tiers, layout corrected) | W1 |

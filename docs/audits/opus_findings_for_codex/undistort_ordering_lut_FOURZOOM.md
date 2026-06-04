@@ -6,6 +6,13 @@ static LEAD in `distortion_apply_stage.md` (`LensUndistortCRA 0x261940`). One re
 
 # Lane B2 — undistort `0x261940` runs PER-RENDER BEFORE the merge; live LUT is a real (non-identity) radial curve
 
+> ✅ **GRADUATED to four-zoom OBSERVED (2026-06-03, `four_zoom_data_W1_batch1.md`).** First-hit operands captured
+> at all four tiers: scale `[+0x08/0x0c]`=1.0/1.0 all tiers; center+LUT split by **camera GROUP** — wide
+> (28≡35) center 2020.0/1505.0, LUT head `1.0,1.0000052,1.0000052,1.0000051…`; tele (70≡150) center
+> 2075.0/1590.0, LUT head `1.0,1.0,1.0,1.0,1.0000001…`. (Supersedes the earlier 70mm-only center 2075/1590.)
+> Scope = first-hit sample/tier, Unit-1. Residual: per-camera attribution within a tier; full-LUT compare;
+> Unit-2.
+
 ## (A) ORDERING — OBSERVED (upgraded from static call-graph LEAD)
 In one 70mm render, BPs on `0x261940` (undistort) and `0x3661b0` (merge entry): undistort fired **25 times
 before** the first merge hit (`first_u_seq=1`, `first_m_seq=26`). ⇒ **undistort precedes merge** at runtime.
