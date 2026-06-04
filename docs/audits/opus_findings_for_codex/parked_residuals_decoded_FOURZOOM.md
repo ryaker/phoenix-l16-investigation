@@ -86,7 +86,32 @@ that proves these are candidates, not verdicts:
   (init **0**). **Live-adjudicated** (render `--profile 3`, BP set MODULE-RELATIVE): two State instances ran;
   state-int sequences `0→2→3→6→4→7→8→9` and `0→1→3→6→5→8→9`; the profiling vector grew **+1 per iteration**
   (confirms push-back log, not a tree walk); 14 distinct live action-functor VAs (`0x229df0..0x22e1d0`). Enum
-  ints 0..9, terminal 9. (Candidate; the action-functor semantics per state not yet decoded.)
+  ints 0..9, terminal 9. **Action-functor semantics DECODED (candidate, static):** 13 distinct functor types
+  ($_0..$_12, vtable blocks `0x6583a0` stride 0x80), each returns its next-state in `eax`. Roles: transition
+  stubs (`0x229df0`→2, `0x22bdf0`→1, byte-verified `mov $imm,eax`); per-camera calib-record accumulators
+  (`0x22a0e0`→3/6 calls the record-chain `0x23faf0`×2 + RB-tree insert, inits weight `0x58=1.0f`; `0x22c350`
+  →3/6 on the `0x78` list); iterator/loop-control (`0x22a9b0`, `0x22cd00`); **geometry-apply** (`0x22aaf0`,
+  `0x22d250` call the geometry builders `0x216f50`/`0x216eb0`/`0x216f60` with per-cam score `0x108`);
+  mode/init (`0x229ec0`, `0x22bee0`); cleanup/finalize (`0x22ae60`, `0x22af80`, `0x22e1d0`). ⇒ the state
+  machine IS the **per-camera calibration/geometry refinement loop** (accumulate records → apply geometry
+  builders → finalize), driving the same `0x216f60`/`0x23faf0` kernels other lanes mapped. (Residual: the
+  exact State-enum→vtable-index binding in `runReferenceGroupCams()`'s table init not yet disassembled.)
+- **Folded-optics mirror model role DECODED (candidate, static).** `MirrorSysParam`/`MirrorActuatorMapping`
+  (`ltpb.MirrorActuatorMapping` protobuf: `QuadraticModel` + `ActuatorAnglePair` + `actuator_angle_pair_vec`,
+  strings confirmed) built by `0x1f0a00` are consumed in the **per-camera calibration/geometry path**:
+  `0x1f0a00`'s callers `0x210ccb` (in `0x210c10`, reached from state functor `0x22bee0`) and `0x217145` (in
+  the geometry builder `0x216f60`) both do `f3360`(cam handle)→`0x1f0a00`→`0x1c1860`→`0x1ed4d0` = a piecewise
+  **actuator↔angle lookup** (sorted `vector<double>`, `ucomisd` threshold select) yielding a per-camera
+  **mirror-deflection scalar** that feeds the geometry-record builders `0x216f60`/`0x218390`/`0x264440`. ⇒ the
+  mirror model supplies per-camera ray geometry via mirror deflection (NOT a separate undistort LUT).
+  (Residual: whether the deflection reaches per-pixel warp at render = geometry-record→pixel-warp, not traced.)
+- **⚠ Flow `{fx,fy,score}` buffer (`0x369e7e`) — runtime-bound + INTER-PASS CONTRADICTION, being resolved by
+  render.** One static pass decoded a `{fx,fy,score}` 12-byte store into an image whose data ptr is its `+0x60`
+  field; a second pass found the `0x60` refs in `0x3661b0` are rbp stack-locals and saw NO `+0x60` store into
+  the output struct, and the merge's returned output (data at `+0x20`) is consumed only by `0xd76a0` (squares
+  it) then destroyed — no static reader of a `+0x60` buffer in the processLevel0 chain. So whether the
+  `{fx,fy,score}` buffer is even populated/read in the bridge path is genuinely DATA/PATH-dependent. Resolving
+  by a live render (BP `0x369e7e` module-relative: does it fire + write, and what reads it) — not left open.
 - **CalibStage bank census (`0xf33d0`, 10 static call sites, r8d all immediate):** 9 sites pass **r8d=1 =
   current bank** (`+0x12c`); exactly ONE — `0x1f1328` — passes **r8d=0 = factory bank** (`+0x180`), immediately
   paired with a current read at `0x1f134b` (a factory-vs-current comparison in one function).
