@@ -1,6 +1,15 @@
 # Lane P residual — the 182 use a structurally different LELR layout
 
-**Status:** `NEEDS_CODEX_VALIDATION`. Bounded structural characterization + one explicit HYPOTHESIS.
+> **GRADUATED (2026-06-04) — deterministic, reproducible, spot-re-verified.** NOT corpus-blocked: the 182
+> unassigned files ARE in the corpus and were exhaustively parsed (`observations.md` O1–O6, `commands.txt`).
+> Orchestrator spot-re-verified: `2017-12-09/L16_00795.lri` = **1** LELR block (total_size 84934688,
+> payload 1497, no recognized proto fields) vs assigned `L16_02130` = **11** — confirming the class-wide
+> distribution `{0:4,1:10,2:26,3:77,4:65}` (all ≤4) vs assigned ~11–12. **No third unit** (0/182 yield any
+> 16×field-13 calibration signature even under magic-scan). The CORE characterization is finding-grade; the
+> firmware-generation HYPOTHESIS (below) stays a hypothesis, and unit-assigning the 182 (extended-parser RE)
+> is correctly DEFERRED — neither is parity-blocking (all canonical seeds + U2 twins are assigned).
+
+**Status:** GRADUATED (deterministic file-structure; hypothesis + assignment = scoped opens). Bounded structural characterization + one explicit HYPOTHESIS.
 This does NOT assign the 182; it scopes WHY they can't be assigned by the current parser and what an
 extended-parser effort would face. The integrity result (no third unit, `README.md`/`observations.md`)
 is unaffected and already settled.

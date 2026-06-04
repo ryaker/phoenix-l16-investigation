@@ -63,17 +63,17 @@ its own packet. This is the entry point for Codex's validation pass.
   0.8252], bit-identical I1I2I3) with per-body CCM values ⇒ structure universal, values per-body. Other U2
   runtime stages (depth/denoise/resample/gates/topology) not re-run. ⚠ The documented Unit-2 "twins" are
   focals (28,70,150,150) NOT (28,35,70,150) — no clean Unit-2 35mm; CLAUDE.md corpus note is wrong (flag).
-- **Long-tail staging** (~28 docs remain, down from ~50): the verified static sub-mechanisms + magnitudes +
-  LRI sub-facts graduated 2026-06-04. Still owed (per ledger): lane-A3 combine-store, lane-A5 kernel/bss
-  dupes, lane-A6/A7 score-consumption runtime, several lane-B2 runtime-consumption (AWB/CCM differential),
-  lane-D/E runtime tallies, BLIND_SPOTS. Many are subsumed by graduated parents; the genuinely-owed remainder
-  is mostly RUNTIME (differential-render / Unit-2) not static.
+- **Long-tail staging — CLEARED (2026-06-04).** All 80 ledger rows are now resolved (61 graduated, 17
+  subsumed-into-graduated-parents, 2 superseded/retracted; 0 staging). Subsumption residuals tracked in
+  `../opus_pending/2026-06-02/SUBSUMPTION_RESIDUALS.md`. The only remaining items are the explicitly-scoped,
+  non-blocking sub-residuals listed below + this synthesis's own decode-gaps — all first-class tracked.
 - **Decode gaps:** unsharp combine VA; Laplacian-pyramid clarity kernel; NLM search radius (runtime param);
   lens-shading {1,15} sub-grid on Unit-2; the CCM→payload+0x14 writer on the taken `eax==0` path (per-camera
   CCM *existence* now RESOLVED — it's `0xa9f20`/Block-6 f2.2); AWB 35/70/150 perturbation.
 
-> Count: REMEDIATION_LEDGER 60/80 graduated (79/80 resolved; **1 staging** = row77, corpus-blocked — needs a
-> 182-class unassigned LRI not in the corpus). Unit-2 runtime universality now confirmed for merge/score/CCM. This synthesis covers the graduated subset; it is NOT a claim the whole pipeline is
+> Count: REMEDIATION_LEDGER **61/80 graduated, 80/80 RESOLVED, 0 staging** — the tractable remediation set is
+> COMPLETE. Remaining = Codex validation + explicitly-scoped non-blocking sub-residuals (see ledger header).
+> Unit-2 runtime universality confirmed for merge/score/CCM. This synthesis covers the graduated subset; it is NOT a claim the whole pipeline is
 > validated — the residuals above are first-class open items.
 > **2026-06-04 corrections (see `cgroup_runtime_FOURZOOM`):** stage 10 pyramid-merge runs **L0+L1+L2-4 all
 > firing** (the prior "only L0/L1, L2-4=0" was a python-hit-drop artifact; counts are tier-VARYING);
