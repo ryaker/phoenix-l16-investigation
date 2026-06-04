@@ -29,3 +29,30 @@ BP `0xf33d0`: capture rdi(State addr) + the values written at `+0x12c`. BP `0x3e
 transform-state addr (from callable `+0x8`) + the values read at `+0x12c`. If the ADDRESSES match (same
 object) and the values written by accept later appear at the projection read → link CONFIRMED. (Read
 watchpoints dead; use BP-stop pointer/value compare.) Until then: LEAD only.
+
+## VERDICT (runtime probe a1d4b4b, one 70mm render): the predicted direct link is REFUTED
+Decisive same-object test:
+- Accept-gate `0xf33d0` current-branch State objects = heap family **`0x7f8099f1xxxx`** (10 distinct); their
+  `+0x12c` holds LARGE per-frame-varying calibration floats (e.g. `8270.35`, `18149.125` — fx-magnitude,
+  re-estimated per frame; factory branch first writes identity `[1,0,0,0]`).
+- Projection `0x3e42e0` transform-state = a **single render-STATIC object `0x7f809b054000`** for ALL 80
+  sampled hits; `+0x12c`=`[-0.0, 0.998077, 1.999756, -0.0]`, `+0x120`=`[0.998077,-0.0,2.999756,-0.0]`,
+  invariant; radial/distortion coeff table ptr at `+0x100` (cvttss2si radius, clamp [0,0xfff]).
+- **OVERLAP(accept States ∩ proj state) = ∅; accept `+0x12c` (thousands) ≠ proj `+0x12c` (~0.998). NO flow.**
+⇒ The accept-gate per-frame calibration State is **NOT** the projection matrix the merge reads. They are two
+separate object families. The merge projection uses a render-static transform (with a radial LUT —
+**looks like the LRI factory intrinsics/undistort**, ties to laneB2's distortion model), distinct from the
+per-frame accept-gate refinement. The LEAD above (region-overlap) is therefore explained as coincidental
+offset reuse across two different object types, NOT a shared object.
+
+## Verify-before-trust catch on COMMITTED evidence (for Codex)
+Committed `bundle_proof_src1_projection_callable_transform.md` states `0x3e42e4: state = *(rdi+0x8)`. That
+register is WRONG: actual disasm `libcp[0x3e42e4]: movq 0x8(%rsi),%rax` ⇒ transform-state = `*(rsi+0x8)`
+(rsi = callable `this`; rdi = the output 2-float point buffer, `movss %xmm0,(%rdi)` at +252). Minor but
+load-bearing for anyone re-probing this site. (Quarantine note only; committed doc not modified.)
+
+## Now-open
+- Where DOES the accept-gate per-frame calibration (`0x7f8099f1xxxx` State) get consumed? (indirect path
+  unknown — not the projection.)
+- What builds the projection's static transform `0x7f809b054000`? (LEAD: LRI factory intrinsics/distortion
+  = laneB2 Block-3; would connect merge-projection ← B2 factory calibration.)
