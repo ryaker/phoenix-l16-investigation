@@ -16,7 +16,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
   ctor `0x360a00`). Floor only — scopes W1; NOT graduation. Method: "drain" harness (per-hit callbacks stall
   under Rosetta) ⇒ W1 must stop SELECTIVELY (1-2 stages/render) → even more render-bound.
 - **W1:** four-zoom DATA sweep #1 — merge/score/gates/CCM/undistort/resample/compositing (lane A/D/E + B2 color).
-- **TOOL WALL (Rosetta):** merge reduction magnitude / score magnitude / per-camera-CCM later-hit need native-arm64 or differential-render (Kth-hit uncapturable under Rosetta). Tracked per-datum on affected docs.
+- **~~TOOL WALL (Rosetta)~~ — BROKEN (W5, 2026-06-04):** the "Kth-hit uncapturable under Rosetta" claim was premature (only per-hit Python-callback / `--auto-continue` had been tried — those stampede). **LLDB ignore-count (`-i N`) + conditional (`-c`) breakpoints are core-handled (no Python callback), reach mid-render hits in ~11–50s with no stampede.** Real magnitudes captured 28mm+70mm (score `0x36cde0`=√(a·b), merge Σscore `0x36a938`=1/Σ, CCM `0xbfa20`=fixed I1I2I3) — see `four_zoom_data_W5_magnitudes.md`. **35mm+150mm capture in flight (W5b)**; magnitude docs graduate as a 4-tier set on W5b completion. read-watchpoints dead + differential-defeated-by-nondeterminism remain the only verified limits.
 - **W2:** four-zoom DATA sweep #2 — denoise/sharpen/CNR/bilateral + stereo cost (the new stages).
 - **W3 (DONE):** 4-LRI re-parse — 14 calibration/distortion/color/AWB/header docs GRADUATED via consolidated finding; Claim-1 block-count correction (11 wide / 12 tele, role=payload-size not index); AWB=54B f19.15; depth-no-LRI confirmed 4-LRI. Block-4/5 internal grids + Unit-2 still owed.
 - **Unit-2 universality (DONE for calibration):** STRUCTURE cross-unit-confirmed (7 calibration claims hold on Unit-2 body 223961c6); VALUES per-body. New invariants: CCM row-sums + Block-5 vignetting byte-identical cross-unit. CORRECTION: Unit-2 'twins' are focals (28,70,150,150) not (28,35,70,150) — CLAUDE.md corpus note wrong (flag for Codex). Runtime findings' Unit-2 still owed.
@@ -39,8 +39,8 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 11 | laneA_prefusion_reducer_static/matrix_36acf0_decode.md | STAGING | OWED | - |
 | 12 | laneA_prefusion_reducer_static/merge_projection_radial_identity.md | STAGING | OWED | - |
 | 13 | laneA_prefusion_reducer_static/reducer_verdict.md | STAGING | W1c: accepts N=5 4-zoom (CANDIDATE, not full reducer verdict; body unverified) | W1c |
-| 14 | laneA_prefusion_reducer_static/score_kernel_36cde0_two_factors.md | STAGING | W1: firing✓ magnitude-owed (degenerate first-hit) | W1 |
-| 15 | laneA_prefusion_reducer_static/score_production.md | STAGING | W1c: firing 4-zoom; Σscore magnitude degenerate first-hit (Rosetta tool limit) | W1c |
+| 14 | laneA_prefusion_reducer_static/score_kernel_36cde0_two_factors.md | STAGING→graduating | W5: √(a·b) magnitudes captured 28/70 (0.62859/0.78014/0.78062); 35/150 in flight W5b | W5/W5b |
+| 15 | laneA_prefusion_reducer_static/score_production.md | STAGING→graduating | W5: Σscore real magnitudes 28/70 (0.39071→2.55957, 0.25464→3.92627); 35/150 in flight W5b | W5/W5b |
 | 16 | laneA_prefusion_reducer_static/score_q1q2_lineage.md | STAGING | OWED | - |
 | 17 | laneA_prefusion_reducer_static/src2_box_role.md | STAGING | OWED | - |
 | 18 | laneA_prefusion_reducer_static/src2_callback_374ac0.md | STAGING | OWED | - |
