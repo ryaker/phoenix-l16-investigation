@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1b — four_zoom_data_W1b.md). drain structure 4-zoom; tile-count .lris-confounded not tier. Scope=first-hit/tier, Unit-1.
+
 <!-- provenance: l16-investigator finder (static disasm) + orchestrator independent re-extraction of load-bearing VAs, 2026-06-03 -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, STATIC disasm; finder-produced, orchestrator-verified — all
 load-bearing VAs independently re-extracted, see "Verification" below). Closes the Lane E gap left open in

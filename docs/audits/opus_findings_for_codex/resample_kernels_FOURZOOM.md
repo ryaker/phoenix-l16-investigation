@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1b — four_zoom_data_W1b.md). B-spline=merge-interior(0x3661b0), Catmull-Rom=separate 0x3d0650 stage; both fire 4-zoom. Scope=first-hit/tier, Unit-1.
+
 <!-- provenance: orchestrator static disasm + constant byte-decode of 0x2b2be0 and 0x36f800, 2026-06-03 -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine, STATIC disasm + float constant byte-decode). Verify-before-trust
 check on the handoff's resample-kernel labels ("B-spline `0x2b2be0` / Catmull-Rom `0x36f800`"). Binary:

@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1b — four_zoom_data_W1b.md). CNR/bilateral/sharpen fire 4-zoom; active bilateral window=W5; CNR params=1.0. Scope=first-hit/tier, Unit-1.
+
 <!-- provenance: l16-investigator finder (static disasm) + orchestrator re-extraction of load-bearing VAs/consts, 2026-06-03 -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine; finder + orchestrator-verified). Maps the blind-spot stages
 from `BLIND_SPOTS_discovered_stages.md` (denoise/sharpen/tone) — CNR fully, bilateral partially, sharpen

@@ -1,3 +1,5 @@
+> ⚠ W1b CORRECTION (2026-06-03): the ACTIVE bilateral window is **W5** (`0x2f78e0`), confirmed `r8d=5` all 4 tiers — the W3 worker `0x2f6ad0` below is dormant because W5 is selected, not because bilateral is off. W5 inner math still OWED. CNR runs at default params 1.0/1.0 four-zoom.
+
 <!-- provenance: l16-investigator finder (static disasm) + orchestrator instruction/constant re-extraction, 2026-06-03 -->
 **Status:** NEEDS_CODEX_VALIDATION + **NOT FOUR-ZOOM VALIDATED (static-only, zero renders).** This packet is
 NOT done to Codex rigor — it is a static decode that has NOT been run at 28/35/70/150. It must get a four-zoom

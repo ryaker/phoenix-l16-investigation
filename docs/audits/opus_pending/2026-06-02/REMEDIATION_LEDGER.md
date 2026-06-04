@@ -3,7 +3,7 @@
 
 **Directive (Rich, 2026-06-03):** run the four-zoom playbook (see `../opus_findings_for_codex/README.md`)
 disciplined through EVERY finding doc from the last 2 days. None graduates to Tier 1 (findings_for_codex)
-until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 18 / 80 graduated** (W1: 2 render-findings; W3: 14 + W3b: 2 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
+until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 22 / 80 graduated** (W1: 2 + W1b: 4 render-findings; W3: 14 + W3b: 2 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
 
 Cadence is render-bound (4 sequential renders per data sweep, minutes each, one external disk under
 Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 4-render sweep with many
@@ -25,8 +25,8 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | # | doc | tier | four-zoom | wave |
 |---|-----|------|-----------|------|
 | 1 | BLIND_SPOTS_discovered_stages.md | STAGING | OWED | - |
-| 2 | denoise_sharpen_kernel_math.md | STAGING | OWED | - |
-| 3 | denoise_sharpen_tone_stages_mapped.md | STAGING | OWED | - |
+| 2 | denoise_sharpen_kernel_math.md | STAGING | W1b: active window=W5 (W3 dormant); W5 inner math owed | W1b |
+| 3 | → GRADUATED: opus_findings_for_codex/denoise_sharpen_stages_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 4 | depth_stereo_no_lri_origin.md | STAGING (LRI-side graduated) | W3: Claim6 four-LRI✓ (consolidated); runtime ctor part static | W3 |
 | 5 | laneA_prefusion_reducer_static/accumulate_search_216f60.md | STAGING | OWED | - |
 | 6 | laneA_prefusion_reducer_static/contributor_gate.md | STAGING | OWED | - |
@@ -88,17 +88,17 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 62 | laneB2_lri_calibration_origins/verified_field_map.md | STAGING | OWED | - |
 | 63 | laneC6_remaining/c6_grouptype2_survival.md | STAGING | OWED | - |
 | 64 | laneD_final_acceptance_static/accept_consumer_calibstage.md | STAGING | OWED | - |
-| 65 | laneD_final_acceptance_static/accept_reject_gate_located.md | STAGING | OWED | - |
+| 65 | → GRADUATED: opus_findings_for_codex/accept_reject_gate_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 66 | laneD_final_acceptance_static/acceptance_gate_location.md | STAGING | OWED | - |
 | 67 | laneD_final_acceptance_static/calib_to_merge_link_LEAD.md | STAGING | OWED | - |
 | 68 | laneD_final_acceptance_static/e6ba0_not_accumulator.md | STAGING | OWED | - |
 | 69 | laneD_final_acceptance_static/final_acceptance_filter.md | STAGING | OWED | - |
-| 70 | laneD_final_acceptance_static/gate2_gate3_reject_semantics.md | STAGING | OWED | - |
-| 71 | laneE_fourzoom_topology/final_compositing_consumer.md | STAGING | OWED | - |
+| 70 | laneD_final_acceptance_static/gate2_gate3_reject_semantics.md | STAGING | W1b: gate1 fires 4-zoom; gate2/3 still untriggered | W1b |
+| 71 | → GRADUATED: opus_findings_for_codex/final_compositing_consumer_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 72 | laneE_fourzoom_topology/level_dispatcher_topology.md | STAGING | OWED | - |
 | 73 | laneE_fourzoom_topology/level_fire_runtime_28mm.md | STAGING | OWED | - |
 | 74 | laneE_fourzoom_topology/output_producer_static.md | STAGING | OWED | - |
-| 75 | laneE_fourzoom_topology/resample_kernels_constants.md | STAGING | OWED | - |
+| 75 | → GRADUATED: opus_findings_for_codex/resample_kernels_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 76 | laneE_fourzoom_topology/scheduler_recombine_runtime.md | STAGING | OWED | - |
 | 77 | laneP_parser_gap_182/residual_alternate_container.md | STAGING | OWED | - |
 | 78 | MERGE_MECHANISM_SYNTHESIS.md | STAGING | OWED | - |

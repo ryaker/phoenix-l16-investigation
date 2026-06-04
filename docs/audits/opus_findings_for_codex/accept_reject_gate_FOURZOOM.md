@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W1b — four_zoom_data_W1b.md). gate+0.25 ceiling fire 4-zoom; 35mm near-boundary 0.2485; gate2/3 still untriggered. Scope=first-hit/tier, Unit-1.
+
 <!-- provenance: runtime probe agent abe3fd62 (single 70mm render) + static, 2026-06-03 -->
 **Status:** NEEDS_CODEX_VALIDATION (quarantine). OBSERVED runtime backtrace + thresholds extracted; the
 gate identity is a STRONG LEAD (runtime-anchored to confirmed vtable, not yet live-watched at the branch).
