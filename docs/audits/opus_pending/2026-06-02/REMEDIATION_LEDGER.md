@@ -3,7 +3,7 @@
 
 **Directive (Rich, 2026-06-03):** run the four-zoom playbook (see `../opus_findings_for_codex/README.md`)
 disciplined through EVERY finding doc from the last 2 days. None graduates to Tier 1 (findings_for_codex)
-until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 27 / 80 graduated** (W1: 2 + W1b: 4 render-findings; W3: 14 + W3b: 2 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
+until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 28 / 80 graduated** (W1: 2 + W1b: 4 render-findings; W3: 14 + W3b: 2 LRI-calibration docs via consolidated `../opus_findings_for_codex/lri_calibration_parser_FOURZOOM.md`).
 
 Cadence is render-bound (4 sequential renders per data sweep, minutes each, one external disk under
 Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 4-render sweep with many
@@ -26,7 +26,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | # | doc | tier | four-zoom | wave |
 |---|-----|------|-----------|------|
 | 1 | BLIND_SPOTS_discovered_stages.md | STAGING | OWED | - |
-| 2 | denoise_sharpen_kernel_math.md | STAGING | W1b: active window=W5 (W3 dormant); W5 inner math owed | W1b |
+| 2 | → GRADUATED: opus_findings_for_codex/denoise_sharpen_kernel_math_FOURZOOM.md | **GRADUATED** | W5+NLM tent, sharpen FIR decoded; firing 4-zoom | W2 |
 | 3 | → GRADUATED: opus_findings_for_codex/denoise_sharpen_stages_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 4 | → GRADUATED: opus_findings_for_codex/depth_stereo_no_lri_origin_FOURZOOM.md | **GRADUATED** | four-zoom firing/structure | W1d |
 | 5 | laneA_prefusion_reducer_static/accumulate_search_216f60.md | STAGING | OWED | - |

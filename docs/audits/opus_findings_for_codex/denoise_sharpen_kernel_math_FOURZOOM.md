@@ -1,3 +1,5 @@
+> GRADUATED to four-zoom OBSERVED (2026-06-03, W2 — four_zoom_data_W2.md). W5 bilateral tent + NLM tent (body 0x3070e0) + sharpen Gaussian-FIR decoded; firing 4-zoom established (CNR/bilateral/sharpen). Residuals: sharpen σ→factory link (runtime), unsharp combine VA, NLM radius+firing. ALL Lumen denoise weights are TENT/covariance, none exponential.
+
 > ⚠ W1b CORRECTION (2026-06-03): the ACTIVE bilateral window is **W5** (`0x2f78e0`), confirmed `r8d=5` all 4 tiers — the W3 worker `0x2f6ad0` below is dormant because W5 is selected, not because bilateral is off. W5 inner math still OWED. CNR runs at default params 1.0/1.0 four-zoom.
 
 <!-- provenance: l16-investigator finder (static disasm) + orchestrator instruction/constant re-extraction, 2026-06-03 -->
