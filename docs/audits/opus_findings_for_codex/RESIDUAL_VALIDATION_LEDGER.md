@@ -41,8 +41,8 @@ spot-verified). Genuinely runtime-only remainders are named per row.
 ## Net
 **19/19 at the bar:** 7 INVALIDATED (each with the correct alternative investigated + graduated), 12 VALIDATED
 (parent coverage cited; all 6 shed sub-mechanisms DECODED byte-exact). The decode caught **two further wrong
-claims** (#4 `0x1f0a00` "RB-tree"; #2 `0x22f3fd` conflation). The merge SELECTION prong (#1 `0x36930f`),
-previously OPEN in the graduated reducer verdict, is now closed statically. The only remainders are genuinely
-RUNTIME-only (state-enum integer values; bilateral per-tile kernel form; flow-map producer/consumer) — named
-per item in `parked_residuals_decoded_FOURZOOM.md`, and they are the kind of thing Codex's validation pass
-runs, not static gaps.
+claims** (#4 `0x1f0a00` "RB-tree"; #2 `0x22f3fd` conflation). The merge SELECTION prong (#1 `0x36930f`) was
+decoded statically. The remainders (state-enum values + which functor location is right; bilateral per-tile
+kernel — decoded statically as Gaussian exp; flow-map producer — decoded as Cramer's-rule registration; the
+flow-map's downstream reader; the `0xf33d0` bank census) are **still-to-do, and being done now** (a live
+trace + remaining static decode are in flight) — not deferred.

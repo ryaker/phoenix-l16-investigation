@@ -30,7 +30,7 @@ N→1 merge), full pixel-merge pipeline (src1/src2 = geometry descriptors; index
 wavelet-domain SSIM-class score; `1/Σscore`-normalized soft average; lane-3 detail-transfer; `__bss`
 color matrix), acceptance statistics, and the verify-before-trust reconciliation that the IRAMP source/
 warp producer is Codex's **FusionCacheBayer** (`0x406a10`), NOT `0x216f60`. Residual merge-core unknowns
-are all runtime (Codex's domain). Supersedes the older `MERGE_PIPELINE.md` table for the merge story.
+are runtime, still to do (mine; renders available). Supersedes the older `MERGE_PIPELINE.md` table for the merge story.
 
 `MERGE_PIPELINE.md` — end-to-end IRAMP merge→output dataflow synthesis (entry → coverage gate →
 block-match align → SSIM-class score → soft similarity-weighted blend → Hann accumulator → edge-pad →

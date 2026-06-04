@@ -69,7 +69,7 @@ fraction arrays), dispatched indirectly via `__const 0x6580e0` (gate consumer = 
 = both lanes strictly >0; sentinel `(-1,-1)` rejected; `<8` positive pairs → clean early return skipping
 the merge body.
 
-## Residual unknowns — all RUNTIME (Codex's domain) or already in committed evidence
+## Residual unknowns — RUNTIME, still to do (mine; renders are available) or already in committed evidence
 1. IRAMP source/warp producer — **RESOLVED by Codex** (FusionCacheBayer `0x406a10`/`0x3ed2e0`).
 2. `0x216f60` geometry-record consumer + record-count==N — runtime (Codex `0x23faf0` thread).
 3. Final `sqrt` operand certification at `0x36e511` — runtime tag (low marginal value; static structure

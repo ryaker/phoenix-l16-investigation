@@ -77,4 +77,4 @@ Codex's committed `bundle_static_prefusion_sentinel_216f60_scan_count_window.md`
 found here is at `0x217ab9..0x217af9` — AFTER `0x217110`, the next section — and the accept consumer is
 `0xf33d0` (CalibStage write). So this lane resolves the exact "final acceptance/rejection semantics" that
 Codex's committed evidence left OPEN: the post-scan argmax + 0.25 exceed-fraction ceiling (+2 gates) decides
-accept→write candidate into the current CalibStage vs reject→teardown. Codex to validate.
+accept→write candidate into the current CalibStage vs reject→teardown. (Candidate.)

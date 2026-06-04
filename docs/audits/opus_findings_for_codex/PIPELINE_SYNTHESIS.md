@@ -50,7 +50,7 @@ its own packet. This is the entry point for Codex's validation pass.
 - **Calibration: structure universal cross-unit, values per-body.** Cross-unit invariants: CCM row-sums
   [0.9642,1.0,0.8252] + Block-5 vignetting (byte-identical = firmware constant).
 
-## RESIDUALS for Codex
+## RESIDUALS — open, still to do (mine, not handed off)
 - **Data-dependent MAGNITUDES — RESOLVED four-zoom (W5+W5b, `merge_magnitudes_FOURZOOM`).** The "Kth-hit
   uncapturable under Rosetta" wall is BROKEN: LLDB ignore-count (`-i N`) + conditional (`-c`) breakpoints are
   core-handled (no Python), reach mid-render in ~11–50s, no stampede. Captured all four tiers: score

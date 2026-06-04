@@ -79,8 +79,9 @@ that proves these are candidates, not verdicts:
   `(*0x90)→vtable+0x30`), with `+0x6c`=current-state int, `+0x68`=terminal, and `+0x58`/`+0xa0` a
   `std::vector<{state_int, elapsed_double}>` PROFILING log (the "tree insert" = its push_back grow), plus an
   "state function has not been registered" throw. **The two passes disagree on the functor location and on
-  whether `+0x58` is a functor tree or a profiling vector. NOT resolved here — flagged for Codex.** Both agree
-  the next-state binding is populated at State construction time (the enum→functor table is construction data).
+  whether `+0x58` is a functor tree or a profiling vector. NOT resolved by these two static passes — I am
+  resolving it now (decode the State registration/construction + a live state-sequence trace), not leaving
+  it.** Both agree the next-state binding is populated at State construction time.
 - **Bilateral kernel (real body `0x29f070`, NOT `0x5dcf40` which is `__const`):** range weight =
   **Gaussian `exp(−1.5·d²/σ²)`** via inline branchless `exp2f` (4th-order minimax `2^x` poly coeffs
   `0x5dae2c..` ≈ {0.078,0.226,0.696,0.99993}; `pslld $0x17` exponent pack; clamp ±126/128) — NOT a rational
@@ -99,4 +100,5 @@ that proves these are candidates, not verdicts:
   **`std::shared_ptr<MirrorSysParam<double>>`** (0xe8) and **`std::shared_ptr<MirrorActuatorMapping<double>>`**
   (0x220, transform-type 1/2 else "Unrecognized Variable Transform Type!"). ⇒ the L16 **folded-optics
   moving-mirror system parameters + actuator-position→deflection mapping** — a calibration object class not
-  previously surfaced. Candidate; Codex to validate the mirror-model role.
+  previously surfaced (the L16 folded-optics moving-mirror calibration). Candidate; the mirror-model's role in
+  the pipeline is still to decode (mine to do).
