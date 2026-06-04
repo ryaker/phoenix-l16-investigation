@@ -105,13 +105,16 @@ that proves these are candidates, not verdicts:
   **mirror-deflection scalar** that feeds the geometry-record builders `0x216f60`/`0x218390`/`0x264440`. ⇒ the
   mirror model supplies per-camera ray geometry via mirror deflection (NOT a separate undistort LUT).
   (Residual: whether the deflection reaches per-pixel warp at render = geometry-record→pixel-warp, not traced.)
-- **⚠ Flow `{fx,fy,score}` buffer (`0x369e7e`) — runtime-bound + INTER-PASS CONTRADICTION, being resolved by
-  render.** One static pass decoded a `{fx,fy,score}` 12-byte store into an image whose data ptr is its `+0x60`
-  field; a second pass found the `0x60` refs in `0x3661b0` are rbp stack-locals and saw NO `+0x60` store into
-  the output struct, and the merge's returned output (data at `+0x20`) is consumed only by `0xd76a0` (squares
-  it) then destroyed — no static reader of a `+0x60` buffer in the processLevel0 chain. So whether the
-  `{fx,fy,score}` buffer is even populated/read in the bridge path is genuinely DATA/PATH-dependent. Resolving
-  by a live render (BP `0x369e7e` module-relative: does it fire + write, and what reads it) — not left open.
+- **Flow `{fx,fy,score}` buffer (`0x369e7e`) — RESOLVED by render (candidate); the first pass was right, the
+  second refuted.** Module-relative BP (nlocs=1, exact-pc stop, worker thread) under bridge profile-3/--no-lris:
+  the store **FIRES**; the data ptr is loaded from the **object field `+0x60`** (`0x369e6d movq 0x60(%rcx,%rdx),
+  %rcx`; runtime obj+0x60 == dataptr 0x7fbce0860640, in an 8 MB rw HEAP region — NOT rbp), so it writes a real
+  **heap {flow_x,flow_y,score} map** (stride field `+0x58`=28; 12-byte/3-float records; first-hit fx=fy=19.2256,
+  score=0). It is **read back**: intra-merge at `0x36a803`/`0x36a814` (`addss (%rbx,%rcx,4)` — the SAME
+  weight/normalization block decoded in `merge_magnitudes` §1b, so the flow/score map FEEDS the per-contributor
+  weighting) plus a `0x2ec6xx` weighted-accumulation consumer. ⇒ persistent heap flow/score map, written AND
+  consumed in the bridge path; the prior "rbp stack-local / no reader" reading was wrong. (Residual: the score
+  `+8` slot's specific reader and the `0x2ec6xx` consumer semantics not yet decoded — single 28mm U1 sample.)
 - **CalibStage bank census (`0xf33d0`, 10 static call sites, r8d all immediate):** 9 sites pass **r8d=1 =
   current bank** (`+0x12c`); exactly ONE — `0x1f1328` — passes **r8d=0 = factory bank** (`+0x180`), immediately
   paired with a current read at `0x1f134b` (a factory-vs-current comparison in one function).
