@@ -105,7 +105,11 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
    `0x3ec960`). Motion-compensated, index-validity-gated contributors, **1/Σscore-normalized soft weighted
    average** (`rcpss 0x36a938`), wavelet-domain SSIM-class score `0x36cde0`. Driven by a tiled work-queue
    scheduler `0x3adf30` (producer `0x41a7d0` + level-keyed collector `0x3bf820`); no global Laplacian add.
-4. **RESAMPLE** — B-spline `0x2b2be0` / Catmull-Rom `0x36f800` (parity-grade kernels).
+4. **RESAMPLE** — **cubic B-spline `0x2b2be0` CONFIRMED** (consts 1/6, 3, −6, 4, 6, 2 = textbook basis;
+   `laneE_fourzoom_topology/resample_kernels_constants.md`). ⚠ The prior **"Catmull-Rom `0x36f800`" label is
+   REFUTED** by its constants `{1/6, 9, ±15, −3, −12, 116/3, 1/64, 0.075274}` — neither Catmull-Rom (no
+   −0.5/2.5/−4) nor cubic B-spline; it IS a 1/6-normalized piecewise-polynomial spline of unidentified order
+   (LEAD: higher-order spline / B-spline derivative). Exact identity = residual.
 5. **COLOR/SHAPING** — lane-3 detail-transfer; fixed **I1I2I3** decorrelation matrix (`__bss 0x671980`,
    runtime-constant); per-camera **CCM** parsed from LRI Block-6 + applied (`ImageApplyColorMatrix`); **AWB**
    gains (Block-8) applied as reciprocals folded into the demosaic; spectral curves (Block-6 f2.8); per-camera
