@@ -67,6 +67,10 @@ its own packet. This is the entry point for Codex's validation pass.
 - **Decode gaps:** unsharp combine VA; Laplacian-pyramid clarity kernel; NLM search radius (runtime param);
   per-camera CCM existence; lens-shading {1,15} sub-grid on Unit-2.
 
-> Count: REMEDIATION_LEDGER 48/80 graduated (+3 subsumed, +1 superseded, 28 staging). This synthesis covers
-> the graduated subset; it is NOT a claim the whole pipeline is validated — the residuals above are
-> first-class open items.
+> Count: REMEDIATION_LEDGER 57/80 graduated (76/80 resolved; 4 staging — 3 in the color-consumption render
+> batch, 1 corpus-capped). This synthesis covers the graduated subset; it is NOT a claim the whole pipeline is
+> validated — the residuals above are first-class open items.
+> **2026-06-04 corrections (see `cgroup_runtime_FOURZOOM`):** stage 10 pyramid-merge runs **L0+L1+L2-4 all
+> firing** (the prior "only L0/L1, L2-4=0" was a python-hit-drop artifact; counts are tier-VARYING);
+> stage 9 calib gate2/gate3 **DO fire** (28/35/70); merge-projection radial ≈identity (undistort stays a
+> separate pre-merge stage); post-merge color matrix = fixed I1I2I3 const bit-verified four-zoom.

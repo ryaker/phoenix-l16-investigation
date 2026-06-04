@@ -3,7 +3,7 @@
 
 **Directive (Rich, 2026-06-03):** run the four-zoom playbook (see `../opus_findings_for_codex/README.md`)
 disciplined through EVERY finding doc from the last 2 days. None graduates to Tier 1 (findings_for_codex)
-until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 51 / 80 graduated** (+14 subsumed, +3 subsumed-corrected, +1 superseded, +1 retracted = 70/80 resolved; 10 STAGING). Jump 28→50 = 2026-06-04: tool wall BROKEN (W5+W5b → 4-tier merge/score/CCM magnitudes via `merge_magnitudes_FOURZOOM`, +weight_vec4 formula §1b); 13 static sub-mechanism docs byte-verified (`static_submechanisms_verified_FOURZOOM`); LRI sub-facts (incl 8-seed two-unit intrinsics) re-parsed (`lri_calibration_parser_FOURZOOM` addendum); 15 docs subsumption-confirmed into graduated parents (residuals → `SUBSUMPTION_RESIDUALS.md`). **11 STAGING remain:** 6 in the runtime C-group render batch (12/25/67/70/73/76), 3 differential-render-owed (34/48/49 AWB/CCM consumption), reducer_verdict two-prong (13, open), 77 corpus-capped partial. Earlier: W1:2 + W1b:4 render + W3:14 + W3b:2 LRI-calibration.
+until its per-tier (28/35/70/150) data is captured + verified. **Current truth: 57 / 80 graduated** (+14 subsumed, +3 subsumed-corrected, +1 superseded, +1 retracted = **76/80 resolved**; 4 STAGING). Jump 28→57 = 2026-06-04: tool wall BROKEN (W5+W5b → 4-tier merge/score/CCM magnitudes via `merge_magnitudes_FOURZOOM` + weight_vec4 §1b + reducer two-prong verdict); 13 static sub-mechanism docs byte-verified; LRI sub-facts (8-seed two-unit intrinsics) re-parsed; 15 subsumption-confirmed (residuals → `SUBSUMPTION_RESIDUALS.md`); **C-group runtime batch graduated 6 (`cgroup_runtime_FOURZOOM`) with TWO corrections: L2-4 FIRES (refutes 'L2-4=0' python-hit-drop artifact) + gate2/3 FIRE (refutes 'untriggered')**. **4 STAGING remain:** 34/48/49 in the color-consumption render batch (`NEXT_RENDER_BATCH.md`, in flight), 77 corpus-capped (needs a 182-class unassigned LRI not in corpus). Plus owed re-measures: 70mm dispatcher tally (native), Unit-2 runtime (corpus lacks clean U2 35mm). Earlier: W1:2 + W1b:4 render + W3:14 + W3b:2 LRI-calibration.
 
 Cadence is render-bound (4 sequential renders per data sweep, minutes each, one external disk under
 Rosetta) — this is a multi-day campaign, not a pass. Renders are BATCHED: one 4-render sweep with many
@@ -37,7 +37,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 9 | → GRADUATED: opus_findings_for_codex/lane3_blend_FOURZOOM.md | **GRADUATED** | four-zoom structure (magnitude tool-limited) | W1c |
 | 10 | laneA_prefusion_reducer_static/matrix_36acf0_bss_storage.md | SUBSUMED | →colormatrix_runtime_const_RESOLVED (I1I2I3 const; self-fwd-ptr). Clean, no residual | sub |
 | 11 | laneA_prefusion_reducer_static/matrix_36acf0_decode.md | SUBSUMED | →merge_magnitudes §3 + colormatrix const + lane3_blend (lane3=1.0). Clean | sub |
-| 12 | laneA_prefusion_reducer_static/merge_projection_radial_identity.md | STAGING | OWED | - |
+| 12 | → GRADUATED(cgroup_runtime_FOURZOOM §1) | **GRADUATED** | merge-projection radial 0x3e42e0 ≈identity (≤0.84% mid-radius) all 4 tiers ⇒ undistort separate pre-merge, not re-applied | Crender |
 | 13 | → GRADUATED(terminal_merge_3661b0_FOURZOOM verdict) | **GRADUATED** | two-prong byte-verified: N-accept loop + N→1 store 0x36aa50→57; src1/src2=geometry (H1 refuted); normalize/weight/score/lane3 all graduated. OPEN: sentinel-gate runtime, two-unit | Bstatic |
 | 14 | → GRADUATED(merge_magnitudes_FOURZOOM) | **GRADUATED** | score `0x36cde0`=√(a·b) non-degenerate 4-tier: 28=.78062, 35=.34404/.29467, 70=.62859/.78014, 150=.98853 (orch bit-checked) | W5/W5b |
 | 15 | → GRADUATED(merge_magnitudes_FOURZOOM) | **GRADUATED** | Σscore `0x36a938`=1/Σ 4-tier: 28 .2546→3.926, 35 .9436→1.060, 70 .3907→2.560, 150 5.20→.1923 | W5/W5b |
@@ -50,7 +50,7 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 22 | laneA3_combine_store_site/step0_inner_body.md | SUBSUMED | self-retracted by step0_reconciliation (-0x4240=compared patch not accumulator). Clean | sub |
 | 23 | laneA3_combine_store_site/step0_reconciliation.md | SUBSUMED | →terminal_merge + lane3_blend (N→1 reduction). Residual: (flow_x,flow_y,score) tuple store → committed iramp lane / SUBSUMPTION_RESIDUALS | sub |
 | 24 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | resample APPLY Q16.16/64-phase/4-tap MAC; 0x5abed8=65536.0; byte-verified | Bstatic |
-| 25 | laneA5_output_finalization/colormatrix_runtime_const_RESOLVED.md | STAGING (RESOLVER) | 0x671980 = fixed I1I2I3 const, static-init (write-wp 0 hits 28mm + recognizable 1/√3,1/√2,1/√6 + single __const writer 0x374505). Static-init ⇒ tier-invariant; 35/70/150+U2 = low-risk confirm | W1/W5 |
+| 25 | → GRADUATED(cgroup_runtime_FOURZOOM §2) | **GRADUATED** | I1I2I3 matrix bit-verified 4-tier (const 0x5f2380; 0 write-wp hits 35/70/150 + 28 prior); static-init tier-invariant | Crender |
 | 26 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | detail-transfer out=(B+C)+clamp((A−B)·2·C.l3,±0.1); consts byte-verified | Bstatic |
 | 27 | laneA5_output_finalization/kernel_identity.md | SUBSUMED | →resample_kernels_FOURZOOM (B-spline 0x2b2be0 / Catmull-Rom 0x36f800 byte-identical). Clean | sub |
 | 28 | laneA5_output_finalization/matrix_36acf0_bss_storage.md | SUBSUMED | DUPLICATE of row10 →colormatrix_runtime_const_RESOLVED. Clean | sub |
@@ -92,16 +92,16 @@ breakpoints captures per-tier data for many runtime docs at once, then those doc
 | 64 | laneD_final_acceptance_static/accept_consumer_calibstage.md | SUBSUMED | →accept_reject_gate_FOURZOOM (ACCEPT→0xf33d0). Residual: 0xf33d0 bank layout + 0x22f3ff dispatcher → SUBSUMPTION_RESIDUALS | sub |
 | 65 | → GRADUATED: opus_findings_for_codex/accept_reject_gate_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 66 | laneD_final_acceptance_static/acceptance_gate_location.md | SUBSUMED | →accept_reject_gate_FOURZOOM (parent FOUND gate 0x217ab9 staging couldn't). Residual: call-site map + r14=-0x220 fix → SUBSUMPTION_RESIDUALS | sub |
-| 67 | laneD_final_acceptance_static/calib_to_merge_link_LEAD.md | STAGING | OWED | - |
+| 67 | → GRADUATED(cgroup_runtime_FOURZOOM §3) | **GRADUATED** | calib-State ≠ merge-projection object (∅-overlap all 4 tiers) ⇒ direct calib→merge link REFUTED four-zoom | Crender |
 | 68 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | 0xe6ba0 = keyed SELECT-ONE, 0 FP-arith ops (verified) | Bstatic |
 | 69 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | 0x218b30 stat reducer (mean+exceed-frac); <8 pairs→skip (0x2170d1) | Bstatic |
-| 70 | laneD_final_acceptance_static/gate2_gate3_reject_semantics.md | STAGING | W1b: gate1 fires 4-zoom; gate2/3 still untriggered | W1b |
+| 70 | → GRADUATED(cgroup_runtime_FOURZOOM §3) | **GRADUATED**(corrected) | gate2/gate3 DO FIRE (28/35/70=3/3/4; 150=0 short-path) — REFUTES W1b 'untriggered'; static decode runtime-confirmed | Crender |
 | 71 | → GRADUATED: opus_findings_for_codex/final_compositing_consumer_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
 | 72 | → GRADUATED(static_submechanisms_verified_FOURZOOM) | **GRADUATED** | level dispatcher 0x3ec9dc: L0=0x3ec770/L1=0x3ebb80/L2-4=0x3d0650; vtable+0x30 | Bstatic |
-| 73 | laneE_fourzoom_topology/level_fire_runtime_28mm.md | STAGING | OWED | - |
+| 73 | → GRADUATED(cgroup_runtime_FOURZOOM §4)(corrected) | **GRADUATED** | ⚠ L2-4 FIRES all tiers (REFUTES 'L2-4=0/zoom-indep' python-hit-drop artifact); native tally 28~298/343/362, 35 232/280/232, 150 63/80/59; 70mm re-measure owed | Crender |
 | 74 | laneE_fourzoom_topology/output_producer_static.md | A→SUBSUMED+CORRECTED | producer path OBSERVED; "RB-tree" REFUTED (libc++ symbol scan: __tree/map/set/list all 0); final-compositing question CLOSED by graduated final_compositing_consumer_FOURZOOM. Correction banner added | 2026-06-04 |
 | 75 | → GRADUATED: opus_findings_for_codex/resample_kernels_FOURZOOM.md | **GRADUATED** | four-zoom OBSERVED (first-hit) | W1b |
-| 76 | laneE_fourzoom_topology/scheduler_recombine_runtime.md | STAGING (CORRECTED) | dispatch tally OBSERVED 28mm; "RB-tree/list insert" REFUTED (intrusive 0x80-node list); correction banner added. Tally 35/70/150mm still owed (C, runtime) | 2026-06-04 |
+| 76 | → GRADUATED(cgroup_runtime_FOURZOOM §4) | **GRADUATED** | collector 0x3bf820/node 0x3bfc40 native tally: 35 240/313, 70 252/323, 150 60/101 (RB-tree already refuted→intrusive list) | Crender |
 | 77 | laneP_parser_gap_182/residual_alternate_container.md | STAGING (PARTIAL) | assigned LELR count verified (wide=11/tele=12; prose off-by-one fixed); unassigned-file 0–4 claim untestable in corpus | Blri |
 | 78 | MERGE_MECHANISM_SYNTHESIS.md | A→SUBSUMED+CORRECTED | synthesis of graduated children; stale "runtime-populated color matrix" corrected → fixed I1I2I3 const (rows 25/W5) | 2026-06-04 |
 | 79 | MERGE_PIPELINE.md | A→SUBSUMED+CORRECTED | navigational table; stage-10 "runtime/per-LRI color-correction" corrected → fixed I1I2I3 const | 2026-06-04 |

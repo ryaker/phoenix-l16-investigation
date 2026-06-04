@@ -1,5 +1,12 @@
 <!-- provenance: runtime probe agent abbfa81e (single 28mm render), 2026-06-03 -->
-**Status:** NEEDS_CODEX_VALIDATION (quarantine, runtime LLDB, single 28mm profile-3 render).
+> **CORRECTED + GRADUATED (2026-06-04) → `../../opus_findings_for_codex/cgroup_runtime_FOURZOOM.md` §4.**
+> ⚠ The **"L2-4=0 / only L0,L1 fire / zoom-independent" claim below is REFUTED.** It came from a python
+> script-callback breakpoint that **silently drops hits under Rosetta multi-thread**. The reliable native
+> drain-counter shows **L2-4 (`0x3d0650`) fires on every tier** and counts are **tier-VARYING**: 28mm
+> ~298/343/362 (L0/L1/L2-4, 2-run reproducible), 35mm 232/280/232, 150mm 63/80/59. The merge runs a real
+> multi-level pyramid. (70mm native re-measure still owed.)
+
+**Status:** GRADUATED(corrected) → cgroup_runtime_FOURZOOM §4 (was NEEDS_CODEX_VALIDATION; the L2-4=0 claim is REFUTED — python hit-drop artifact).
 **Verifier reliability:** single-probe OBSERVED (breakpoint tally + backtrace); not independently re-run. Scope-bound to this one render.
 
 # Lane E — RUNTIME: which PipelineCache levels fire + the scheduler topology (28mm)

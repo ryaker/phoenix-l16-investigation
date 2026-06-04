@@ -1,5 +1,11 @@
 <!-- provenance: orchestrator static disasm of libcp.dylib 0x216f60 accept-gate, region 0x217a40..0x217b20, 2026-06-03 -->
-**Status:** NEEDS_CODEX_VALIDATION (quarantine, STATIC disasm; gate1 separately OBSERVED live in
+> **GRADUATED (2026-06-04) → `../../opus_findings_for_codex/cgroup_runtime_FOURZOOM.md` §3.** ⚠ The
+> "untriggered at runtime" wording below is **REFUTED**: native drain-count shows **gate2/gate3 DO FIRE** —
+> 28mm 3/3, 35mm 3/3, 70mm 4/4 (`0x217acf`/`0x217ae3`); 150mm 0/0 (short-path, scope-bound). The prior
+> "untriggered" was the python-callback hit-drop artifact. The static decode below stands and is now
+> runtime-confirmed live.
+
+**Status:** GRADUATED → cgroup_runtime_FOURZOOM §3 (was NEEDS_CODEX_VALIDATION; gate2/gate3 now runtime-confirmed FIRING, "untriggered" REFUTED). STATIC disasm; gate1 separately OBSERVED live in
 `accept_reject_gate_located.md`; gate2/gate3 were "present but untriggered" at runtime — now characterized
 statically). Binary: `libcp.dylib` (Mach-O x86_64, __TEXT fileVA==offset).
 
