@@ -36,3 +36,16 @@ a runtime per-render refinement of it, gated by the 0.25 exceed-fraction ceiling
 - The exact meaning of the 3 records (2×vec4+int) — a 3-row transform? per-axis alignment? (LEAD).
 - The factory(0)/current(1) tag is named from the string; not traced to who reads each bank downstream.
 - Whether the pixel merge reads the "current" CalibStage (the link calib→merge) — not yet traced.
+
+## Where the accepted calibration is CONSUMED (reconciled with committed evidence, 2026-06-03)
+Per committed `bundle_proof_calibdataprocessor_lambda_family.md` + `lldb_calib_state_operator_runtime_four_zoom.md`:
+the `CalibDataProcessor::State()` operator family (`+0x30` slot) = the camera-GROUP runners —
+`runReferenceGroupCams::$_0` (`0x229df0`, first) … `runHigherGroupCams::$_12` (`0x22e1d0`, terminal), 13
+bodies, all fire four-zoom. So the per-render accepted calibration (current CalibStage, State `+0x12c..`) is
+consumed by the **per-camera-group processing** (reference group = anchor focal tier; higher groups = tele
+tiers). The committed note explicitly flags that "the consumer of these states closes the exact src1/src2
+merge/reduction" via the **`0x22f3ff` dispatcher → `0x22e1d0` consumers** — i.e. group-runner → merge is the
+known OPEN closure point. Coherent chain: accept-gate refines per-group alignment calibration → State current
+CalibStage → consumed by runReferenceGroupCams/runHigherGroupCams (group processing) → aligned/undistorted
+sources → IRAMP merge. (Answers "where the accept-gate calib goes" at the consumer level; the final
+group-runner→merge byte-level closure remains the `0x22f3ff` open point Codex tracks.)
