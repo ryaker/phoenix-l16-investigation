@@ -110,10 +110,14 @@ All per-camera calibration is **LRI-resident** (clean-room Rule #0 OK):
    REFUTED** by its constants `{1/6, 9, ±15, −3, −12, 116/3, 1/64, 0.075274}` — neither Catmull-Rom (no
    −0.5/2.5/−4) nor cubic B-spline; it IS a 1/6-normalized piecewise-polynomial spline of unidentified order
    (LEAD: higher-order spline / B-spline derivative). Exact identity = residual.
-5. **COLOR/SHAPING** — lane-3 detail-transfer; fixed **I1I2I3** decorrelation matrix (`__bss 0x671980`,
-   runtime-constant); per-camera **CCM** parsed from LRI Block-6 + applied (`ImageApplyColorMatrix`); **AWB**
-   gains (Block-8) applied as reciprocals folded into the demosaic; spectral curves (Block-6 f2.8); per-camera
-   lens-shading grid (Block-4).
+5. **COLOR/SHAPING** — lane-3 detail-transfer; fixed **I1I2I3** decorrelation matrix (corroborated TWICE:
+   `__bss 0x671980` and global `0x670b00` from consts `0x5f2380` = Ohta basis, applied via 3×3 path `0x300570`
+   — a DECOY, not the per-camera CCM); **per-camera CCM apply site now LOCATED**
+   (`laneB2_lri_calibration_origins/ccm_apply_site_located.md`): the **4×4 apply `0xbfa20`** reached via
+   `setColorCorrection $_58 0x3466d0` → `0xa9f20` → worker `0xbf4a0`, matrix = `*[BayerPipelinePayload+0]+0x14`
+   → closure+0x20 → apply `[rdi+0x8]`. (This explains the inert entry-time perturbation — CCM comes via the
+   closure capture, not the render-entry proto.) **AWB** gains (Block-8) applied as reciprocals folded into the
+   demosaic; spectral curves (Block-6 f2.8); per-camera lens-shading grid (Block-4).
 6. **OUTPUT ASSEMBLY** — **final compositing consumer now CROSSED** (`laneE_fourzoom_topology/
    final_compositing_consumer.md`): orchestrator `0x3bca90` join-waits `0x3c25a0`, then **gather `0x3bfe60`**
    drains the level-keyed tile container (a **priority-sorted doubly-linked list at `RendererPrivate+0x260`** —

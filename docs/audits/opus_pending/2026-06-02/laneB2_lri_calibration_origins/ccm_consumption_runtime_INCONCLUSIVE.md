@@ -1,3 +1,9 @@
+> **UPDATE 2026-06-03 — the CCM apply site is now LOCATED statically** (`ccm_apply_site_located.md`): per-camera
+> CCM = 4×4 apply `0xbfa20` via `setColorCorrection $_58 0x3466d0` → `0xa9f20`; matrix = `*[BayerPipelinePayload
+> +0]+0x14` delivered through the closure capture (+0x20), NOT the render-entry proto buffer — which is exactly
+> why the entry-time perturbation below (`0x390180`) was inert. Codex now has a concrete BP target (`0xbfa20`).
+> The nondeterminism finding (§1) and structural CCM corrections (§2) below still stand.
+
 # Lane B2 — RUNTIME (INCONCLUSIVE): Block-6 CCM consumption + a spike-critical nondeterminism finding
 
 **Status:** `NEEDS_CODEX_VALIDATION`. Method: runtime differential rendering (28mm Unit-1 seed). The CCM
