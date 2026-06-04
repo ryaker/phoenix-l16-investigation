@@ -1,0 +1,53 @@
+<!-- provenance: runtime probe agent abe3fd62 (single 70mm render) + static, 2026-06-03 -->
+**Status:** NEEDS_CODEX_VALIDATION (quarantine). OBSERVED runtime backtrace + thresholds extracted; the
+gate identity is a STRONG LEAD (runtime-anchored to confirmed vtable, not yet live-watched at the branch).
+
+# Lane D — final merge ACCEPT/REJECT gate LOCATED (prefusion candidate scoring)
+
+## How it was found (un-fenced: runtime backtrace crosses the __const indirect dispatch)
+`0x218e20` (the score/fraction array-filler) is reached via an indirect function-ptr in `__const 0x6580b0`
+slot +0x30 — static couldn't find its caller. A runtime BP + backtrace (70mm render) crossed it:
+`0x218e20` runs as a **pooled parallel-for task body** — backtrace = `0x5ed0` (generic parallel-for worker:
+`lock xaddl` work-counter, then `callq *0x30(%rax)` = the task body) → `0x4de0` (thread-pool scheduler) →
+`0x2770` (pthread trampoline). So the immediate caller is the thread pool, NOT the gate.
+
+## The gate = the SPAWNER `0x216f60`, block `0x217ab9..0x217af9` (LEAD, runtime-anchored)
+The runtime `call *0x30(rax)` ⇒ `rax = vtable 0x6580b0`; that vtable is LEA-installed ONLY at `0x2179d9`
+inside `0x216f60` (the `eax==0` branch). `0x216f60` (frame 0x6c8):
+1. Allocates the polymorphic scoring functor; stores stack arrays into it — **fraction array `-0x410` →
+   functor+0x38** (matches the filler's `*(rbx+0x38)` fraction store), score region `-0x3f0/-0x430`
+   (matches the filler's `*(rbx+0x18)` mean-score store at `0x218f88`).
+2. `0x217a42 callq 0x5670` — spawns the recursive divide-and-conquer parallel-for (runs `0x218e20` per tile).
+3. Joins (`0x217a47..0x217a65`).
+4. `0x217a68..0x217aa2` — scans score array `-0x3f0` for the extreme element (argmax/argmin via
+   `ucomiss (%rcx),%xmm0; jae`) → selects the best candidate index.
+5. **THREE REJECT GATES on the selected index (`0x217ab9..0x217af9`):**
+   - `0x217ab9` load fraction `-0x410[idx]`; `0x217ac9 jb 0x217bf8` ⇒ **REJECT if fraction < 0.25**
+     (const `0x5a8200` = 0.25).
+   - `0x217ad2 ucomiss (rsi,rdx,4),xmm0; 0x217ad6 ja 0x217bf8` ⇒ **REJECT if fraction > a 2nd array elem.**
+   - `0x217ae8.. movss score; mulss 0.8 (const 0x5d5350); ucomiss; jb 0x217bf8` ⇒ **REJECT if 0.8·score <
+     comparator.**
+   - all rejects → `0x217bf8` = array free/teardown chain (drops the candidate).
+   - **ACCEPT** path `0x217aff+`: reads the 24-byte-stride record array `-0x430`, calls `0x218390` →
+     `0x264980` → `0xf33d0` (records the accepted contributor).
+
+## Extracted thresholds (clean-room-relevant)
+- Fraction floor = **0.25** (`0x5a8200`).
+- Score scale-before-compare = **0.8** (`0x5d5350`).
+- Gate 2 = relational vs a 2nd fraction-array element (no literal).
+
+## Reframe of `0x216f60` (reconciles the earlier "geometry builder" read)
+`0x216f60` is the **prefusion candidate ACCEPT/REJECT orchestrator**: builds candidate transform/records →
+spawns parallel scoring (`0x218e20` filler + `0x218b30` stats reducer) → joins → argmax → thresholds →
+accept (`0xf33d0`) or drop. The earlier `geom_record_consumer_static.md` view (record-builder, callers
+`0x22aaf0`/`0x22d250`) is the record-building half of the same function.
+
+## OBSERVED vs LEAD
+- OBSERVED: 70mm hits the path (28mm `L16_02130` ran to 100% but `0x218e20` NEVER fired ⇒ prefusion-state
+  path is TELE-gated); backtrace `0x5ed0→0x4de0→0x2770`; immediate caller = thread pool (no gate there).
+- LEAD (static, anchored to runtime-confirmed vtable `0x6580b0` + the +0x38 field match): `0x216f60` is the
+  spawner and `0x217ab9..0x217af9` is the gate. NOT yet live-watched at the branch.
+
+## Next (clean upgrade LEAD→OBSERVED)
+BP `0x217ab9` on a 70mm render; read xmm0 (fraction) + which `jb/ja` branch is taken per candidate; confirm
+the 0.25 / 0.8 thresholds fire and tally accept vs reject counts. One render; breakpoints work.
