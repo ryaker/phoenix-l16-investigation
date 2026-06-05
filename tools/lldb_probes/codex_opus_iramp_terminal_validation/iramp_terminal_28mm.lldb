@@ -1,0 +1,18 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_opus_iramp_terminal_validation/iramp_terminal_probe.py
+script iramp_terminal_probe.reset("28mm L16_02130 Codex Opus IRAMP terminal validation", 8)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_opus_iramp_terminal_validation
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x365960
+breakpoint set --shlib libcp.dylib --address 0x3661b0
+breakpoint set --shlib libcp.dylib --address 0x36930f
+breakpoint set --shlib libcp.dylib --address 0x369e91
+breakpoint set --shlib libcp.dylib --address 0x36a938
+breakpoint set --shlib libcp.dylib --address 0x36aa57
+breakpoint set --shlib libcp.dylib --address 0x36e511
+script iramp_terminal_probe.attach_existing(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_opus_iramp_terminal_validation/iramp_terminal_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script iramp_terminal_probe.drive_until_exit_or_step_cap(lldb.debugger, 60000)
+script iramp_terminal_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_opus_iramp_terminal_validation/iramp_terminal_28mm.json")
+quit

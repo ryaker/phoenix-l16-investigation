@@ -37,6 +37,11 @@ investigation and write the durable result here or in `docs/evidence/`.
   2026-05-31 Opus/Claude work: reran the nine local verifier scripts,
   independently re-read corrected VAs, swept for hypothesis contamination, and
   audited commit range `3559b65..aa9904c`.
+- `codex_opus_quarantine_validation_2026-06-04.md` — Codex validation against
+  Opus quarantine branch `research/opus-quarantine-2026-06-02`; records the
+  first independent static re-extraction of the terminal IRAMP candidate
+  cluster plus a first four-zoom runtime harness, while keeping full
+  reducer/magnitude semantics explicitly unadmitted.
 
 ## Verified Cleanup Note
 
