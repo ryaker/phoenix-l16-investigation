@@ -33,6 +33,7 @@ If a claim does not change that outcome, it does not belong here.
 - Partner records are `0x280` bytes.
 - Runtime non-empty partner-vector states and first SAD hits are observed at `28mm`, `35mm`, `70mm`, and `150mm`.
 - Runtime empty partner-vector states are observed at `28mm` and `70mm`; `35mm` and `150mm` empty-gate runtime hits are not proven.
+- Follow-up branch-target proof bounds the local index sentinel gate: capped packets reach `0x36931b` with `eax == 0x80000000` and reach `0x369320` with non-sentinel `eax` values whose low table dword at `r12 + rsi * 8` matches `eax` on all four canonical focal tiers. This is local branch-target proof, not full candidate-policy closure.
 - Static plus runtime proof now shows the first-hit partner-record append/population path reaches `0x368b02` at `28mm`, `35mm`, `70mm`, and `150mm`.
 - A populated `0x280` record is physically four int32 scalar fields followed by thirteen contiguous `0x30` descriptor-like blocks.
 - Static plus runtime proof now also bounds the live non-empty consumer path through coarse SIMD SAD / `phminposuw` winner selection, local absolute-difference refinement, guarded float refinement, 16x16 bilinear vec4 resampling, `0x36cde0`, and a three-float scratch write at `0x369e7e..0x369e91` across all four canonical zooms.

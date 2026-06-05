@@ -157,7 +157,7 @@ claimed four-zoom runtime `Σscore` values.
 |---|---|---|
 | `0x365960 -> 0x3661b0` static caller/inner split | STATIC CONFIRMED | Fresh installed-bundle re-disassembly matches the candidate. |
 | `0x3661b0` uses `arg0+0x18` vector count | STATIC CONFIRMED, RUNTIME COUNT-USE CONFIRMED | Fresh re-disassembly confirms the corrected vector location. The first 2026-06-04 runtime harness sampled `0x3661b0` entry, but its closure-vector reads were rejected as count evidence. The follow-up `0x366a65` probe then sampled the actual post-`sarq` count-use site and verified live count `5` for all four canonical focal tiers. |
-| `0x36930f` sentinel skip gate | STATIC CONFIRMED, RUNTIME PARTIAL | The compare/skip sequence is real. The 2026-06-04 Codex rerun sampled the first eight hits per focal tier and all sampled `eax` values were `0x80000000`; this proves the sentinel path occurs under the tested conditions, not the full distribution. |
+| `0x36930f` sentinel skip gate | STATIC CONFIRMED, BRANCH TARGETS RUNTIME CONFIRMED | The compare/skip sequence is real. The 2026-06-04 Codex rerun sampled the first eight compare hits per focal tier and all sampled `eax` values were `0x80000000`. The 2026-06-05 branch-target rerun then confirmed both `0x36931b` sentinel-skip packets with `eax == 0x80000000` and `0x369320` valid-target packets with non-sentinel table values across all four canonical focal tiers. This is branch-target evidence, not full candidate-policy closure. |
 | `0x36cde0` returns `sqrt(xmm0*xmm1)` | STATIC CONFIRMED, RUNTIME MAGNITUDE CONFIRMED | Already consistent with current evidence. The 2026-06-04 rerun captured live first-window packets; the 2026-06-05 W5 reproduction captured representative nonzero score factors, product, and square-root result on all four focal tiers. Opus's exact sample rows are still not admitted as constants. |
 | `0x36a938` reciprocal normalizer | STATIC CONFIRMED, RUNTIME MAGNITUDE CONFIRMED | The instruction is real. The 2026-06-04 first-eight sample set saw `xmm2_low == 0.200000003` for all four focal tiers; the 2026-06-05 W5 reproduction captured non-common denominators on all four focal tiers and verified `rcpss` approximates `1/xmm2`. This is representative magnitude evidence, not a full `sum(score)` census. |
 | `0x36aa30..0x36aa57` weighted destination store | STATIC CONFIRMED, RUNTIME PARTIAL | Already consistent with current evidence. The 2026-06-04 rerun captured live destination-store packets at `0x36aa57`; public field/weight semantics remain unproven. |
@@ -302,6 +302,42 @@ arithmetic at the score and reciprocal sites. It does not admit Opus's exact W5
 numeric table as constants, does not provide a full distribution, and does not
 close the complete reducer algorithm.
 
+## Sentinel-Gate Branch-Target Result, 2026-06-05
+
+Codex then created and ran a focused branch-target harness:
+
+- Evidence document: `docs/evidence/lldb_iramp_sentinel_gate_targets_four_zoom.md`
+- Harness: `tools/lldb_probes/codex_iramp_sentinel_gate_validation/`
+- Raw outputs: `runs/codex_iramp_sentinel_gate_validation/`
+- Target sites: `0x36931b` sentinel skip target and `0x369320` valid target.
+
+The final accepted run followed two rejected harness attempts:
+
+- Python absolute-address breakpoints did not bind to `libcp` and produced zero
+  hits.
+- Shared-library breakpoints then stopped correctly, but missing breakpoint-ID
+  mapping prevented cap-disable on the first 28mm rerun; that run was
+  terminated and not admitted.
+
+The corrected harness capped each branch target at 12 packets per focal tier
+and completed cleanly:
+
+| Focal tier | Process exit | Sentinel-target packets with `eax == 0x80000000` | Valid-target packets | Valid table-low-dword matches `eax` | Valid `eax` range | Partner-record count in sampled window |
+|---|---:|---:|---:|---:|---:|---:|
+| 28mm | `0` | 12/12 | 12 | 12/12 | `-1..150` | 1 |
+| 35mm | `0` | 12/12 | 12 | 12/12 | `8..644` | 1 |
+| 70mm | `0` | 12/12 | 12 | 12/12 | `5..194` | 1 |
+| 150mm | `0` | 12/12 | 12 | 12/12 | `-1..185` | 4 |
+
+Accepted conclusion: both local branch targets are runtime-live on the
+canonical four-zoom bridge HDR quartet. `0x36931b` is reached with the sentinel
+value preserved in `eax`, and `0x369320` is reached with non-sentinel table
+values that match the low dword read from `r12 + rsi * 8`.
+
+Non-claim: this is not a full sentinel/valid distribution, not final
+contributor acceptance, not downstream score-threshold policy, and not full
+`0x3661b0` reducer closure.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -311,12 +347,10 @@ claims and validated separately.
 
 ## Next Validation Steps
 
-1. Probe non-sentinel `0x36930f` packets, or prove a scope-bound condition under
-   which the first-eight sample window is expected to be all sentinel.
-2. If exact Opus W5 sample rows matter, build a hit-window-specific reproduction
+1. If exact Opus W5 sample rows matter, build a hit-window-specific reproduction
    harness; otherwise keep the admitted W5 fact at representative magnitude
    scope.
-3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
+2. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
 
 ## Non-Claims
