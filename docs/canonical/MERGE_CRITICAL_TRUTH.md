@@ -73,6 +73,7 @@ If a claim does not change that outcome, it does not belong here.
 - On the tested bridge HDR path, IRAMP receives two anchor-side IGs plus a 5-element contributor vector.
 - Static bundle proof ties that live call shape to `PipelineCache+0x238`, `+0x248`, `+0x270`, `+0x258`, `+0x1e8`, and the ROI passed into `processLevel0`.
 - LLDB runtime proof now directly verifies that same `src1`, `src2`, `srcs[5]`, `warps[5]`, scale, and ROI signature on the canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR seed files.
+- Follow-up LLDB runtime proof inside `0x3661b0` verifies the live count-use window at `0x366a50..0x366a65`: the body reads a vector header through `r15+0x18`, computes `(end-begin)/16`, and reaches `0x366a65` with live count `5` across 16 capped packets per canonical focal tier. This confirms count use only, not complete contributor acceptance or full reducer closure.
 - That input shape matters because a parity renderer that collapses IRAMP to one anchor plus ad-hoc extras will target the wrong merge topology.
 
 ### 3. The direct IRAMP contributor vector identity is known

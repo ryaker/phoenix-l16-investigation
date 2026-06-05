@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.153
+**Version**: 3.0.154
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -49,6 +49,8 @@ These claims are currently `PROVEN` in the canonical ledger.
 | `CLM-WARP-002` | The dst-coordinate backing store is packed int32 `(x, y)` pairs on an 8-pixel lattice; actual writes occur at `0x366520..0x366523`. | same mechanism across all four zoom tiers | `SPEC_READY` |
 | `CLM-WARP-003` | Inside IRAMP, the first pair grid is ROI-derived and a second same-sized transformed pair grid is produced before bbox / clipping handling. | same mechanism across all four zoom tiers | `SPEC_READY` |
 | `CLM-CERES-001` | `libcp+0x5c3580` begins with two doubles `(1.0, 1.0)`; the stale four-float decode was a wrong-offset error. | static bundle fact, zoom-irrelevant | `SPEC_READY` |
+
+Additional `CLM-MERGE-003` / `CLM-MERGE-005` addendum: follow-up runtime proof now bounds the live `0x3661b0` vector-count use window. At `0x366a50..0x366a65`, the body reads a vector header through `r15+0x18`, computes `(end-begin)/16`, and reaches `0x366a65` with live `rbx = 5` across 16 capped packets per canonical focal tier under `--no-auto-lris`; every accepted packet has vector byte span `80`. This is count-use evidence only. It does not prove complete contributor acceptance, `src1` / `src2` semantics, the full reducer algorithm, or final acceptance/rejection.
 
 ## Established But Not Fully Closed
 

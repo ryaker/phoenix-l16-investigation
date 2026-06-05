@@ -91,6 +91,8 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   LLDB runtime proof that the canonical four-zoom bridge HDR quartet all hit the visible `src1` wrapper, `src2` wrapper, contributor wrapper, and IRAMP accumulator surfaces at `0x3ecc10`, `0x3ecd80`, `0x3eced0`, and `0x369fa1`.
 - `lldb_iramp_entry_signature_four_zoom.md`
   LLDB runtime proof that the canonical four-zoom bridge HDR quartet all enter `0x365960` with `src1`, `src2`, `srcs[5]`, `warps[5]`, scale, and ROI.
+- `lldb_iramp_count_use_vector_four_zoom.md`
+  LLDB runtime proof that the live `0x3661b0` count-use window at `0x366a50..0x366a65` reads a vector header through `r15+0x18`, computes `(end-begin)/16`, and reaches `0x366a65` with live count `5` across 16 capped packets per canonical focal tier. This is count-use evidence only, not a complete reducer proof.
 - `lri_35mm_seed_correction_true35_runtime.md`
   Direct LRI-header and corrected LLDB-runtime proof replacing the mislabeled `L16_02951` 35mm seed with true-35mm `L16_03041`, and repairing the affected runtime split rows.
 - `lldb_iramp_contributor_identity_four_zoom.md`

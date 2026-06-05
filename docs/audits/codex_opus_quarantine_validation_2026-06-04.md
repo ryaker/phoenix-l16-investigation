@@ -156,7 +156,7 @@ claimed four-zoom runtime `Σscore` values.
 | Claim cluster | Codex status | Notes |
 |---|---|---|
 | `0x365960 -> 0x3661b0` static caller/inner split | STATIC CONFIRMED | Fresh installed-bundle re-disassembly matches the candidate. |
-| `0x3661b0` uses `arg0+0x18` vector count | STATIC CONFIRMED, RUNTIME COUNT STILL OWED | Fresh re-disassembly confirms the corrected vector location. The 2026-06-04 runtime harness sampled `0x3661b0` entry, but its closure-vector reads are not accepted as count evidence because the sampled entry packets produced non-countable overlapping raw pointer fields. A later-instruction probe at the actual count-use site is still required. |
+| `0x3661b0` uses `arg0+0x18` vector count | STATIC CONFIRMED, RUNTIME COUNT-USE CONFIRMED | Fresh re-disassembly confirms the corrected vector location. The first 2026-06-04 runtime harness sampled `0x3661b0` entry, but its closure-vector reads were rejected as count evidence. The follow-up `0x366a65` probe then sampled the actual post-`sarq` count-use site and verified live count `5` for all four canonical focal tiers. |
 | `0x36930f` sentinel skip gate | STATIC CONFIRMED, RUNTIME PARTIAL | The compare/skip sequence is real. The 2026-06-04 Codex rerun sampled the first eight hits per focal tier and all sampled `eax` values were `0x80000000`; this proves the sentinel path occurs under the tested conditions, not the full distribution. |
 | `0x36cde0` returns `sqrt(xmm0*xmm1)` | STATIC CONFIRMED, RUNTIME PARTIAL | Already consistent with current evidence. The 2026-06-04 rerun captured live `xmm0`, `xmm1`, product, and square-root packets at `0x36e511`; multi-threaded sampling prevents treating row order as a complete per-candidate trace. |
 | `0x36a938` reciprocal normalizer | STATIC CONFIRMED, RUNTIME PARTIAL | The instruction is real. The 2026-06-04 first-eight sample set saw `xmm2_low == 0.200000003` for all four focal tiers, predicting reciprocal about `5.0`. This is a sampled denominator, not yet a full `sum(score)` census. |
@@ -227,6 +227,42 @@ Rejected / not-yet-admitted conclusions:
   count evidence.
 - The harness does not prove a clean-room algorithm or Lumen-quality parity.
 
+## Count-Use Follow-Up Result, 2026-06-04
+
+Codex then created and ran a focused later-instruction harness:
+
+- Evidence document: `docs/evidence/lldb_iramp_count_use_vector_four_zoom.md`
+- Harness: `tools/lldb_probes/codex_iramp_count_use_validation/`
+- Raw outputs: `runs/codex_iramp_count_use_validation/`
+- Breakpoint: `libcp+0x366a65`, immediately after
+  `0x366a61 sarq $0x4,%rbx`.
+
+The target static window is:
+
+```asm
+0x366a50  movq  0x18(%r15), %rcx
+0x366a54  movq  (%rcx), %rax
+0x366a57  movq  0x8(%rcx), %rcx
+0x366a5b  movq  %rcx, %rbx
+0x366a5e  subq  %rax, %rbx
+0x366a61  sarq  $0x4, %rbx
+0x366a65  je    0x366ae1
+```
+
+The corrected rerun completed cleanly across all four focal tiers:
+
+| Focal tier | Process exit | Events | Breakpoint hits | Probe errors | Disabled after cap | `(end-begin)` | Computed count | Live `rbx` |
+|---|---:|---:|---:|---:|---|---:|---:|---:|
+| 28mm | `0` | 16 | 16 | 0 | yes | 80 | 5 | 5 |
+| 35mm | `0` | 16 | 16 | 0 | yes | 80 | 5 | 5 |
+| 70mm | `0` | 16 | 16 | 0 | yes | 80 | 5 | 5 |
+| 150mm | `0` | 16 | 16 | 0 | yes | 80 | 5 | 5 |
+
+This closes the narrow runtime count-use question for the sampled canonical
+four-zoom bridge HDR quartet. It does not close full contributor acceptance,
+full denominator distributions, public vector semantics, or the complete
+`0x3661b0` reducer algorithm.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -236,14 +272,11 @@ claims and validated separately.
 
 ## Next Validation Steps
 
-1. Create a later-instruction runtime probe at the `0x3661b0` vector-count use
-   site (`0x366a50..0x366a61`) instead of trying to infer closure counts from
-   the `0x3661b0` entry packet.
-2. Reproduce or refute Opus's LLDB ignore-count / conditional-breakpoint method
+1. Reproduce or refute Opus's LLDB ignore-count / conditional-breakpoint method
    for mid-render score and `Σscore` magnitudes.
-3. Probe non-sentinel `0x36930f` packets, or prove a scope-bound condition under
+2. Probe non-sentinel `0x36930f` packets, or prove a scope-bound condition under
    which the first-eight sample window is expected to be all sentinel.
-4. Only after successful Codex-owned runtime reproduction, write an evidence
+3. Only after successful Codex-owned runtime reproduction, write an evidence
    bundle under `docs/evidence/` and then consider canonical ledger changes.
 
 ## Non-Claims
