@@ -387,6 +387,46 @@ producer call boundary, not a proven producer for the IRAMP
 vector. The upstream producers of `+0x270` and `+0x258` remain separate
 unknowns unless proven by their own runtime/static custody chain.
 
+## Final-Compositing Static Redo Result, 2026-06-05
+
+Codex then re-did the static portions of Opus's
+`final_compositing_consumer_FOURZOOM.md` packet. The admitted proof is:
+
+- Evidence document:
+  [bundle_static_final_compositing_queue_drain.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/bundle_static_final_compositing_queue_drain.md)
+- Raw static logs:
+  `runs/codex_opus_final_compositing_static/`
+
+Accepted static facts:
+
+- `0x3bf820` builds a stack record with tag-like field `0xd` and level-like
+  field `2`, advances the owner/container pointer by `+0x260`, and calls
+  `0x3bfc40`.
+- `0x3bfc40` locks the local container, checks stop flag `+0x18`, walks direct
+  node pointers from `+0x08`, compares priority at node `+0x14`, allocates an
+  `0x80`-byte node, copies a 0x70-byte payload to `node+0x10`, splices direct
+  pointers, increments count `+0x10`, and broadcasts on the local condition
+  variable.
+- `0x3c25a0` waits on the same mutex/count/stop/condition-variable shape.
+- `0x3bfe60` drains the ring into vector-like 0x70-stride storage through
+  `0x3f0130` / `0x3c0c70`, then zeroes count and deletes nodes.
+- `0x3bca90` statically calls `0x3c25a0` and `0x3bfe60`, filters 0x70-byte
+  records, and reaches ImagePyramid/Image accessor plus per-tile indirect
+  dispatch surfaces.
+- The old RB-tree / `std::list` anchor is refuted for this local surface:
+  disassembly shows a hand-rolled intrusive ring/list, and the installed
+  `libc++` symbol-family census for `__tree`, `map`, `set`, `list`,
+  `forward_list`, and `_Rb_tree` patterns returned zero.
+
+Not admitted from the Opus packet:
+
+- "four-zoom OBSERVED" runtime status for this queue/drain packet; the Codex
+  redo here is static only.
+- byte-level copy-vs-blend behavior of the per-tile virtual processors.
+- public field/type names for the 0x70-byte records.
+- final file/display sink identity.
+- final merge acceptance/rejection or anti-ghosting policy.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
