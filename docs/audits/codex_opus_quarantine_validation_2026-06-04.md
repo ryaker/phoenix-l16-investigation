@@ -613,6 +613,50 @@ Still not admitted:
 - final output semantics, anti-ghosting policy, or final merge
   acceptance/rejection.
 
+## Final-Compositing Case-1 / Case-3 Boundary Redo Result, 2026-06-05
+
+Codex then drilled into the remaining live case-`1` and case-`3` targets from
+the switch census. The admitted proof is:
+
+- Evidence document:
+  [lldb_final_compositing_case1_case3_boundary_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_final_compositing_case1_case3_boundary_four_zoom.md)
+- Reusable harness:
+  `tools/lldb_probes/codex_final_compositing_case1_case3_boundary/`
+- Raw LLDB logs/reports:
+  `runs/codex_final_compositing_case1_case3_boundary/`
+
+Accepted runtime facts:
+
+- The canonical CLI bridge-HDR quartet reaches the case-`1` target
+  `0x3bce77`, mutex lock call `0x3bce7e`, type check `0x3bce83`, flag write
+  `0x3bce92`, condition-broadcast call `0x3bce9c`, mutex unlock call
+  `0x3bcea8`, and return jump `0x3bcead` once per render.
+- Case `1` packets show `field_i32_0x00 = 1`, and the pointed flag byte
+  changes from `0` before `0x3bce92` to `1` after `0x3bce92`.
+- The canonical CLI bridge-HDR quartet reaches the case-`3` target
+  `0x3bcee3`, pre-helper callsite `0x3bceeb -> 0x3b07c0`, helper callsite
+  `0x3bcf16 -> 0x4182a0`, and return jump `0x3bcf1b` once per render.
+- Case `3` packets show `field_i32_0x00 = 3` and exact argument custody for
+  `record+0x10`, `record+0x20`, `record+0x50`, `record+0x60`, and
+  `record+0x68` into helper `0x4182a0`.
+- Helper `0x4182a0` reaches selected normal callsites `0x418380`,
+  `0x41847d`, `0x4184b0`, `0x41850b`, `0x418518`, `0x418908`, and
+  normal-return site `0x418bfd` once per render.
+- Case mismatch targets `0x3bea7b` / `0x3beacd` and helper error labels
+  `0x418d38` / `0x418e27` record zero hits under the admitted four runs.
+
+Still not admitted:
+
+- a universal zero-hit/global-terminal claim for case `1`, case `3`, or helper
+  `0x4182a0` outside the tested CLI path;
+- public field/type names for case-`1` or case-`3` records, helper arguments,
+  helper locals, or context objects;
+- helper body semantics for `0x4182a0`;
+- final file/display sink identity;
+- byte-level copy-vs-blend behavior;
+- final output semantics, anti-ghosting policy, or final merge
+  acceptance/rejection.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -625,12 +669,13 @@ claims and validated separately.
 1. If exact Opus W5 sample rows matter, build a hit-window-specific reproduction
    harness; otherwise keep the admitted W5 fact at representative magnitude
    scope.
-2. For the output lane, trace the remaining live post-gather cases `1` and `3`,
-   any case-`2` / case-`11` / case-`16` callees or helper paths that matter
-   downstream, plus the final sink with similarly narrowed/dynamic probes; do
-   not treat queue liveness, the static case-`4` branch, case-`2` helper
-   reachability, case-`11` callback-gate zero hits, or case-`16` cleanup zero
-   hits as copy-vs-blend or acceptance proof.
+2. For the output lane, continue from the now-bounded live cases `1`, `2`,
+   `3`, `11`, and `16` toward the final sink and any downstream callees or
+   helper paths that matter, using similarly narrowed/dynamic probes; do not
+   treat queue liveness, the static case-`4` branch, case-`1` flag/broadcast
+   behavior, case-`2` helper reachability, case-`3` helper reachability,
+   case-`11` callback-gate zero hits, or case-`16` cleanup zero hits as
+   copy-vs-blend or acceptance proof.
 3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
 
