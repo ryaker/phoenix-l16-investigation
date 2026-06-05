@@ -338,6 +338,55 @@ Non-claim: this is not a full sentinel/valid distribution, not final
 contributor acceptance, not downstream score-threshold policy, and not full
 `0x3661b0` reducer closure.
 
+## Terminal Producer-Barrier Correction, 2026-06-05
+
+Codex re-read the Opus terminal packet's "producer barrier" language against
+current committed evidence and fresh installed-bundle disassembly. The packet's
+claim that `0x3ebf5d` is the unresolved producer boundary for
+`PipelineCache+0x258` / `PipelineCache+0x270` is not admitted.
+
+Fresh static logs:
+
+- `runs/codex_opus_terminal_producer_correction/static_3ebb80_visible_src2_descriptor.log`
+- `runs/codex_opus_terminal_producer_correction/static_3ec770_iramp_processlevel0_args.log`
+
+The `0x3ebb80` window shows `0x3ebf5d` in the already-proven visible-`src2`
+source-descriptor construction path:
+
+- `0x3ebf36` zeroes stack descriptor `rbp-0x2200`.
+- `0x3ebf3d` loads `PipelineCache+0x1d8` into `rdi`.
+- `0x3ebf48` loads vtable slot `+0x18`.
+- `0x3ebf5d` calls the loaded slot target with `rsi = rbp-0x2200`.
+- `0x3ec41a` later stores the descriptor into callback field `+0x08`.
+- `0x3ec462` dispatches the generic executor that consumes the callback.
+
+Existing runtime evidence
+[lldb_src2_descriptor_origin_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_src2_descriptor_origin_four_zoom.md)
+and
+[lldb_src2_406a10_branch_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_src2_406a10_branch_four_zoom.md)
+already admits the runtime target of that visible-`src2` vtable slot as
+`0x406a10` across the canonical four-zoom quartet.
+
+Separately, the `0x3ec770` `processLevel0` window shows the IRAMP argument
+handoff:
+
+- `0x3ec7ac`: `rsi = *(PipelineCache+0x238)`
+- `0x3ec7b3`: `rdx = *(PipelineCache+0x248)`
+- `0x3ec7c2`: `rcx = PipelineCache+0x270`
+- `0x3ec7c9`: `r8 = PipelineCache+0x258`
+- `0x3ec7da`: calls `0x365960`
+
+Existing evidence
+[bundle_proof_iramp_live_signature_and_warp_records.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/bundle_proof_iramp_live_signature_and_warp_records.md)
+admits those `+0x270` / `+0x258` offsets as live IRAMP arguments and records
+their consumption through `0x365960 -> 0x3661b0`.
+
+Accepted correction: `0x3ebf5d` is the visible-`src2` source-descriptor
+producer call boundary, not a proven producer for the IRAMP
+`PipelineCache+0x270` source-vector or `PipelineCache+0x258` paired-record
+vector. The upstream producers of `+0x270` and `+0x258` remain separate
+unknowns unless proven by their own runtime/static custody chain.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
