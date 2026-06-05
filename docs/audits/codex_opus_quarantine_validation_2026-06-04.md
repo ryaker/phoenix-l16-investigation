@@ -657,6 +657,50 @@ Still not admitted:
 - final output semantics, anti-ghosting policy, or final merge
   acceptance/rejection.
 
+## Final CLI HDR Writer-Boundary Redo Result, 2026-06-05
+
+Codex then followed the live case-`3` helper boundary into the tested CLI HDR
+writer path. The admitted proof is:
+
+- Evidence document:
+  [lldb_final_output_hdr_writer_boundary_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_final_output_hdr_writer_boundary_four_zoom.md)
+- Reusable harness:
+  `tools/lldb_probes/codex_final_output_hdr_writer_boundary/`
+- Raw LLDB logs/reports/output HDR files:
+  `runs/codex_final_output_hdr_writer_boundary/`
+
+Accepted runtime facts:
+
+- The canonical CLI bridge-HDR quartet reaches helper `0x41e180` once per
+  render with entry dimensions `10432 x 7824` and export-format argument `3`.
+- The same runs follow the `.hdr` branch, call writer helper `0x2326a0` at
+  `0x41e599`, reach cleanup `0x41ea07`, and reach normal-return site
+  `0x41f9eb`.
+- The PPM branch target `0x41e953`, PPM writer call `0x41e9ea`, unexpected
+  export-format path `0x41fa93`, invalid export-size path `0x41fad4`, and
+  writer no-data error path `0x232758` record zero hits under the admitted
+  four runs.
+- Writer helper `0x2326a0` receives a populated descriptor with width `10432`,
+  height `7824`, stride/count field `10432`, nonzero data pointer, and decoded
+  extension `.hdr`.
+- The writer path reaches descriptor data check `0x2326b6`, writer-factory call
+  `0x2326ec`, virtual writer call `0x232731`, after-call site `0x232733`, and
+  normal-return site `0x23274a` once per render.
+- The virtual writer-call descriptor has row bytes `166912`, bytes-per-pixel
+  field `16`, and the same nonzero data pointer across all four admitted runs.
+- The emitted files identify as `Radiance HDR image data` under the OS `file`
+  command.
+
+Still not admitted:
+
+- pixel correctness, copy-vs-blend behavior, source contribution, anti-ghosting
+  policy, or final merge acceptance/rejection;
+- public or opaque-third-argument semantics for the `0x41e599 -> 0x2326a0 ->
+  0x232731` handoff;
+- every body reached by `0x41e180`, `0x2326a0`, writer factory `0x1b1d0`, or
+  the virtual writer target;
+- non-CLI export/display/preview sinks.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -670,12 +714,13 @@ claims and validated separately.
    harness; otherwise keep the admitted W5 fact at representative magnitude
    scope.
 2. For the output lane, continue from the now-bounded live cases `1`, `2`,
-   `3`, `11`, and `16` toward the final sink and any downstream callees or
-   helper paths that matter, using similarly narrowed/dynamic probes; do not
-   treat queue liveness, the static case-`4` branch, case-`1` flag/broadcast
-   behavior, case-`2` helper reachability, case-`3` helper reachability,
-   case-`11` callback-gate zero hits, or case-`16` cleanup zero hits as
-   copy-vs-blend or acceptance proof.
+   `3`, `11`, and `16`, plus the now-bounded tested CLI HDR writer boundary,
+   toward copy-vs-blend provenance, pixel source contribution,
+   non-CLI/display/preview sinks, and final acceptance/rejection; do not treat
+   queue liveness, the static case-`4` branch, case-`1` flag/broadcast
+   behavior, case-`2` helper reachability, case-`3` helper reachability, the
+   CLI HDR writer-boundary proof, case-`11` callback-gate zero hits, or
+   case-`16` cleanup zero hits as copy-vs-blend or acceptance proof.
 3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
 
