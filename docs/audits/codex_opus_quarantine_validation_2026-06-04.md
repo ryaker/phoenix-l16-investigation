@@ -539,6 +539,37 @@ Still not admitted:
 - final output semantics, anti-ghosting policy, or final merge
   acceptance/rejection.
 
+## Final-Compositing Case-11 Callback-Gate Redo Result, 2026-06-05
+
+Codex then drilled into the live case-`11` target from the switch census. The
+admitted proof is:
+
+- Evidence document:
+  [lldb_final_compositing_case11_callback_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_final_compositing_case11_callback_four_zoom.md)
+- Reusable harness:
+  `tools/lldb_probes/codex_final_compositing_case11_callback/`
+- Raw LLDB logs/reports:
+  `runs/codex_final_compositing_case11_callback/`
+
+Accepted runtime facts:
+
+- The canonical CLI bridge-HDR quartet reaches case target `0x3bd453` and
+  owner `+0x5d0` null-test site `0x3bd45d` with counts `7`, `7`, `6`, and
+  `6` for `28mm`, `35mm`, `70mm`, and `150mm`.
+- Every captured case-`11` sample observes owner `+0x5d0 = 0`.
+- Callback callsite `0x3bd47b` and callback return site `0x3bd47d` record zero
+  hits under the admitted four runs.
+
+Still not admitted:
+
+- a universal "case 11 never calls back" claim outside the tested CLI path;
+- public field/type names for the case-`11` record;
+- proof that case-`11` records are globally terminal or globally irrelevant;
+- final file/display sink identity;
+- byte-level copy-vs-blend behavior;
+- final output semantics, anti-ghosting policy, or final merge
+  acceptance/rejection.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -551,11 +582,11 @@ claims and validated separately.
 1. If exact Opus W5 sample rows matter, build a hit-window-specific reproduction
    harness; otherwise keep the admitted W5 fact at representative magnitude
    scope.
-2. For the output lane, trace the remaining live post-gather cases (`11`, `16`,
-   and any case-`2` callees that matter downstream) plus the final sink with
+2. For the output lane, trace the remaining live post-gather case `16`, any
+   case-`2` / case-`11` callees that matter downstream, plus the final sink with
    similarly narrowed/dynamic probes; do not treat queue liveness, the static
-   case-`4` branch, or case-`2` helper reachability as copy-vs-blend or
-   acceptance proof.
+   case-`4` branch, case-`2` helper reachability, or case-`11` callback-gate
+   zero hits as copy-vs-blend or acceptance proof.
 3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
 

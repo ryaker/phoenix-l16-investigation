@@ -1,0 +1,13 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_final_compositing_case11_callback/case11_callback_probe.py
+script case11_callback_probe.reset("150mm L16_02285 final compositing case11 callback", 64)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case11_callback
+platform shell rm -f /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case11_callback/case11_callback_150mm.hdr /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case11_callback/case11_callback_150mm.json
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+process handle SIGABRT -p true -s false -n false
+script case11_callback_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case11_callback/case11_callback_150mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script case11_callback_probe.drive_until_exit_or_step_cap(lldb.debugger, 120000)
+script case11_callback_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case11_callback/case11_callback_150mm.json")
+quit
