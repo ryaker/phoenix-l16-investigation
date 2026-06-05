@@ -1,0 +1,23 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_opus_index5_origin_classification/index5_origin_probe.py
+script index5_origin_probe.reset("35mm L16_03041 index-5 origin classification", 240)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_opus_index5_origin_classification
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26aa30
+breakpoint set --shlib libcp.dylib --address 0x26aa39
+breakpoint set --shlib libcp.dylib --address 0x29ed90
+breakpoint set --shlib libcp.dylib --address 0x26dd40
+breakpoint set --shlib libcp.dylib --address 0x26ddd7
+breakpoint set --shlib libcp.dylib --address 0x26e120
+breakpoint set --shlib libcp.dylib --address 0x267010
+breakpoint set --shlib libcp.dylib --address 0x26e633
+breakpoint set --shlib libcp.dylib --address 0x26e638
+breakpoint set --shlib libcp.dylib --address 0x26e64a
+breakpoint set --shlib libcp.dylib --address 0x26e64f
+script index5_origin_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_opus_index5_origin_classification/index5_origin_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script index5_origin_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script index5_origin_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_opus_index5_origin_classification/index5_origin_35mm.json")
+script index5_origin_probe.report(lldb.debugger)
+quit

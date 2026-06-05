@@ -701,6 +701,52 @@ Still not admitted:
   the virtual writer target;
 - non-CLI export/display/preview sinks.
 
+## Index-5 Origin Classification Redo Result, 2026-06-05
+
+Codex then re-entered the Opus residual around the `0x29ed90` guided-upsample
+input path and the `StereoLayer<false>` index-5 descriptor.
+
+The admitted proof is:
+
+- Evidence document:
+  [lldb_index5_origin_classification_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_index5_origin_classification_four_zoom.md)
+- Reusable harness:
+  `tools/lldb_probes/codex_opus_index5_origin_classification/`
+- Raw LLDB logs/reports/output HDR files:
+  `runs/codex_opus_index5_origin_classification/`
+
+Accepted runtime/static facts:
+
+- All four canonical bridge-HDR runs used `--no-auto-lris`, exited `0`, had no
+  JSON errors, avoided the probe step cap, and emitted files identified as
+  `Radiance HDR image data`.
+- Each focal tier reaches `0x26dd40 -> 0x26e120 -> 0x267010 -> 0x26e64a ->
+  0xf340` six times, covering `StereoLayer<false>` indices `0..5`, all with
+  mode `8`.
+- The six observed descriptor sizes form the pyramid `65x49`, `130x98`,
+  `260x195`, `520x390`, `1040x780`, and `2080x1560`; index `5` is the full
+  `2080 x 1560`, stride-`2080` descriptor returned through slot `+0x90` at
+  `0x26aa30/0x26aa39` and consumed by `0x29ed90`.
+- Static disassembly classifies `0x267010` as building a new 4-byte-output
+  descriptor from source descriptor dimensions, 16-bit source entries, and a
+  `this+0xe0` lookup/vector input before `0xf340` moves the stack descriptor
+  into `this+0x2a8`.
+
+Accepted correction / narrowing:
+
+- The index-5 descriptor consumed by `0x29ed90` is now bounded as a
+  runtime-built `StereoLayer<false>` pyramid product on the tested path, not a
+  direct whole-descriptor copy from a known LRI map blob.
+
+Still not admitted:
+
+- public physical meaning of the descriptor;
+- public LRI/protobuf field origin;
+- upstream source-descriptor semantics for `0x267010`;
+- `this+0xe0` lookup/vector semantics;
+- full-map statistics from first sampled floats;
+- final source contribution, anti-ghosting behavior, or acceptance/rejection.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -723,6 +769,11 @@ claims and validated separately.
    case-`16` cleanup zero hits as copy-vs-blend or acceptance proof.
 3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
+4. For the index-5 / `0x29ed90` lane, the next validation target is upstream
+   of the now-classified `0x267010` builder: identify the source descriptor
+   passed as `rsi`, the `this+0xe0` lookup/vector values, and any deterministic
+   LRI/calibration bridge before assigning public names such as depth,
+   disparity, inverse depth, or confidence.
 
 ## Non-Claims
 
