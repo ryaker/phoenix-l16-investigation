@@ -570,6 +570,49 @@ Still not admitted:
 - final output semantics, anti-ghosting policy, or final merge
   acceptance/rejection.
 
+## Final-Compositing Case-16 Cleanup Redo Result, 2026-06-05
+
+Codex then drilled into the live case-`16` target from the switch census. The
+admitted proof is:
+
+- Evidence document:
+  [lldb_final_compositing_case16_cleanup_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_final_compositing_case16_cleanup_four_zoom.md)
+- Reusable harness:
+  `tools/lldb_probes/codex_final_compositing_case16_cleanup/`
+- Raw LLDB logs/reports:
+  `runs/codex_final_compositing_case16_cleanup/`
+
+Accepted runtime facts:
+
+- The canonical CLI bridge-HDR quartet reaches case target `0x3bd2f7`, helper
+  callsite `0x3bd2fe -> 0x3adad0`, and helper return site `0x3bd303` once per
+  render.
+- Static disassembly shows case `16` passes `rbp-0x840` to helper `0x3adad0`;
+  runtime packets show `rbp-0x840 == owner+0xd0`, the captured case-`16`
+  record has `field_i32_0x00 = 16`, `field_i32_0x04 = 2`, and captured
+  remaining i32 fields zero in all four admitted runs.
+- Helper `0x3adad0` is entered four times per admitted render, and one entry is
+  the case-`16` call returning to `0x3bd303`.
+- Every captured helper invocation reaches raw local-count branch `0x3adb16`
+  with `rbp-0x38 = 0`, then cleanup path `0x3adc74 -> 0x3ae490`, local-base
+  cleanup site `0x3adcc3`, and return `0x3adcdf`.
+- Helper callback site `0x3adb6e`, release sites `0x3adb9b`, `0x3adbaa`,
+  `0x3adbb9`, and bad-function throw path `0x3adc3f` record zero hits under
+  the admitted four runs.
+
+Still not admitted:
+
+- a universal "case 16 never performs callback work" claim outside the tested
+  CLI path;
+- public field/type names for the case-`16` record, helper locals, local
+  vector-like storage, or context object;
+- proof that case-`16` records or helper `0x3adad0` are globally terminal;
+- downstream behavior of live cases `1` or `3`;
+- final file/display sink identity;
+- byte-level copy-vs-blend behavior;
+- final output semantics, anti-ghosting policy, or final merge
+  acceptance/rejection.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -582,11 +625,12 @@ claims and validated separately.
 1. If exact Opus W5 sample rows matter, build a hit-window-specific reproduction
    harness; otherwise keep the admitted W5 fact at representative magnitude
    scope.
-2. For the output lane, trace the remaining live post-gather case `16`, any
-   case-`2` / case-`11` callees that matter downstream, plus the final sink with
-   similarly narrowed/dynamic probes; do not treat queue liveness, the static
-   case-`4` branch, case-`2` helper reachability, or case-`11` callback-gate
-   zero hits as copy-vs-blend or acceptance proof.
+2. For the output lane, trace the remaining live post-gather cases `1` and `3`,
+   any case-`2` / case-`11` / case-`16` callees or helper paths that matter
+   downstream, plus the final sink with similarly narrowed/dynamic probes; do
+   not treat queue liveness, the static case-`4` branch, case-`2` helper
+   reachability, case-`11` callback-gate zero hits, or case-`16` cleanup zero
+   hits as copy-vs-blend or acceptance proof.
 3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
 
