@@ -355,6 +355,14 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   destination objects and `204` selector-`1` `0xf34e0` calls per run. This is
   internal transitive helper-custody proof, not post-`0x23c5f0` image effect,
   reducer closure, or final acceptance/rejection.
+- `lldb_state_helper_23faf0_record_chain_four_zoom.md`
+  LLDB runtime proof bounding the next internal `0x23c5f0` record-chain step:
+  after `0x264440`, the `rbp-0x378` output record changes across
+  `0x23cbbc -> 0x23faf0`, remains stable through later node writes, and mapped
+  output fields are materialized into local tree-node fields in all `104`
+  admitted four-zoom groups. This is helper-record-to-local-tree custody proof,
+  not public field semantics, post-`0x23c5f0` image effect, reducer closure, or
+  final acceptance/rejection.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`
