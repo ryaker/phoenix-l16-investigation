@@ -420,12 +420,51 @@ Accepted static facts:
 
 Not admitted from the Opus packet:
 
-- "four-zoom OBSERVED" runtime status for this queue/drain packet; the Codex
-  redo here is static only.
 - byte-level copy-vs-blend behavior of the per-tile virtual processors.
 - public field/type names for the 0x70-byte records.
 - final file/display sink identity.
 - final merge acceptance/rejection or anti-ghosting policy.
+
+## Final-Compositing Runtime Redo Result, 2026-06-05
+
+Codex then re-ran the runtime liveness portion as a separate, narrowed probe.
+The admitted proof is:
+
+- Evidence document:
+  [lldb_final_compositing_queue_liveness_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_final_compositing_queue_liveness_four_zoom.md)
+- Reusable harness:
+  `tools/lldb_probes/codex_final_compositing_liveness/`
+- Raw LLDB logs/reports:
+  `runs/codex_final_compositing_liveness/`
+
+Accepted runtime facts:
+
+- The narrowed final-compositing queue/drain path is live across the canonical
+  `28mm`, `35mm`, `70mm`, and `150mm` bridge-HDR quartet under
+  `--no-auto-lris`.
+- `0x3bf8bc -> 0x3bfc40`, `0x3bfc40`, `0x3bfe60`,
+  `0x3bcc51 -> 0x3bfe60`, and `0x3bccc0` all record nonzero hits with clean
+  process exits on all four focal tiers.
+- Captured operands match the local intrusive queue / 0x70-stride vector-drain
+  shape from the static proof: producer records carry local fields
+  `field_i32_0x00 = 13` and `field_i32_0x04 = 2`; first drain samples see
+  container `count_0x10 = 1`, `stop_0x18 = 0`; post-gather loop samples see
+  gathered-vector counts `9`, `9`, `8`, and `9` for `28mm`, `35mm`, `70mm`,
+  and `150mm`.
+
+Instrumentation note:
+
+- An initial broader 35mm probe with extra join/dispatch breakpoints stalled
+  under Rosetta and was not admitted. The accepted run uses only the narrowed
+  liveness sites above.
+
+Still not admitted:
+
+- byte-level copy-vs-blend behavior of the per-tile virtual processors;
+- public field/type names for the 0x70-byte records;
+- final file/display sink identity;
+- final output semantics, anti-ghosting policy, or final merge
+  acceptance/rejection.
 
 ## Opus Internal Tension Noted
 
@@ -439,7 +478,10 @@ claims and validated separately.
 1. If exact Opus W5 sample rows matter, build a hit-window-specific reproduction
    harness; otherwise keep the admitted W5 fact at representative magnitude
    scope.
-2. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
+2. For the output lane, trace the post-`0x3bccc0` per-tile processor targets
+   and final sink with a similarly narrowed/dynamic probe; do not treat queue
+   liveness as copy-vs-blend or acceptance proof.
+3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
 
 ## Non-Claims
