@@ -466,6 +466,43 @@ Still not admitted:
 - final output semantics, anti-ghosting policy, or final merge
   acceptance/rejection.
 
+## Final-Compositing Switch Census Redo Result, 2026-06-05
+
+Codex then re-ran a post-gather switch census for `0x3bca90`. The admitted
+proof is:
+
+- Evidence document:
+  [lldb_final_compositing_switch_census_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_final_compositing_switch_census_four_zoom.md)
+- Reusable harness:
+  `tools/lldb_probes/codex_final_compositing_switch_census/`
+- Raw LLDB logs/reports:
+  `runs/codex_final_compositing_switch_census/`
+
+Accepted runtime facts:
+
+- The `0x3bce59` post-gather switch is live across the canonical CLI
+  bridge-HDR quartet under `--no-auto-lris`.
+- The only observed record types / case targets are `1`, `2`, `3`, `11`, and
+  `16`; no case/type mismatches were recorded.
+- Case `4` target `0x3bcf20`, which contains the static
+  `0x3bcf8d` ImagePyramid and `0x3bd05d` per-tile-dispatch branch from the
+  Opus packet, records zero hits on all four canonical CLI bridge-HDR runs.
+
+Accepted correction:
+
+- The ImagePyramid/per-tile-dispatch branch is statically present but is not
+  runtime-proven for the tested CLI bridge-HDR quartet. Any prose treating that
+  branch as the runtime final-output assembly path for these tested runs is too
+  strong.
+
+Still not admitted:
+
+- a universal "case 4 never fires" claim outside the tested CLI path;
+- final file/display sink identity;
+- byte-level copy-vs-blend behavior;
+- final output semantics, anti-ghosting policy, or final merge
+  acceptance/rejection.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -478,9 +515,10 @@ claims and validated separately.
 1. If exact Opus W5 sample rows matter, build a hit-window-specific reproduction
    harness; otherwise keep the admitted W5 fact at representative magnitude
    scope.
-2. For the output lane, trace the post-`0x3bccc0` per-tile processor targets
-   and final sink with a similarly narrowed/dynamic probe; do not treat queue
-   liveness as copy-vs-blend or acceptance proof.
+2. For the output lane, trace the live post-gather cases (`2`, `11`, `16` and
+   their downstream effects) plus the final sink with similarly narrowed/dynamic
+   probes; do not treat queue liveness or the static case-`4` branch as
+   copy-vs-blend or acceptance proof.
 3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
 

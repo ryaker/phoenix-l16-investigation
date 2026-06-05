@@ -1,0 +1,12 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_final_compositing_switch_census/switch_census_probe.py
+script switch_census_probe.reset("28mm L16_02130 final compositing switch census", 512)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_switch_census
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+process handle SIGABRT -p true -s false -n false
+script switch_census_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_switch_census/switch_census_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script switch_census_probe.drive_until_exit_or_step_cap(lldb.debugger, 120000)
+script switch_census_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_switch_census/switch_census_28mm.json")
+quit
