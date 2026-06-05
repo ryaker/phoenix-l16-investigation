@@ -1,0 +1,13 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_final_compositing_case2_helper/case2_helper_probe.py
+script case2_helper_probe.reset("35mm L16_03041 final compositing case2 helper", 24)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case2_helper
+platform shell rm -f /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case2_helper/case2_helper_35mm.hdr /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case2_helper/case2_helper_35mm.json
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+process handle SIGABRT -p true -s false -n false
+script case2_helper_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case2_helper/case2_helper_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script case2_helper_probe.drive_until_exit_or_step_cap(lldb.debugger, 120000)
+script case2_helper_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_final_compositing_case2_helper/case2_helper_35mm.json")
+quit

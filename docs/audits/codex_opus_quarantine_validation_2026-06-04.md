@@ -503,6 +503,42 @@ Still not admitted:
 - final output semantics, anti-ghosting policy, or final merge
   acceptance/rejection.
 
+## Final-Compositing Case-2 Helper Redo Result, 2026-06-05
+
+Codex then drilled into the live case-`2` target from the switch census. The
+admitted proof is:
+
+- Evidence document:
+  [lldb_final_compositing_case2_helper_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_final_compositing_case2_helper_four_zoom.md)
+- Reusable harness:
+  `tools/lldb_probes/codex_final_compositing_case2_helper/`
+- Raw LLDB logs/reports:
+  `runs/codex_final_compositing_case2_helper/`
+
+Accepted runtime facts:
+
+- The canonical CLI bridge-HDR quartet reaches case target `0x3bd308`,
+  helper entry `0x3bf2f0`, helper callsites `0x3bf331`, `0x3bf344`,
+  `0x3bf354`, `0x3bf382`, helper return `0x3bf4b8`, and post-helper
+  append callsite `0x3bd31d` once per render.
+- The same admitted runs record zero hits at alternate/helper
+  callback/completion/error sites `0x3bf39a`, `0x3bf3be`, `0x3bf419`,
+  `0x3bf481`, `0x3bf49a`, `0x3bf4c7`, `0x3bf50f`, and `0x3bf55a`.
+- Captured case-`2` record fields match the switch-census shape, including
+  `field_i32_0x00 = 2`, `field_i32_0x10 = 1`, `field_i32_0x24 = 2`, and
+  focal-specific `field_i32_0x20` values `3912`, `3120`, `3312`, and `1560`.
+
+Still not admitted:
+
+- public field/type names for the case-`2` record;
+- semantics of helper bodies `0x3b5b50`, `0x3b6070`, `0x3b07c0`, or
+  `0x3ba0a0`;
+- downstream behavior of live cases `1`, `3`, `11`, or `16`;
+- final file/display sink identity;
+- byte-level copy-vs-blend behavior;
+- final output semantics, anti-ghosting policy, or final merge
+  acceptance/rejection.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -515,10 +551,11 @@ claims and validated separately.
 1. If exact Opus W5 sample rows matter, build a hit-window-specific reproduction
    harness; otherwise keep the admitted W5 fact at representative magnitude
    scope.
-2. For the output lane, trace the live post-gather cases (`2`, `11`, `16` and
-   their downstream effects) plus the final sink with similarly narrowed/dynamic
-   probes; do not treat queue liveness or the static case-`4` branch as
-   copy-vs-blend or acceptance proof.
+2. For the output lane, trace the remaining live post-gather cases (`11`, `16`,
+   and any case-`2` callees that matter downstream) plus the final sink with
+   similarly narrowed/dynamic probes; do not treat queue liveness, the static
+   case-`4` branch, or case-`2` helper reachability as copy-vs-blend or
+   acceptance proof.
 3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
 
