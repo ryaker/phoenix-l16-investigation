@@ -42,6 +42,10 @@ investigation and write the durable result here or in `docs/evidence/`.
   first independent static re-extraction of the terminal IRAMP candidate
   cluster plus a first four-zoom runtime harness, while keeping full
   reducer/magnitude semantics explicitly unadmitted.
+- `untracked_lri_verifier_quarantine_2026-06-05.md` — custody note for six
+  loose untracked LRI/protobuf verifier scripts moved into
+  `tools/quarantine/lri_field_verifiers_2026-06-05/` as candidate material only,
+  with no claim admission.
 
 ## Verified Cleanup Note
 
