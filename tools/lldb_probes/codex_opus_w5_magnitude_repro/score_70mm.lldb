@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_opus_w5_magnitude_repro/magnitude_dump.py
+script magnitude_dump.reset("70mm score #2001 at 0x36e511", "score")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_opus_w5_magnitude_repro
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x36e511 -i 2000
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_opus_w5_magnitude_repro/score_70mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script magnitude_dump.capture_score_pre(lldb.debugger)
+thread step-inst
+script magnitude_dump.capture_score_after_mul(lldb.debugger)
+thread step-inst
+script magnitude_dump.capture_score_after_sqrt(lldb.debugger)
+script magnitude_dump.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_opus_w5_magnitude_repro/score_70mm.json")
+quit

@@ -158,8 +158,8 @@ claimed four-zoom runtime `Σscore` values.
 | `0x365960 -> 0x3661b0` static caller/inner split | STATIC CONFIRMED | Fresh installed-bundle re-disassembly matches the candidate. |
 | `0x3661b0` uses `arg0+0x18` vector count | STATIC CONFIRMED, RUNTIME COUNT-USE CONFIRMED | Fresh re-disassembly confirms the corrected vector location. The first 2026-06-04 runtime harness sampled `0x3661b0` entry, but its closure-vector reads were rejected as count evidence. The follow-up `0x366a65` probe then sampled the actual post-`sarq` count-use site and verified live count `5` for all four canonical focal tiers. |
 | `0x36930f` sentinel skip gate | STATIC CONFIRMED, RUNTIME PARTIAL | The compare/skip sequence is real. The 2026-06-04 Codex rerun sampled the first eight hits per focal tier and all sampled `eax` values were `0x80000000`; this proves the sentinel path occurs under the tested conditions, not the full distribution. |
-| `0x36cde0` returns `sqrt(xmm0*xmm1)` | STATIC CONFIRMED, RUNTIME PARTIAL | Already consistent with current evidence. The 2026-06-04 rerun captured live `xmm0`, `xmm1`, product, and square-root packets at `0x36e511`; multi-threaded sampling prevents treating row order as a complete per-candidate trace. |
-| `0x36a938` reciprocal normalizer | STATIC CONFIRMED, RUNTIME PARTIAL | The instruction is real. The 2026-06-04 first-eight sample set saw `xmm2_low == 0.200000003` for all four focal tiers, predicting reciprocal about `5.0`. This is a sampled denominator, not yet a full `sum(score)` census. |
+| `0x36cde0` returns `sqrt(xmm0*xmm1)` | STATIC CONFIRMED, RUNTIME MAGNITUDE CONFIRMED | Already consistent with current evidence. The 2026-06-04 rerun captured live first-window packets; the 2026-06-05 W5 reproduction captured representative nonzero score factors, product, and square-root result on all four focal tiers. Opus's exact sample rows are still not admitted as constants. |
+| `0x36a938` reciprocal normalizer | STATIC CONFIRMED, RUNTIME MAGNITUDE CONFIRMED | The instruction is real. The 2026-06-04 first-eight sample set saw `xmm2_low == 0.200000003` for all four focal tiers; the 2026-06-05 W5 reproduction captured non-common denominators on all four focal tiers and verified `rcpss` approximates `1/xmm2`. This is representative magnitude evidence, not a full `sum(score)` census. |
 | `0x36aa30..0x36aa57` weighted destination store | STATIC CONFIRMED, RUNTIME PARTIAL | Already consistent with current evidence. The 2026-06-04 rerun captured live destination-store packets at `0x36aa57`; public field/weight semantics remain unproven. |
 | Opus phrase "`0x3661b0` is the N-to-1 score-normalized weighted-average reducer" | NOT YET ADMITTED | Static pieces are promising, but canonical promotion requires a Codex-owned runtime rerun of contributor counts, sentinel-gate behavior, score/denominator magnitudes, and output-store context. |
 
@@ -263,6 +263,45 @@ four-zoom bridge HDR quartet. It does not close full contributor acceptance,
 full denominator distributions, public vector semantics, or the complete
 `0x3661b0` reducer algorithm.
 
+## W5 Magnitude Reproduction Result, 2026-06-05
+
+Codex then created and ran a W5 reproduction harness:
+
+- Evidence document: `docs/evidence/lldb_iramp_w5_magnitude_repro_four_zoom.md`
+- Harness: `tools/lldb_probes/codex_opus_w5_magnitude_repro/`
+- Raw outputs: `runs/codex_opus_w5_magnitude_repro/`
+
+The harness used LLDB core-handled ignore-count / conditional breakpoints.
+Python was used only after breakpoint stops to read registers and write JSON;
+it was not installed as a per-hit callback.
+
+Accepted runtime score captures:
+
+| Focal tier | Capture | Factor A | Factor B | Product after `mulss` | Score after `sqrtss` |
+|---|---|---:|---:|---:|---:|
+| 28mm | `score_28mm` | `0.845083833` | `1.000000000` | `0.845083833` | `0.919284403` |
+| 35mm | `score_nonzero_35mm` | `0.283306062` | `0.843024850` | `0.238834053` | `0.488706499` |
+| 70mm | `score_nonzero_70mm` | `0.660202682` | `0.800213039` | `0.528302789` | `0.726844430` |
+| 150mm | `score_150mm` | `0.941425800` | `1.000000000` | `0.941425800` | `0.970270991` |
+
+Accepted reciprocal captures:
+
+| Focal tier | `xmm2` before `rcpss` | Exact `1/xmm2` | `xmm2` after `rcpss` |
+|---|---:|---:|---:|
+| 28mm | `0.399711609` | `2.501803745` | `2.501953125` |
+| 35mm | `1.023340702` | `0.977191661` | `0.977294922` |
+| 70mm | `0.902118564` | `1.108501743` | `1.108398438` |
+| 150mm | `1.149109244` | `0.870239279` | `0.870239258` |
+
+The first fixed-ignore score attempts for `35mm` and `70mm` landed on real
+zero-factor packets in this Codex run, so they were rejected as
+non-degenerate-score evidence and replaced by condition-only nonzero captures.
+
+This reproduces the W5 method and admits representative non-degenerate
+arithmetic at the score and reciprocal sites. It does not admit Opus's exact W5
+numeric table as constants, does not provide a full distribution, and does not
+close the complete reducer algorithm.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -272,12 +311,13 @@ claims and validated separately.
 
 ## Next Validation Steps
 
-1. Reproduce or refute Opus's LLDB ignore-count / conditional-breakpoint method
-   for mid-render score and `Σscore` magnitudes.
-2. Probe non-sentinel `0x36930f` packets, or prove a scope-bound condition under
+1. Probe non-sentinel `0x36930f` packets, or prove a scope-bound condition under
    which the first-eight sample window is expected to be all sentinel.
-3. Only after successful Codex-owned runtime reproduction, write an evidence
-   bundle under `docs/evidence/` and then consider canonical ledger changes.
+2. If exact Opus W5 sample rows matter, build a hit-window-specific reproduction
+   harness; otherwise keep the admitted W5 fact at representative magnitude
+   scope.
+3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
+   accept/reject/store topology before considering any "full reducer" claim.
 
 ## Non-Claims
 

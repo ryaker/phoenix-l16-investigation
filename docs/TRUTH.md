@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.154
+**Version**: 3.0.155
 **Status**: Canonical root truth rebuilt from admitted claims only. This file replaces the previous mixed-trust root TRUTH narrative. Older versions live in git history.
 
 ## Canonical Authority
@@ -51,6 +51,8 @@ These claims are currently `PROVEN` in the canonical ledger.
 | `CLM-CERES-001` | `libcp+0x5c3580` begins with two doubles `(1.0, 1.0)`; the stale four-float decode was a wrong-offset error. | static bundle fact, zoom-irrelevant | `SPEC_READY` |
 
 Additional `CLM-MERGE-003` / `CLM-MERGE-005` addendum: follow-up runtime proof now bounds the live `0x3661b0` vector-count use window. At `0x366a50..0x366a65`, the body reads a vector header through `r15+0x18`, computes `(end-begin)/16`, and reaches `0x366a65` with live `rbx = 5` across 16 capped packets per canonical focal tier under `--no-auto-lris`; every accepted packet has vector byte span `80`. This is count-use evidence only. It does not prove complete contributor acceptance, `src1` / `src2` semantics, the full reducer algorithm, or final acceptance/rejection.
+
+Additional `CLM-MERGE-005` addendum: follow-up W5 reproduction proof now verifies representative non-degenerate score and reciprocal magnitudes at the terminal IRAMP arithmetic sites. LLDB core-handled ignore-count / conditional breakpoints capture live `0x36e511 -> 0x36e515` `sqrt(xmm0*xmm1)` score arithmetic on all four canonical focal tiers, and live `0x36a938` non-common `xmm2` denominators whose post-`rcpss` values approximate `1/xmm2` on all four tiers. This admits the arithmetic and representative magnitudes only; it does not admit Opus's exact numeric rows as constants, a full per-pixel distribution, public semantic field names, complete reducer closure, or final acceptance/rejection.
 
 ## Established But Not Fully Closed
 
