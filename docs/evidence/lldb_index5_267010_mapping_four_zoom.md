@@ -108,10 +108,14 @@ StereoLayer<false> object
 
 This narrows the prior source descriptor / lookup-vector unknown to an internal
 sampled mapping fact: the tested source descriptor is an index image into a
-tiered float lookup table for the sampled entries. It still does not identify
-the public field names, upstream producer of the source index image, public
-calibration/LRI origin of the lookup table, or physical meaning of the
-resulting float values.
+tiered float lookup table for the sampled entries. This proof by itself did not
+identify the public field names, immediate upstream producer/custody chain,
+public calibration/LRI origin of the lookup table, or physical meaning of the
+resulting float values. A later follow-up,
+[lldb_source_index_299c70_producer_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_source_index_299c70_producer_four_zoom.md),
+now bounds the immediate internal `0x299c70` producer/custody path, while the
+public names, public origins, callback worker formula, and physical meaning
+remain open.
 
 ## Non-Claims
 
@@ -119,8 +123,9 @@ resulting float values.
 - This proof does not prove the descriptor is metric depth, disparity, inverse
   depth, confidence, or any other public physical quantity.
 - This proof does not prove full-map statistics from the first sampled entries.
-- This proof does not identify the upstream producer of the `uint16` source
-  descriptor.
+- This proof by itself did not identify the immediate producer/custody chain for
+  the `uint16` source descriptor; that boundary is covered by
+  [lldb_source_index_299c70_producer_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_source_index_299c70_producer_four_zoom.md).
 - This proof does not identify the public calibration origin of the lookup
   vector.
 - This proof does not prove final merge source contribution, anti-ghosting

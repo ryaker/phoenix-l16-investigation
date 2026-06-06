@@ -157,17 +157,23 @@ StereoLayer<false> update wrapper 0x26dd40
 
 This narrows the previous public-origin unknown: the index-5 descriptor consumed
 by `0x29ed90` is a runtime-built `StereoLayer<false>` pyramid product on the
-tested path. Its upstream source descriptor, lookup/vector values, LRI-carried
-calibration inputs, and public physical meaning remain unknown.
+tested path. A later follow-up,
+[lldb_source_index_299c70_producer_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_source_index_299c70_producer_four_zoom.md),
+now bounds the immediate internal `0x299c70` producer/custody path for the
+source descriptor passed to `0x267010`. The public source-field names,
+lookup/vector public origin, LRI-carried calibration inputs, callback worker
+formula, and public physical meaning remain unknown.
 
 ## Non-Claims
 
 - This proof does not identify a public LRI/protobuf field name.
 - This proof does not prove the descriptor is metric depth, disparity, inverse
   depth, confidence, or any other public physical quantity.
-- This proof does not decode the upstream source descriptor passed to
+- This proof by itself does not decode the source descriptor passed to
   `0x267010`, the lookup/vector at `this+0xe0`, or the worker bodies dispatched
-  by `0x299c70` / `0x299da0`.
+  by `0x299c70` / `0x299da0`; the immediate `0x299c70` custody boundary is
+  covered by
+  [lldb_source_index_299c70_producer_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_source_index_299c70_producer_four_zoom.md).
 - This proof does not prove full-map statistics from first sampled floats.
 - This proof does not prove final merge source contribution, anti-ghosting
   behavior, or final acceptance/rejection.

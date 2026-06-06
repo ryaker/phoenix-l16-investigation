@@ -319,7 +319,16 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
 - `lldb_index5_origin_classification_four_zoom.md`
   LLDB runtime plus installed-bundle static proof classifying the later `StereoLayer<false>+0x2a8` overwrite feeding the `0x29ed90` guided-upsample path: under `--no-auto-lris`, the canonical quartet reaches `0x26dd40 -> 0x26e120 -> 0x267010 -> 0x26e64a -> 0xf340` for six `StereoLayer<false>` objects with indices `0..5`; index `5` is the full `2080 x 1560` descriptor returned through slot `+0x90`, and static `0x267010` builds a new 4-byte descriptor from source descriptor dimensions, 16-bit source entries, and `this+0xe0` lookup/vector state before the move into `+0x2a8`. Public physical meaning and LRI/protobuf origin remain open.
 - `lldb_index5_267010_mapping_four_zoom.md`
-  LLDB runtime proof for sampled `0x267010` mapping behavior: under `--no-auto-lris`, the canonical quartet reaches six `StereoLayer<false>` indices `0..5`; for each captured index, the first 16 sampled source entries are read as `uint16` indices into the `rdx` float lookup vector, and every sampled `lookup[source_u16]` value exactly matches the corresponding float in the built stack descriptor after `0x267010` returns at `0x26e638`. Public physical meaning, public LRI/protobuf origin, upstream source producer, full-map statistics, and final merge effect remain open.
+  LLDB runtime proof for sampled `0x267010` mapping behavior: under `--no-auto-lris`, the canonical quartet reaches six `StereoLayer<false>` indices `0..5`; for each captured index, the first 16 sampled source entries are read as `uint16` indices into the `rdx` float lookup vector, and every sampled `lookup[source_u16]` value exactly matches the corresponding float in the built stack descriptor after `0x267010` returns at `0x26e638`. This proof alone did not close public physical meaning, public LRI/protobuf origin, immediate producer/custody, full-map statistics, or final merge effect.
+- `lldb_source_index_299c70_producer_four_zoom.md`
+  LLDB runtime plus static proof for the immediate upstream source-index
+  descriptor producer feeding `0x267010`: under `--no-auto-lris`, the canonical
+  quartet reaches `0x26e4c6 -> 0x299c70` for six `StereoLayer<false>` indices
+  `0..5`; `0x299c70` receives `this+0xf8`, builds the 2-byte descriptor at
+  caller `rbp-0xe0`, the descriptor is moved into caller `rbp-0x80`, and that
+  moved descriptor is passed unchanged to `0x267010`, while the lookup-vector
+  argument is `this+0xe0`. Public field names, LRI/protobuf origin, callback
+  worker formula, physical meaning, and final merge effect remain open.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.
 - `lldb_calib_state_operator_runtime_four_zoom.md`

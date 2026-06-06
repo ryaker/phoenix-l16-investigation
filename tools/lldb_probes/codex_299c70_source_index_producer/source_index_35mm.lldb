@@ -1,0 +1,22 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_299c70_source_index_producer/source_index_producer_probe.py
+script source_index_producer_probe.reset("35mm L16_03041 299c70 source-index producer", 16)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_299c70_source_index_producer
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26e4c6
+breakpoint set --shlib libcp.dylib --address 0x299c70
+breakpoint set --shlib libcp.dylib --address 0x299d06
+breakpoint set --shlib libcp.dylib --address 0x299d0b
+breakpoint set --shlib libcp.dylib --address 0x26e4d5
+breakpoint set --shlib libcp.dylib --address 0x26e4e0
+breakpoint set --shlib libcp.dylib --address 0x26e4e5
+breakpoint set --shlib libcp.dylib --address 0x26e633
+breakpoint set --shlib libcp.dylib --address 0x267010
+breakpoint set --shlib libcp.dylib --address 0x26e638
+script source_index_producer_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_299c70_source_index_producer/source_index_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script source_index_producer_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script source_index_producer_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_299c70_source_index_producer/source_index_35mm.json")
+script source_index_producer_probe.report(lldb.debugger)
+quit
