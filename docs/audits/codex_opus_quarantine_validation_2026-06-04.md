@@ -747,6 +747,50 @@ Still not admitted:
 - full-map statistics from first sampled floats;
 - final source contribution, anti-ghosting behavior, or acceptance/rejection.
 
+## `0x267010` Mapping Redo Result, 2026-06-05
+
+Codex then validated the next Opus-scout lead inside the already classified
+`0x267010` builder.
+
+The admitted proof is:
+
+- Evidence document:
+  [lldb_index5_267010_mapping_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_index5_267010_mapping_four_zoom.md)
+- Reusable harness:
+  `tools/lldb_probes/codex_index5_267010_mapping/`
+- Raw LLDB logs/reports/output HDR files:
+  `runs/codex_index5_267010_mapping/`
+
+Accepted runtime facts:
+
+- The admitted `28mm`, `35mm`, `70mm`, and `150mm` runs used
+  `--no-auto-lris`, exited `0`, avoided the probe step cap, had zero JSON
+  errors, and emitted files identified as `Radiance HDR image data`.
+- Each focal tier reaches `0x267010` and post-return site `0x26e638` six
+  times, covering `StereoLayer<false>` indices `0..5`.
+- For all six indices under all four focal tiers, the first 16 sampled source
+  entries are `uint16` indices into the `rdx` float lookup vector, and every
+  sampled `lookup[source_u16]` value exactly matches the corresponding float in
+  the built stack descriptor after `0x267010`.
+- The source descriptor sizes are `65x49`, `130x98`, `260x195`, `520x390`,
+  `1040x780`, and `2080x1560`; lookup-vector counts are `752` for `28mm` /
+  `35mm` and `1472` for `70mm` / `150mm`.
+
+Accepted correction / narrowing:
+
+- The prior "source descriptor plus lookup/vector state" wording is now
+  narrowed for sampled entries: the source descriptor acts as an internal
+  `uint16` index image into a tiered float lookup table.
+
+Still not admitted:
+
+- public physical meaning of the float values;
+- public LRI/protobuf field origin;
+- upstream producer of the `uint16` source-index descriptor;
+- public calibration origin of the lookup vector;
+- full-map statistics from the first sampled entries;
+- final source contribution, anti-ghosting behavior, or acceptance/rejection.
+
 ## Opus Internal Tension Noted
 
 Some Opus packets contain both "four-zoom OBSERVED" banners and older body
@@ -770,10 +814,11 @@ claims and validated separately.
 3. Continue reducing `0x3661b0` from arithmetic surfaces into a complete
    accept/reject/store topology before considering any "full reducer" claim.
 4. For the index-5 / `0x29ed90` lane, the next validation target is upstream
-   of the now-classified `0x267010` builder: identify the source descriptor
-   passed as `rsi`, the `this+0xe0` lookup/vector values, and any deterministic
-   LRI/calibration bridge before assigning public names such as depth,
-   disparity, inverse depth, or confidence.
+   of the now-sampled `0x267010` index-to-lookup mapping: identify the producer
+   of the `uint16` source-index descriptor, the public calibration/LRI origin
+   of the float lookup vector, and any deterministic LRI/calibration bridge
+   before assigning public names such as depth, disparity, inverse depth, or
+   confidence.
 
 ## Non-Claims
 

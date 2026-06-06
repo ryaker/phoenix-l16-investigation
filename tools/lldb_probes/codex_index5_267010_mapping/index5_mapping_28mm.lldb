@@ -1,0 +1,14 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_index5_267010_mapping/index5_267010_mapping_probe.py
+script index5_267010_mapping_probe.reset("28mm L16_02130 267010 mapping", 16)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_index5_267010_mapping
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x267010
+breakpoint set --shlib libcp.dylib --address 0x26e638
+script index5_267010_mapping_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_index5_267010_mapping/index5_mapping_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script index5_267010_mapping_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script index5_267010_mapping_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_index5_267010_mapping/index5_mapping_28mm.json")
+script index5_267010_mapping_probe.report(lldb.debugger)
+quit
