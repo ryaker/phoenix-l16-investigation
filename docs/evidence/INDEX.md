@@ -327,8 +327,18 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   `0..5`; `0x299c70` receives `this+0xf8`, builds the 2-byte descriptor at
   caller `rbp-0xe0`, the descriptor is moved into caller `rbp-0x80`, and that
   moved descriptor is passed unchanged to `0x267010`, while the lookup-vector
-  argument is `this+0xe0`. Public field names, LRI/protobuf origin, callback
-  worker formula, physical meaning, and final merge effect remain open.
+  argument is `this+0xe0`. Public field names, LRI/protobuf origin, physical
+  meaning, and final merge effect remain open.
+- `lldb_source_index_299c70_worker_formula_four_zoom.md`
+  LLDB runtime plus static proof for the sampled internal source-index callback
+  worker formula feeding the `0x267010` source descriptor: static extraction
+  binds callback address point `0x6680f0` through generic executor `0x5440`
+  slot `+0x30` to worker `0x29a670`; accepted no-auto-LRIS four-zoom runs
+  validate six dispatches and six sampled worker tiles per focal tier, with
+  `192/192` sampled post-write `uint16` values matching the source-record
+  min-cost formula. Public field names, LRI/protobuf origin, lookup-vector
+  origin, physical meaning, full-map statistics, and final merge effect remain
+  open.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.
 - `lldb_calib_state_operator_runtime_four_zoom.md`

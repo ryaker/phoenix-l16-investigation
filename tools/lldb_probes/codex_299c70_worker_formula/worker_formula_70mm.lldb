@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_299c70_worker_formula/worker_formula_probe.py
+script worker_formula_probe.reset("70mm L16_03434 299c70 worker formula", 8, 6)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_299c70_worker_formula
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x299d06
+breakpoint set --shlib libcp.dylib --address 0x29a670
+breakpoint set --shlib libcp.dylib --address 0x29a7e6
+breakpoint set --shlib libcp.dylib --address 0x299d0b
+script worker_formula_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_299c70_worker_formula/worker_formula_70mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script worker_formula_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script worker_formula_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_299c70_worker_formula/worker_formula_70mm.json")
+quit

@@ -1,0 +1,6 @@
+target create /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+memory read --format x --size 8 --count 12 0x6680e0
+disassemble --start-address 0x299c70 --end-address 0x299d42
+disassemble --start-address 0x5440 --end-address 0x5664
+disassemble --start-address 0x29a5e0 --end-address 0x29a830
+quit
