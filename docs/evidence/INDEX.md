@@ -348,6 +348,15 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   `0x26e4c6`, `0x299c70`, and `0x267010` with source dimensions
   `2080 x 1560`, stride `2080`. Public origin, physical meaning, full-map
   statistics, and final merge effect remain open.
+- `lldb_index5_source_object_field_origin_four_zoom.md`
+  LLDB runtime/static proof for the immediate internal field assembly of the
+  tracked index-5 `StereoLayer<false>+0xf8` source object: under
+  `--no-auto-lris`, the canonical quartet validates `0x29a140` stack-local
+  production, `0x26be5b` control write `2 -> 8`, `0x28f420` header move into
+  `this+0x100`, `0xf340` descriptor move into `this+0x118`, descriptor
+  dimensions `2080 x 1560`, stride `2080`, and later continuity into
+  `0x26e4c6`, `0x299c70`, and `0x267010`. Public origin, physical meaning,
+  full-map statistics, and final merge effect remain open.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.
 - `lldb_calib_state_operator_runtime_four_zoom.md`
