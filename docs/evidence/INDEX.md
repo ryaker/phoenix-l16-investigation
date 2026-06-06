@@ -339,6 +339,15 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   min-cost formula. Public field names, LRI/protobuf origin, lookup-vector
   origin, physical meaning, full-map statistics, and final merge effect remain
   open.
+- `lldb_index5_source_lookup_origin_watch_four_zoom.md`
+  LLDB runtime watchpoint proof for internal construction/custody of the same
+  tracked index-5 source/lookup inputs: under `--no-auto-lris`, the canonical
+  quartet populates `StereoLayer<false>+0xe0` through the `0xf02d0` path with
+  final observed write at `0xf043e`, writes `StereoLayer<false>+0xf8` control
+  state at `0x26be62`, and later passes the populated same object into
+  `0x26e4c6`, `0x299c70`, and `0x267010` with source dimensions
+  `2080 x 1560`, stride `2080`. Public origin, physical meaning, full-map
+  statistics, and final merge effect remain open.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.
 - `lldb_calib_state_operator_runtime_four_zoom.md`
