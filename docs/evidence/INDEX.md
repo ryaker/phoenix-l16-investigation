@@ -375,9 +375,12 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   LLDB runtime/static proof for sampled SIMD increment arithmetic feeding the
   `0x277a10` payload store: accepted four-zoom packets validate the
   `0x2779b0..0x277a10` unsigned-16 recurrence, full side-store and payload-store
-  register agreement, and watched-lane saturating accumulation where prior
-  watched bytes are known. Public operand origin/meaning, full-map payload
-  distribution, all records/lane positions, and final merge effect remain open.
+  register agreement, watched-lane saturating accumulation where prior watched
+  bytes are known, and narrow stable custody for the sampled record base /
+  offset table / stride, `r9` destination, `r10` temporary pointer, and `%xmm1`
+  broadcast from `object+0x56`. Public operand origin/meaning, `%xmm2/%xmm3`
+  stable scalar origin, full-map payload distribution, all records/lane
+  positions, and final merge effect remain open.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.
 - `lldb_calib_state_operator_runtime_four_zoom.md`

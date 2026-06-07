@@ -31,6 +31,10 @@ def hex_from_words(values):
     return bytes(out).hex()
 
 
+def broadcast_hex(value):
+    return hex_from_words([value & 0xFFFF] * 8)
+
+
 def paddusw(a, b):
     return [min(0xFFFF, x + y) for x, y in zip(a, b)]
 
@@ -62,6 +66,63 @@ def expected_increment(src0, src6, accum, xmm1, xmm2, xmm3):
     v6 = pminuw(paddusw(src6, xmm1), v0)
     v6 = pminuw(v6, xmm3)
     return psubusw(paddusw(accum, v6), xmm2), v6
+
+
+def maker_sample(packet):
+    for sample in packet.get("setup_samples", []):
+        if sample.get("site") == "maker_after_299fd0":
+            return sample
+    return None
+
+
+def validate_origin_context(path, packet, sample, index):
+    origin = sample["vector_context"].get("origin_context")
+    require(origin, f"{path.name}: sample {index} missing origin context")
+    relationships = origin.get("relationships", {})
+    for key in (
+        "object_eq_target_object",
+        "stack_minus_0x200_eq_object_0x168",
+        "stack_minus_0x210_eq_object_0x198",
+        "r10_eq_stack_minus_0x2e0",
+        "r9_eq_object_record_base_plus_record_offset_plus_8",
+        "watch_addr_eq_r9_plus_2rdx",
+    ):
+        require(
+            relationships.get(key) is True,
+            f"{path.name}: sample {index} origin relationship {key}={relationships.get(key)}",
+        )
+
+    require(
+        origin.get("object_from_stack_rbp_minus_0x1c8") == packet.get("target_object"),
+        f"{path.name}: sample {index} object stack target mismatch",
+    )
+    obj = origin.get("object_fields", {})
+    require(obj.get("read_ok"), f"{path.name}: sample {index} object fields unreadable")
+    qwords = obj.get("qwords", {})
+    dwords = obj.get("dwords", {})
+    maker = maker_sample(packet)
+    require(maker, f"{path.name}: missing maker_after_299fd0 sample")
+    output_local = maker.get("output_local", {})
+    output_header = output_local.get("header_qwords_0x08_0x20") or []
+    output_desc = output_local.get("descriptor_0x20") or {}
+    require(len(output_header) >= 2, f"{path.name}: maker output header incomplete")
+    require(
+        qwords.get("0x108") == output_header[1],
+        f"{path.name}: sample {index} object+0x108 != output record base",
+    )
+    require(
+        qwords.get("0x138") == output_desc.get("aux_0x28"),
+        f"{path.name}: sample {index} object+0x138 != output offset table",
+    )
+    require(
+        dwords.get("0x130") == output_desc.get("stride_0x18"),
+        f"{path.name}: sample {index} object+0x130 stride mismatch",
+    )
+    require(
+        sample["vector_context"]["xmm_hex"].get("xmm1")
+        == broadcast_hex(obj.get("u16_0x56")),
+        f"{path.name}: sample {index} xmm1 not broadcast object+0x56",
+    )
 
 
 def validate_report(path):
@@ -143,6 +204,7 @@ def validate_report(path):
             mem["payload_r9_plus_2rdx"] == xmm["xmm5"],
             f"{path.name}: sample {index} full payload memory != xmm5",
         )
+        validate_origin_context(path, packet, sample, index)
         if disamb.get("watch_minus_r9_plus_2rdx") == 0:
             require(
                 got_xmm5[:4] == exp_payload[:4],

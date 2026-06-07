@@ -8,7 +8,9 @@ Status: accepted narrow runtime/static evidence.
 payload bytes at `record+0x08` are mutated by the `libcp+0x277a10` SIMD store
 inside the `0x276860` mode-8 `StereoLayer<false>::runPass` body. This probe asks
 whether the sampled SIMD increment feeding that store can be reconstructed from
-the live vector operands at the same watchpoint stops.
+the live vector operands at the same watchpoint stops, and whether a narrow
+internal custody boundary can be proven for the stable object fields feeding the
+sampled destination and `%xmm1` operand.
 
 ## Harness
 
@@ -94,25 +96,51 @@ formula and full 16-byte side-store/payload-store register agreement, but it
 only validates prior-payload accumulation on the watched lanes whose previous
 bytes are actually observed by the watchpoint.
 
+## Validated Operand / Destination Custody
+
+The accepted rerun also captures an `origin_context` packet for every sampled
+watchpoint stop. The validator now requires all of these relationships:
+
+- `rbp-0x1c8` equals the tracked target object captured at the index setter.
+- `object+0x108` equals the output source-local record base observed after
+  `0x299fd0`.
+- `object+0x138` equals the output source-local offset table observed after
+  `0x299fd0`.
+- `object+0x130` equals the output source-local descriptor stride.
+- The sampled payload destination satisfies
+  `r9 == object+0x108 + sampled_record_offset + 8`, and the watched address
+  equals `r9 + 2*rdx`.
+- `r10` equals the temporary accumulator pointer saved at `rbp-0x2e0`.
+- `rbp-0x200` equals `object+0x168`, and `rbp-0x210` equals `object+0x198`.
+- `%xmm1` is the eight-lane unsigned-16 broadcast of `object+0x56`.
+
+Two other inspected stack copies, `rbp-0x1d0` and `rbp-0x188`, matched their
+static object-field origins in early samples but not all later watchpoint
+samples, consistent with those locals being overwritten before some stops. They
+are therefore not admitted as stable operand-origin facts.
+
 ## Accepted Results
 
 | Tier | JSON | Process | Watch hits | Samples |
 |---|---|---|---:|---:|
 | `28mm` | `runs/codex_276860_payload_vector_formula/vector_formula_28mm.json` | exited `0` | `wp1=12`, `wp2=4` | `16` |
-| `35mm` | `runs/codex_276860_payload_vector_formula/vector_formula_35mm.json` | exited `0` | `wp1=12`, `wp2=4` | `16` |
-| `70mm` | `runs/codex_276860_payload_vector_formula/vector_formula_70mm.json` | exited `0` | `wp1=12`, `wp2=8` | `20` |
-| `150mm` | `runs/codex_276860_payload_vector_formula/vector_formula_150mm.json` | exited `0` | `wp1=12`, `wp2=8` | `20` |
+| `35mm` | `runs/codex_276860_payload_vector_formula/vector_formula_35mm.json` | exited `0` | `wp1=12`, `wp2=8` | `20` |
+| `70mm` | `runs/codex_276860_payload_vector_formula/vector_formula_70mm.json` | exited `0` | `wp1=12`, `wp2=3` | `15` |
+| `150mm` | `runs/codex_276860_payload_vector_formula/vector_formula_150mm.json` | exited `0` | `wp1=12`, `wp2=4` | `16` |
 
 Validator output:
 
 ```text
 vector_formula_28mm.json: OK samples=16 watch_hits={'1': 12, '2': 4} vector_formula=0x2779b0..0x277a10
-vector_formula_35mm.json: OK samples=16 watch_hits={'1': 12, '2': 4} vector_formula=0x2779b0..0x277a10
-vector_formula_70mm.json: OK samples=20 watch_hits={'1': 12, '2': 8} vector_formula=0x2779b0..0x277a10
-vector_formula_150mm.json: OK samples=20 watch_hits={'1': 12, '2': 8} vector_formula=0x2779b0..0x277a10
+vector_formula_35mm.json: OK samples=20 watch_hits={'1': 12, '2': 8} vector_formula=0x2779b0..0x277a10
+vector_formula_70mm.json: OK samples=15 watch_hits={'1': 12, '2': 3} vector_formula=0x2779b0..0x277a10
+vector_formula_150mm.json: OK samples=16 watch_hits={'1': 12, '2': 4} vector_formula=0x2779b0..0x277a10
 ```
 
 All four output files are Radiance HDR files.
+
+The watch-hit and sample totals above are accepted-packet counts from this run,
+not stable algorithm constants.
 
 ## Rejected Development Runs
 
@@ -132,11 +160,20 @@ and a Radiance HDR output.
 - The full 16-byte payload store at `[r9 + 2*rdx]` exactly matches live `%xmm5`.
 - For watched lanes with known previous bytes, the payload update is unsigned
   saturating addition of the previous watched payload lanes plus `increment`.
+- The sampled payload destination is internally tied to the tracked object's
+  record base at `object+0x108` plus the sampled `0x299fd0` record offset.
+- The sampled `%xmm1` operand is the unsigned-16 broadcast of `object+0x56`.
+- The sampled accumulator source pointer in `r10` is the temporary pointer saved
+  at `rbp-0x2e0`.
 
 ## Not Proven
 
 - Public meaning or public LRI/protobuf origin for `src0`, `src6`, `accum`,
   `bias1`, `bias2`, `cap`, or the payload records.
+- Public meaning for object fields `+0x56`, `+0x108`, `+0x130`, `+0x138`,
+  `+0x168`, `+0x198`, or the `rbp-0x2e0` temporary pointer.
+- Stable scalar origin for `%xmm2` / `%xmm3`; the attempted hot-loop scalar
+  breakpoint approach was rejected as too intrusive and is not admitted.
 - Full-map payload distribution or all records/lane positions.
 - Prior-payload arithmetic for unwatched lanes in the same 16-byte SIMD store.
 - Whether the sampled payload values are final costs, intermediate accumulated

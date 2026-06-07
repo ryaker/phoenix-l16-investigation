@@ -67,6 +67,30 @@ def _u64(data, off=0):
     return struct.unpack_from("<Q", data, off)[0]
 
 
+def _f32(data, off=0):
+    return struct.unpack_from("<f", data, off)[0]
+
+
+def _u16_at(process, addr):
+    raw = _read(process, addr, 2)
+    return _u16(raw) if raw is not None else None
+
+
+def _u32_at(process, addr):
+    raw = _read(process, addr, 4)
+    return _u32(raw) if raw is not None else None
+
+
+def _u64_at(process, addr):
+    raw = _read(process, addr, 8)
+    return _u64(raw) if raw is not None else None
+
+
+def _f32_at(process, addr):
+    raw = _read(process, addr, 4)
+    return _f32(raw) if raw is not None else None
+
+
 def _u32_list(process, addr, count):
     raw = _read(process, addr, count * 4)
     if raw is None:
@@ -252,6 +276,128 @@ def _u16_header(process, addr):
     return [_u16(raw, off) for off in range(0, 8, 2)]
 
 
+def _slot_key(offset):
+    direction = "plus" if offset >= 0 else "minus"
+    return f"rbp_{direction}_0x{abs(offset):x}"
+
+
+def _stack_qwords(process, rbp, offsets):
+    return {_slot_key(offset): _u64_at(process, rbp + offset) for offset in offsets}
+
+
+def _stack_dwords(process, rbp, offsets):
+    return {_slot_key(offset): _u32_at(process, rbp + offset) for offset in offsets}
+
+
+def _object_fields(process, obj):
+    if not obj:
+        return {"addr": obj, "read_ok": False}
+    qword_offsets = (
+        0x108,
+        0x138,
+        0x148,
+        0x158,
+        0x168,
+        0x178,
+        0x180,
+        0x188,
+        0x198,
+        0x1A8,
+        0x1B0,
+        0x1D0,
+        0x1D8,
+        0x1E0,
+        0x1E8,
+        0x1F8,
+        0x200,
+        0x240,
+        0x248,
+        0x288,
+    )
+    dword_offsets = (0x130, 0x220, 0x238, 0x23C)
+    byte_offsets = (0x20, 0x160, 0x190)
+    return {
+        "addr": obj,
+        "read_ok": True,
+        "u16_0x56": _u16_at(process, obj + 0x56),
+        "f32_0x58": _f32_at(process, obj + 0x58),
+        "bytes_0x60_0x70_hex": _bytes_hex(process, obj + 0x60, 16),
+        "qwords": {f"0x{off:x}": _u64_at(process, obj + off) for off in qword_offsets},
+        "dwords": {f"0x{off:x}": _u32_at(process, obj + off) for off in dword_offsets},
+        "bytes": {
+            f"0x{off:x}": (
+                _read(process, obj + off, 1).hex()
+                if _read(process, obj + off, 1) is not None
+                else None
+            )
+            for off in byte_offsets
+        },
+    }
+
+
+def _origin_context(process, regs, meta):
+    rbp = regs["rbp"]
+    target_obj = _state().get("target_object")
+    obj = _u64_at(process, rbp - 0x1C8)
+    stack_qwords = _stack_qwords(
+        process,
+        rbp,
+        (
+            -0x1C8,
+            -0x2E0,
+            -0x1A0,
+            -0x208,
+            -0x300,
+            -0x150,
+            -0x308,
+            -0x170,
+            -0x158,
+            -0x210,
+            -0x310,
+            -0x280,
+            -0x160,
+            -0x200,
+            -0x318,
+            -0x1D0,
+            -0x188,
+            -0x258,
+            -0x250,
+            -0x228,
+        ),
+    )
+    stack_dwords = _stack_dwords(process, rbp, (-0x248, -0x1F8, -0x1D4, -0x244))
+    fields = _object_fields(process, obj)
+    q = fields.get("qwords", {})
+    d = fields.get("dwords", {})
+    watch_addr = meta.get("watch_addr", 0)
+    record_offset = meta.get("record_offset", 0)
+    r9_store_base = (regs["r9"] + (2 * regs["rdx"])) & 0xFFFFFFFFFFFFFFFF
+    return {
+        "rbp": rbp,
+        "target_object": target_obj,
+        "object_from_stack_rbp_minus_0x1c8": obj,
+        "object_fields": fields,
+        "stack_qwords": stack_qwords,
+        "stack_dwords": stack_dwords,
+        "relationships": {
+            "object_eq_target_object": bool(target_obj and obj == target_obj),
+            "stack_minus_0x200_eq_object_0x168": stack_qwords.get("rbp_minus_0x200")
+            == q.get("0x168"),
+            "stack_minus_0x210_eq_object_0x198": stack_qwords.get("rbp_minus_0x210")
+            == q.get("0x198"),
+            "stack_minus_0x1d0_eq_object_0x180": stack_qwords.get("rbp_minus_0x1d0")
+            == q.get("0x180"),
+            "stack_minus_0x188_eq_object_0x1b0": stack_qwords.get("rbp_minus_0x188")
+            == q.get("0x1b0"),
+            "r10_eq_stack_minus_0x2e0": regs["r10"] == stack_qwords.get("rbp_minus_0x2e0"),
+            "r9_eq_object_record_base_plus_record_offset_plus_8": regs["r9"]
+            == (q.get("0x108") or 0) + record_offset + 8,
+            "watch_addr_eq_r9_plus_2rdx": watch_addr == r9_store_base,
+            "object_0x130_stride": d.get("0x130"),
+        },
+    }
+
+
 def _arm_watchpoints(process, target, output_local):
     state = _state()
     if state.get("watchpoints_armed"):
@@ -323,6 +469,7 @@ def _vector_context(process, frame, regs, meta):
             key: _bytes_hex(process, addr, 16) for key, addr in addrs.items()
         },
         "payload16_before_hit_hex": meta.get("payload16_before_hex"),
+        "origin_context": _origin_context(process, regs, meta),
         "xmm_hex": {f"xmm{i}": _xmm_hex(frame, f"xmm{i}") for i in range(8)},
     }
 
