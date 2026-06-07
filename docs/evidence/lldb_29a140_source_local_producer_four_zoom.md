@@ -183,6 +183,9 @@ record_size = 8 + factor * rounded
 The same validator also requires the first eight output-table offsets and first
 eight record headers to match the reconstructed formula.
 
+The sampled byte spans and mask counts in the table are evidence-run samples,
+not stable constants.
+
 | Focal tier | Computed / returned span | Mask zero / nonzero | First mask bytes | First expected records `(offset,u0,u2,one,rounded,factor,size)` |
 |---|---:|---:|---|---|
 | `28mm` | `89124024` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,205,9,1,16,3,56)`, `(56,205,9,1,16,2,40)`, `(96,205,9,1,16,2,40)`, `(136,205,9,1,16,2,40)`, `(176,205,9,1,16,2,40)`, `(216,205,9,1,16,2,40)`, `(256,205,9,1,16,2,40)`, `(296,205,9,1,16,2,40)` |
