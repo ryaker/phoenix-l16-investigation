@@ -139,6 +139,13 @@ def _u32_list(process, addr, count):
     return [_u32(raw, off) for off in range(0, len(raw), 4)]
 
 
+def _byte_list(process, addr, count):
+    raw = _read(process, addr, count)
+    if raw is None:
+        return []
+    return list(raw)
+
+
 def _qword_list(process, addr, count):
     raw = _read(process, addr, count * 8)
     if raw is None:
@@ -197,7 +204,152 @@ def _input_descriptor(process, addr):
     desc = _descriptor(process, addr)
     if desc.get("read_ok"):
         desc["first_u16_values"] = _u16_list(process, desc.get("data_0x20", 0), 16)
+        desc["first_pairs"] = _first_pairs_from_descriptor(process, desc, 8)
     return desc
+
+
+def _mask_descriptor(process, addr):
+    desc = _descriptor(process, addr)
+    if desc.get("read_ok"):
+        desc["first_bytes"] = _byte_list(process, desc.get("data_0x20", 0), 16)
+    return desc
+
+
+def _first_pairs_from_descriptor(process, desc, count):
+    data = desc.get("data_0x20", 0)
+    stride = desc.get("stride_0x18", 0)
+    if not data or stride <= 0:
+        return []
+    raw = _read(process, data, min(count, stride) * 4)
+    if raw is None:
+        return []
+    pairs = []
+    for index in range(0, len(raw), 4):
+        pairs.append(
+            {
+                "index": index // 4,
+                "u16_0x00": _u16(raw, index),
+                "u16_0x02": _u16(raw, index + 2),
+            }
+        )
+    return pairs
+
+
+def _ceil_to_control(value, control):
+    if control <= 0:
+        return None
+    quotient, remainder = divmod(value, control)
+    if remainder:
+        quotient += 1
+    return quotient * control
+
+
+def _compute_record_formula(process, input_desc, mask_desc, control, observed_return_rax=0):
+    if control <= 0:
+        return {"available": False, "reason": "nonpositive control", "control": control}
+    if not input_desc.get("read_ok") or not mask_desc.get("read_ok"):
+        return {"available": False, "reason": "descriptor unreadable", "control": control}
+
+    width = input_desc.get("width_0x10", 0)
+    height = input_desc.get("height_0x14", 0)
+    input_stride = input_desc.get("stride_0x18", 0)
+    mask_stride = mask_desc.get("stride_0x18", 0)
+    input_data = input_desc.get("data_0x20", 0)
+    mask_data = mask_desc.get("data_0x20", 0)
+    dims_match = (
+        width == mask_desc.get("width_0x10", 0)
+        and height == mask_desc.get("height_0x14", 0)
+    )
+    if width <= 0 or height <= 0 or input_stride < width or mask_stride < width:
+        return {
+            "available": False,
+            "reason": "invalid dimensions",
+            "control": control,
+            "width": width,
+            "height": height,
+            "input_stride": input_stride,
+            "mask_stride": mask_stride,
+            "dims_match": dims_match,
+        }
+    if not input_data or not mask_data:
+        return {
+            "available": False,
+            "reason": "missing data pointer",
+            "control": control,
+            "width": width,
+            "height": height,
+            "input_stride": input_stride,
+            "mask_stride": mask_stride,
+            "dims_match": dims_match,
+        }
+
+    input_raw = _read(process, input_data, input_stride * height * 4)
+    mask_raw = _read(process, mask_data, mask_stride * height)
+    if input_raw is None or mask_raw is None:
+        return {
+            "available": False,
+            "reason": "bulk read failed",
+            "control": control,
+            "width": width,
+            "height": height,
+            "input_stride": input_stride,
+            "mask_stride": mask_stride,
+            "dims_match": dims_match,
+        }
+
+    total = 0
+    first_records = []
+    zero_mask_count = 0
+    nonzero_mask_count = 0
+    for y in range(height):
+        input_row = y * input_stride * 4
+        mask_row = y * mask_stride
+        for x in range(width):
+            input_off = input_row + x * 4
+            first = _u16(input_raw, input_off)
+            second = _u16(input_raw, input_off + 2)
+            rounded = _ceil_to_control(second, control)
+            mask_value = mask_raw[mask_row + x]
+            factor = 2 if mask_value != 0 else 3
+            if mask_value:
+                nonzero_mask_count += 1
+            else:
+                zero_mask_count += 1
+            record_size = 8 + factor * rounded
+            if len(first_records) < 8:
+                first_records.append(
+                    {
+                        "index": y * width + x,
+                        "x": x,
+                        "y": y,
+                        "offset": total,
+                        "u16_0x00": first,
+                        "u16_0x02": second,
+                        "u16_0x04": 1,
+                        "u16_0x06": rounded,
+                        "mask_byte": mask_value,
+                        "factor": factor,
+                        "record_size": record_size,
+                    }
+                )
+            total += record_size
+
+    return {
+        "available": True,
+        "control": control,
+        "width": width,
+        "height": height,
+        "input_stride": input_stride,
+        "mask_stride": mask_stride,
+        "dims_match": dims_match,
+        "pixel_count": width * height,
+        "zero_mask_count": zero_mask_count,
+        "nonzero_mask_count": nonzero_mask_count,
+        "computed_total_bytes": total,
+        "observed_return_rax": observed_return_rax,
+        "return_matches_computed": observed_return_rax == total,
+        "first_records": first_records,
+    }
 
 
 def _append_sample(sample):
@@ -371,6 +523,9 @@ def hit(frame, bp_loc, internal_dict):
     sample["source_object_0xf8"] = _source_object(process, target_obj)
     sample["output_local"] = _source_local(process, output_local)
     sample["input_descriptor"] = _input_descriptor(process, input_desc)
+    sample["mask_descriptor_target_plus_0x208"] = _mask_descriptor(
+        process, target_obj + 0x208 if target_obj else 0
+    )
 
     if site_va == 0x26BE50:
         sample["call_args"] = {
@@ -391,6 +546,15 @@ def hit(frame, bp_loc, internal_dict):
         sample["header_src_return_ptr"] = regs["rax"]
         sample["header_src_qwords_0x40"] = _qword_list(process, regs["rax"], 8)
         sample["header_src_bytes_0x40_hex"] = _bytes_hex(process, regs["rax"], 0x40)
+        formula = _compute_record_formula(
+            process,
+            sample["input_descriptor"],
+            sample["mask_descriptor_target_plus_0x208"],
+            sample["output_local"].get("control_u32_0x00") or 0,
+            regs["rax"],
+        )
+        state["record_formula_299eb0"] = formula
+        sample["record_formula_299eb0"] = formula
     elif site_va == 0x29A192:
         sample["header_src_return_ptr"] = state.get("header_src_return_ptr")
         sample["header_src_qwords_0x40"] = _qword_list(
@@ -401,6 +565,7 @@ def hit(frame, bp_loc, internal_dict):
         )
     elif site_va == 0x29A1A0:
         sample["header_src_return_ptr"] = state.get("header_src_return_ptr")
+        sample["record_formula_299eb0"] = state.get("record_formula_299eb0")
         sample["post_299fd0_record_samples"] = _record_samples_from_source_local(
             process, output_local
         )
@@ -441,7 +606,7 @@ def _record_samples_from_source_local(process, addr):
     stride = desc.get("stride_0x18", 0)
     samples = []
     offsets = _u32_list(process, offset_table, min(8, max(stride, 0))) if offset_table else []
-    for off in offsets[:4]:
+    for off in offsets[:8]:
         raw = _read(process, record_base + off, 8)
         if raw is None:
             samples.append({"offset": off, "read_ok": False})

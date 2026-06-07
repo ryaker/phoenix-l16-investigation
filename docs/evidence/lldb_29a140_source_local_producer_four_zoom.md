@@ -80,6 +80,32 @@ with the input descriptor, target `+0x208`, and control value, calls `0x28f490`
 with destination `output+0x08`, `rsi = rax`, and `edx = 0x40`, then calls
 `0x299fd0` with output local, input descriptor, and target `+0x208`.
 
+Fresh static extraction of `0x299eb0..0x29a140` was captured under
+`runs/codex_29a140_source_local_producer/static_299eb0_29a140.log` and
+`runs/codex_29a140_source_local_producer/static_299fd0_29a140.log`.
+
+The static `0x299eb0` loop:
+
+- checks that the input descriptor and `target+0x208` descriptor have matching
+  width and height;
+- iterates over input width and height;
+- reads the second `uint16` from each 4-byte input entry;
+- rounds that value up to the incoming control value;
+- reads the corresponding mask byte from `target+0x208`;
+- accumulates `8 + factor * rounded`, where the visible branch uses factor
+  `2` for nonzero mask bytes and factor `3` for zero mask bytes;
+- returns the accumulated byte span in `rax`.
+
+The static `0x299fd0` loop:
+
+- builds the output descriptor from the input descriptor dimensions;
+- iterates over the same width and height;
+- writes the current record offset into the output offset table;
+- writes record header fields `(input_u16_0, input_u16_2, 1, rounded)` at
+  `record_base + offset`;
+- advances the current record pointer by the same
+  `8 + factor * rounded` formula.
+
 ## Runtime Result
 
 All accepted runs used:
@@ -132,12 +158,37 @@ Record samples after `0x299fd0`:
 | Focal tier | Record-base pointer | Offset-table pointer | First offsets | First sampled record |
 |---|---:|---:|---|---|
 | `28mm` | nonzero | nonzero | `[0, 56, 96, 136]` | `(205, 9, 1, 16)` |
-| `35mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(27, 3, 1, 8)` |
-| `70mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(58, 4, 1, 8)` |
-| `150mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(3, 4, 1, 8)` |
+| `35mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(25, 4, 1, 8)` |
+| `70mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(9, 8, 1, 8)` |
+| `150mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(19, 5, 1, 8)` |
 
 The sampled record values are admitted only as runtime samples, not as stable
 semantic constants.
+
+Formula validation:
+
+The rerun validator now computes the full byte-span formula directly from live
+process memory at the `0x299eb0` return boundary. It reads the complete
+`2080 x 1560` 4-byte input descriptor and complete `2080 x 1560` byte mask
+descriptor at `target+0x208`, computes the formula below for every pixel, and
+requires the result to match both the `0x299eb0` return and the final output
+header span after `0x299fd0`.
+
+```text
+rounded = ceil(input_u16_2 / control) * control
+factor = 2 if mask_byte != 0 else 3
+record_size = 8 + factor * rounded
+```
+
+The same validator also requires the first eight output-table offsets and first
+eight record headers to match the reconstructed formula.
+
+| Focal tier | Computed / returned span | Mask zero / nonzero | First mask bytes | First expected records `(offset,u0,u2,one,rounded,factor,size)` |
+|---|---:|---:|---|---|
+| `28mm` | `89124024` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,205,9,1,16,3,56)`, `(56,205,9,1,16,2,40)`, `(96,205,9,1,16,2,40)`, `(136,205,9,1,16,2,40)`, `(176,205,9,1,16,2,40)`, `(216,205,9,1,16,2,40)`, `(256,205,9,1,16,2,40)`, `(296,205,9,1,16,2,40)` |
+| `35mm` | `96477512` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,25,4,1,8,3,32)`, `(32,25,4,1,8,2,24)`, `(56,25,4,1,8,2,24)`, `(80,25,4,1,8,2,24)`, `(104,25,4,1,8,2,24)`, `(128,25,2,1,8,2,24)`, `(152,25,2,1,8,2,24)`, `(176,25,2,1,8,2,24)` |
+| `70mm` | `109755992` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,9,8,1,8,3,32)`, `(32,9,8,1,8,2,24)`, `(56,9,8,1,8,2,24)`, `(80,9,8,1,8,2,24)`, `(104,9,8,1,8,2,24)`, `(128,8,9,1,16,2,40)`, `(168,8,9,1,16,2,40)`, `(208,8,9,1,16,2,40)` |
+| `150mm` | `86353544` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,19,5,1,8,3,32)`, `(32,19,5,1,8,2,24)`, `(56,19,5,1,8,2,24)`, `(80,19,5,1,8,2,24)`, `(104,19,5,1,8,2,24)`, `(128,22,3,1,8,2,24)`, `(152,22,3,1,8,2,24)`, `(176,22,3,1,8,2,24)` |
 
 The follow-on moves and continuity also validate:
 
@@ -158,11 +209,24 @@ as the immediate source-local producer body behind the previously proven
 caller rbp-0xb0 / source local
   +0x00 control = 8
   +0x08 header region populated by static 0x28f490 call following 0x299eb0
+        header span equals the full byte span computed from the live input
+        descriptor and target+0x208 mask descriptor
   +0x20 descriptor/record fields populated by 0x299fd0
+        descriptor = 2080 x 1560, stride 2080
+        first eight offsets/record headers match the reconstructed formula
 
 caller rbp-0xb0 +0x08 -> this+0x100 by 0x28f420
 caller rbp-0xb0 +0x20 -> this+0x118 by 0xf340
 this+0xf8 / this+0xe0 later continue into the proven 0x299c70 -> 0x267010 path
+```
+
+For this tracked path, the admitted mechanics are:
+
+```text
+rounded = ceil(input_u16_2 / 8) * 8
+factor = 2 if target_plus_0x208_mask_byte != 0 else 3
+record_size = 8 + factor * rounded
+record_header = (input_u16_0, input_u16_2, 1, rounded)
 ```
 
 ## Non-Claims
@@ -171,8 +235,8 @@ this+0xf8 / this+0xe0 later continue into the proven 0x299c70 -> 0x267010 path
 - This proof does not name the public physical quantity represented by the
   produced descriptor or lookup/source object.
 - This proof does not prove that the sampled record values are constants.
-- This proof does not decode the full body or public semantics of `0x299eb0`.
-- This proof does not decode the full body or public semantics of `0x299fd0`.
+- This proof does not name public semantics for `0x299eb0`, `0x299fd0`, the
+  4-byte input entries, the `target+0x208` mask bytes, or the output records.
 - This proof does not prove exact `0x28f490` helper semantics beyond the
   observed header-population boundary.
 - This proof does not prove final source contribution, anti-ghosting behavior,
@@ -192,8 +256,8 @@ git diff --check
 Validator output:
 
 ```text
-source_local_150mm.json: OK target=0x7f7ed3f0c420 record_base=0x7f7e25478040 offset_table=0x7f7ea5464040 first_offsets=[0, 32, 56, 80]
-source_local_28mm.json: OK target=0x7fcb00713c90 record_base=0x7fca20700040 offset_table=0x7fca56a08040 first_offsets=[0, 56, 96, 136]
-source_local_35mm.json: OK target=0x7f8f4ba096c0 record_base=0x7f8e6fcd8040 offset_table=0x7f8f2bc64040 first_offsets=[0, 32, 56, 80]
-source_local_70mm.json: OK target=0x7f7845908af0 record_base=0x7f7779e8c040 offset_table=0x7f7805c64040 first_offsets=[0, 32, 56, 80]
+source_local_150mm.json: OK target=0x7f950c70e210 record_base=0x7f9474dac040 offset_table=0x7f94dd364040 first_offsets=[0, 32, 56, 80]
+source_local_28mm.json: OK target=0x7fe00f910cf0 record_base=0x7fdf2ef00040 offset_table=0x7fdfd8000040 first_offsets=[0, 56, 96, 136]
+source_local_35mm.json: OK target=0x7ff2c07179f0 record_base=0x7ff2155d8040 offset_table=0x7ff291364040 first_offsets=[0, 32, 56, 80]
+source_local_70mm.json: OK target=0x7fe45612e470 record_base=0x7fe375700040 offset_table=0x7fe416364040 first_offsets=[0, 32, 56, 80]
 ```

@@ -79,9 +79,43 @@ def validate_report(path):
         after_header["output_local"]["descriptor_0x20"]["width_0x10"] == 0,
         f"{path.name}: descriptor populated before 0x299fd0",
     )
+    formula = after_299eb0.get("record_formula_299eb0")
+    require(formula and formula.get("available"), f"{path.name}: formula unavailable")
+    require(formula["control"] == 8, f"{path.name}: formula control {formula}")
+    require(formula["width"] == 2080, f"{path.name}: formula width {formula}")
+    require(formula["height"] == 1560, f"{path.name}: formula height {formula}")
+    require(formula["input_stride"] == 2080, f"{path.name}: formula input stride {formula}")
+    require(formula["mask_stride"] == 2080, f"{path.name}: formula mask stride {formula}")
+    require(formula["dims_match"], f"{path.name}: input/mask dims mismatch {formula}")
+    require(
+        formula["pixel_count"] == 2080 * 1560,
+        f"{path.name}: formula pixel count {formula}",
+    )
+    require(
+        formula["return_matches_computed"],
+        f"{path.name}: 0x299eb0 return does not match computed span {formula}",
+    )
+    require(
+        formula["zero_mask_count"] + formula["nonzero_mask_count"] == formula["pixel_count"],
+        f"{path.name}: mask census count mismatch {formula}",
+    )
 
     output = after_299fd0["output_local"]
     require(output["control_u32_0x00"] == 8, f"{path.name}: final control not 8")
+    final_formula = after_299fd0.get("record_formula_299eb0")
+    require(
+        final_formula == formula,
+        f"{path.name}: formula packet changed between 0x299eb0 and 0x299fd0",
+    )
+    final_header = output["header_qwords_0x08_0x20"]
+    require(
+        final_header[0] == formula["computed_total_bytes"],
+        f"{path.name}: final header size != formula {final_header} {formula}",
+    )
+    require(
+        final_header[2] - final_header[1] == formula["computed_total_bytes"],
+        f"{path.name}: final record span != formula {final_header} {formula}",
+    )
     desc = output["descriptor_0x20"]
     require(desc["read_ok"], f"{path.name}: descriptor unreadable")
     require(desc["width_0x10"] == 2080, f"{path.name}: width {desc}")
@@ -122,7 +156,23 @@ def validate_report(path):
     records = after_299fd0["post_299fd0_record_samples"]
     require(records["available"], f"{path.name}: record samples unavailable")
     require(records["stride"] == 2080, f"{path.name}: record stride {records}")
-    require(records["first_offsets"], f"{path.name}: no record offsets")
+    expected_records = formula["first_records"]
+    require(len(expected_records) == 8, f"{path.name}: formula record count {formula}")
+    require(
+        records["first_offsets"][:8] == [record["offset"] for record in expected_records],
+        f"{path.name}: first offset formula mismatch {records} {expected_records}",
+    )
+    require(
+        len(records["records"]) == 8,
+        f"{path.name}: captured record count {records}",
+    )
+    for index, (observed, expected) in enumerate(zip(records["records"], expected_records)):
+        require(observed["read_ok"], f"{path.name}: record {index} unreadable {observed}")
+        for key in ("offset", "u16_0x00", "u16_0x02", "u16_0x04", "u16_0x06"):
+            require(
+                observed[key] == expected[key],
+                f"{path.name}: record {index} {key} mismatch {observed} {expected}",
+            )
     return packet, records
 
 
