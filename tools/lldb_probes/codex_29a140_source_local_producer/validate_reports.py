@@ -8,7 +8,7 @@ REQUIRED_SITES = {
     "caller_pre_29a140",
     "maker_29a140_entry",
     "maker_after_299eb0",
-    "maker_after_header_copy_28f490",
+    "maker_after_header_28f490",
     "maker_after_299fd0",
     "caller_post_29a140",
     "caller_pre_header_move_28f420",
@@ -50,7 +50,7 @@ def validate_report(path):
     pre = samples["caller_pre_29a140"]
     entry = samples["maker_29a140_entry"]
     after_299eb0 = samples["maker_after_299eb0"]
-    after_copy = samples["maker_after_header_copy_28f490"]
+    after_header = samples["maker_after_header_28f490"]
     after_299fd0 = samples["maker_after_299fd0"]
     caller_post = samples["caller_post_29a140"]
     header_move = samples["caller_pre_header_move_28f420"]
@@ -72,11 +72,11 @@ def validate_report(path):
         f"{path.name}: header not still zero after 0x299eb0",
     )
     require(
-        after_copy["output_local"]["header_qwords_0x08_0x20"][0] != 0,
+        after_header["output_local"]["header_qwords_0x08_0x20"][0] != 0,
         f"{path.name}: header not populated after 0x28f490",
     )
     require(
-        after_copy["output_local"]["descriptor_0x20"]["width_0x10"] == 0,
+        after_header["output_local"]["descriptor_0x20"]["width_0x10"] == 0,
         f"{path.name}: descriptor populated before 0x299fd0",
     )
 

@@ -8,7 +8,7 @@ SITES = {
     0x26BE50: "caller_pre_29a140",
     0x29A140: "maker_29a140_entry",
     0x29A182: "maker_after_299eb0",
-    0x29A192: "maker_after_header_copy_28f490",
+    0x29A192: "maker_after_header_28f490",
     0x29A1A0: "maker_after_299fd0",
     0x26BE55: "caller_post_29a140",
     0x26BE73: "caller_pre_header_move_28f420",
@@ -254,7 +254,7 @@ def _install_deep_breakpoints(debugger):
         {
             "maker_29a140_entry",
             "maker_after_299eb0",
-            "maker_after_header_copy_28f490",
+            "maker_after_header_28f490",
             "maker_after_299fd0",
             "caller_post_29a140",
             "caller_pre_header_move_28f420",

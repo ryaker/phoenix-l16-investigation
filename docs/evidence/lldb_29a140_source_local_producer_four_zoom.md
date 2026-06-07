@@ -77,7 +77,7 @@ The static body:
 Static fact only: `0x29a140` stores the incoming low `ecx` control value into
 the output local, zeroes output-local fields `+0x08..+0x48`, calls `0x299eb0`
 with the input descriptor, target `+0x208`, and control value, calls `0x28f490`
-with destination `output+0x08`, source `rax`, and byte count `0x40`, then calls
+with destination `output+0x08`, `rsi = rax`, and `edx = 0x40`, then calls
 `0x299fd0` with output local, input descriptor, and target `+0x208`.
 
 ## Runtime Result
@@ -157,7 +157,7 @@ as the immediate source-local producer body behind the previously proven
 ```text
 caller rbp-0xb0 / source local
   +0x00 control = 8
-  +0x08 header region populated by static 0x28f490 call after 0x299eb0
+  +0x08 header region populated by static 0x28f490 call following 0x299eb0
   +0x20 descriptor/record fields populated by 0x299fd0
 
 caller rbp-0xb0 +0x08 -> this+0x100 by 0x28f420
@@ -173,8 +173,8 @@ this+0xf8 / this+0xe0 later continue into the proven 0x299c70 -> 0x267010 path
 - This proof does not prove that the sampled record values are constants.
 - This proof does not decode the full body or public semantics of `0x299eb0`.
 - This proof does not decode the full body or public semantics of `0x299fd0`.
-- This proof does not make a runtime byte-for-byte claim about the unreadable
-  `0x299eb0` return source behind the static `0x28f490` call.
+- This proof does not prove exact `0x28f490` helper semantics beyond the
+  observed header-population boundary.
 - This proof does not prove final source contribution, anti-ghosting behavior,
   or final acceptance/rejection.
 
@@ -192,8 +192,8 @@ git diff --check
 Validator output:
 
 ```text
-source_local_150mm.json: OK target=0x7f95678165f0 record_base=0x7f94c6f00040 offset_table=0x7f9540000040 first_offsets=[0, 32, 56, 80]
-source_local_28mm.json: OK target=0x7fa074051620 record_base=0x7f9f984d8040 offset_table=0x7fa034364040 first_offsets=[0, 56, 96, 136]
-source_local_35mm.json: OK target=0x7fafc8828bc0 record_base=0x7faefe088040 offset_table=0x7fafa0c64040 first_offsets=[0, 32, 56, 80]
-source_local_70mm.json: OK target=0x7ff12a824c20 record_base=0x7ff039f00040 offset_table=0x7ff0dab64040 first_offsets=[0, 32, 56, 80]
+source_local_150mm.json: OK target=0x7f7ed3f0c420 record_base=0x7f7e25478040 offset_table=0x7f7ea5464040 first_offsets=[0, 32, 56, 80]
+source_local_28mm.json: OK target=0x7fcb00713c90 record_base=0x7fca20700040 offset_table=0x7fca56a08040 first_offsets=[0, 56, 96, 136]
+source_local_35mm.json: OK target=0x7f8f4ba096c0 record_base=0x7f8e6fcd8040 offset_table=0x7f8f2bc64040 first_offsets=[0, 32, 56, 80]
+source_local_70mm.json: OK target=0x7f7845908af0 record_base=0x7f7779e8c040 offset_table=0x7f7805c64040 first_offsets=[0, 32, 56, 80]
 ```
