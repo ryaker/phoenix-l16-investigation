@@ -357,6 +357,27 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   dimensions `2080 x 1560`, stride `2080`, and later continuity into
   `0x26e4c6`, `0x299c70`, and `0x267010`. Public origin, physical meaning,
   full-map statistics, and final merge effect remain open.
+- `lldb_29a140_source_local_producer_four_zoom.md`
+  LLDB runtime/static proof for the immediate `0x29a140` source-local producer
+  body behind the tracked index-5 `StereoLayer<false>+0xf8` field assembly:
+  accepted four-zoom probes validate the `0x299eb0 -> 0x28f490 -> 0x299fd0`
+  boundaries, populated `2080 x 1560` descriptor, record-base/offset-table
+  state, and sampled `0x299fd0` record-layout formula. Public origin, physical
+  meaning, stable record constants, and final merge effect remain open.
+- `lldb_source_record_payload_watch_four_zoom.md`
+  LLDB hardware write-watchpoint proof for sampled source-record payload bytes
+  after `0x299fd0`: accepted four-zoom probes arm watchpoints on zeroed
+  `record+0x08` payload bytes for the first two source-local records and
+  attribute sampled mutations to the `libcp+0x277a10` SIMD store inside
+  `0x276860`. `%xmm5` arithmetic, full-map payload distributions, public
+  origin/meaning, and final merge effect remain open.
+- `lldb_276860_payload_vector_formula_four_zoom.md`
+  LLDB runtime/static proof for sampled SIMD increment arithmetic feeding the
+  `0x277a10` payload store: accepted four-zoom packets validate the
+  `0x2779b0..0x277a10` unsigned-16 recurrence, full side-store and payload-store
+  register agreement, and watched-lane saturating accumulation where prior
+  watched bytes are known. Public operand origin/meaning, full-map payload
+  distribution, all records/lane positions, and final merge effect remain open.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.
 - `lldb_calib_state_operator_runtime_four_zoom.md`
