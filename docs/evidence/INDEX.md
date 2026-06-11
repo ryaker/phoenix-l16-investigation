@@ -388,7 +388,15 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   proving sampled `%xmm2` is prepared from a `uint16` lookup through
   `rbp-0x210`, sampled `%xmm3` is prepared from the live post-add `edx`, and
   both broadcast-ready registers match those paired scalar values. Public
-  operand origin/meaning, the full upstream `%xmm3` pre-add term, full-map
+  operand origin/meaning, formation/origin of captured `%xmm4`, full-map
+  distribution, all records/lane positions, and final merge effect remain open.
+- `lldb_276860_xmm3_term_step_four_zoom.md`
+  LLDB early-terminate single-step proof for a non-degenerate sampled `%xmm3`
+  term: after skipping the first four target table hits, accepted four-zoom
+  packets validate `preadd = trunc_i32(f32(u16[object+0x56]) *
+  f32[object+0x58] * xmm4_low)`, `postadd = preadd + table`, and the final
+  `%xmm3` broadcast on one stepped target-index-5 packet per focal tier.
+  Formation/origin of captured `%xmm4`, public operand meanings, full-map
   distribution, all records/lane positions, and final merge effect remain open.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.

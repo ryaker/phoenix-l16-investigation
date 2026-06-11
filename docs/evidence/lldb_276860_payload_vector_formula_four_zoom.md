@@ -174,8 +174,9 @@ and a Radiance HDR output.
   `+0x168`, `+0x198`, or the `rbp-0x2e0` temporary pointer.
 - Immediate sampled scalar setup for `%xmm2` / `%xmm3` is handled by the
   follow-up `lldb_276860_scalar_operand_origin_four_zoom.md` packet proof. That
-  follow-up still does not prove public operand meaning/origin, full-map
-  distribution, or the full upstream `%xmm3` pre-add term.
+  follow-up plus `lldb_276860_xmm3_term_step_four_zoom.md` still does not prove
+  public operand meaning/origin, full-map distribution, or formation/origin of
+  captured `%xmm4`.
 - Full-map payload distribution or all records/lane positions.
 - Prior-payload arithmetic for unwatched lanes in the same 16-byte SIMD store.
 - Whether the sampled payload values are final costs, intermediate accumulated

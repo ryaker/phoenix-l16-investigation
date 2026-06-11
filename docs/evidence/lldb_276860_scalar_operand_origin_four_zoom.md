@@ -137,8 +137,9 @@ For every admitted paired packet:
 
 - Public meaning or public LRI/protobuf origin for the table at `rbp-0x210`,
   the `ecx` lookup index, or the `edx` post-add scalar.
-- Runtime reconstruction of the full upstream `%xmm3` pre-add term, including
-  the `%xmm4` value formed by the preceding float/vector path.
+- The follow-up `lldb_276860_xmm3_term_step_four_zoom.md` validates one
+  non-degenerate sampled `%xmm3` pre-add term per focal tier from captured
+  `%xmm4`; formation/origin of that `%xmm4` value remains open.
 - Full-map payload distribution, all records, all lane positions, or stability
   beyond the sampled target-index-5 packets.
 - Whether these sampled scalar operands are final costs, intermediate costs, or

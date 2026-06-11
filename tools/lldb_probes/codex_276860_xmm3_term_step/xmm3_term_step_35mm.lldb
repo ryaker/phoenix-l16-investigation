@@ -1,0 +1,12 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_276860_xmm3_term_step/xmm3_term_step_probe.py
+script xmm3_term_step_probe.reset("35mm L16_03041 0x276860 xmm3 term step packet", 5, 4)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_276860_xmm3_term_step
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26bbd0
+script xmm3_term_step_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_276860_xmm3_term_step/xmm3_term_step_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script xmm3_term_step_probe.drive_step_packet(lldb.debugger)
+script xmm3_term_step_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_276860_xmm3_term_step/xmm3_term_step_35mm.json")
+quit
