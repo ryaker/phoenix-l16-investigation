@@ -378,9 +378,18 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   register agreement, watched-lane saturating accumulation where prior watched
   bytes are known, and narrow stable custody for the sampled record base /
   offset table / stride, `r9` destination, `r10` temporary pointer, and `%xmm1`
-  broadcast from `object+0x56`. Public operand origin/meaning, `%xmm2/%xmm3`
-  stable scalar origin, full-map payload distribution, all records/lane
+  broadcast from `object+0x56`. Public operand origin/meaning, the full
+  upstream `%xmm3` pre-add term, full-map payload distribution, all records/lane
   positions, and final merge effect remain open.
+- `lldb_276860_scalar_operand_origin_four_zoom.md`
+  LLDB early-terminate packet proof for the immediate scalar setup before the
+  admitted `0x2779b0..0x277a10` SIMD recurrence: accepted four-zoom packets pair
+  `0x27786b`, `0x27791d`, and `0x277945` on the same target-index-5 context,
+  proving sampled `%xmm2` is prepared from a `uint16` lookup through
+  `rbp-0x210`, sampled `%xmm3` is prepared from the live post-add `edx`, and
+  both broadcast-ready registers match those paired scalar values. Public
+  operand origin/meaning, the full upstream `%xmm3` pre-add term, full-map
+  distribution, all records/lane positions, and final merge effect remain open.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.
 - `lldb_calib_state_operator_runtime_four_zoom.md`

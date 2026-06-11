@@ -1,0 +1,12 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_276860_scalar_operand_origin/scalar_origin_probe.py
+script scalar_origin_probe.reset("35mm L16_03041 0x276860 scalar operand origin", 5, 8)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_276860_scalar_operand_origin
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26bbd0
+script scalar_origin_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_276860_scalar_operand_origin/scalar_origin_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script scalar_origin_probe.drive_until_capture_or_exit(lldb.debugger)
+script scalar_origin_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_276860_scalar_operand_origin/scalar_origin_35mm.json")
+quit

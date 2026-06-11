@@ -172,8 +172,10 @@ and a Radiance HDR output.
   `bias1`, `bias2`, `cap`, or the payload records.
 - Public meaning for object fields `+0x56`, `+0x108`, `+0x130`, `+0x138`,
   `+0x168`, `+0x198`, or the `rbp-0x2e0` temporary pointer.
-- Stable scalar origin for `%xmm2` / `%xmm3`; the attempted hot-loop scalar
-  breakpoint approach was rejected as too intrusive and is not admitted.
+- Immediate sampled scalar setup for `%xmm2` / `%xmm3` is handled by the
+  follow-up `lldb_276860_scalar_operand_origin_four_zoom.md` packet proof. That
+  follow-up still does not prove public operand meaning/origin, full-map
+  distribution, or the full upstream `%xmm3` pre-add term.
 - Full-map payload distribution or all records/lane positions.
 - Prior-payload arithmetic for unwatched lanes in the same 16-byte SIMD store.
 - Whether the sampled payload values are final costs, intermediate accumulated
