@@ -35,6 +35,8 @@ rejection semantics.
   `tools/lldb_probes/prefusion_sentinel_score_guard/run_four_zoom.sh`
   `tools/lldb_probes/prefusion_sentinel_score_guard/run_wide_skip3.sh`
   `tools/lldb_probes/prefusion_sentinel_score_guard/run_wide_count.sh`
+- Verifier:
+  `tools/lldb_probes/prefusion_sentinel_score_guard/verify_sentinel_score_guard.py`
 - Raw output directory:
   `runs/prefusion_sentinel_score_guard/`
 
@@ -170,6 +172,23 @@ jq -s -e 'all(.[]; .process_exit_status == 0 and (.errors|length == 0) and .driv
 ```
 
 The command returned `true`.
+
+The repo-local verifier rechecks the admitted main, `skip3`, and count-only JSONs,
+including clean completion, exact counts, tele guard sample flags, still-sentinel
+guard operands, wide count-only sentinel populations, and Radiance HDR output
+custody:
+
+```text
+$ python3 tools/lldb_probes/prefusion_sentinel_score_guard/verify_sentinel_score_guard.py
+28mm: OK main guard_hits=0 skip_by_flags=0
+35mm: OK main guard_hits=0 skip_by_flags=0
+70mm: OK main guard_hits=26 skip_by_flags=26
+150mm: OK main guard_hits=24 skip_by_flags=24
+28mm: OK skip3 watched_pairs=3 guard_hits=0
+35mm: OK skip3 watched_pairs=3 guard_hits=0
+28mm: OK count_only completed_sentinels=152
+35mm: OK count_only completed_sentinels=106
+```
 
 The invariant used to admit the `skip3` wide JSONs:
 

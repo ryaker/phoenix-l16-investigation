@@ -1,5 +1,7 @@
 import builtins
+import hashlib
 import json
+import os
 import struct
 
 
@@ -19,7 +21,7 @@ SITES = {
 }
 
 
-def reset(label="", target_index=5, sample_limit=260):
+def reset(label="", target_index=5, sample_limit=260, dump_prefix=None):
     builtins.l16_29a140_source_local = {
         "label": label,
         "target_index": target_index,
@@ -29,6 +31,8 @@ def reset(label="", target_index=5, sample_limit=260):
         "deep_breakpoints_installed": False,
         "target_context": None,
         "header_src_return_ptr": None,
+        "bulk_dump_prefix": dump_prefix,
+        "bulk_dumps": {},
         "sample_limit": sample_limit,
         "counts": {name: 0 for name in SITES.values()},
         "target_counts": {},
@@ -352,6 +356,58 @@ def _compute_record_formula(process, input_desc, mask_desc, control, observed_re
     }
 
 
+def _dump_bulk_source_inputs(process, input_desc, mask_desc):
+    state = _state()
+    prefix = state.get("bulk_dump_prefix")
+    if not prefix or state.get("bulk_dumps"):
+        return state.get("bulk_dumps", {})
+    if not input_desc.get("read_ok") or not mask_desc.get("read_ok"):
+        return {}
+
+    width = input_desc.get("width_0x10", 0)
+    height = input_desc.get("height_0x14", 0)
+    input_stride = input_desc.get("stride_0x18", 0)
+    mask_stride = mask_desc.get("stride_0x18", 0)
+    input_data = input_desc.get("data_0x20", 0)
+    mask_data = mask_desc.get("data_0x20", 0)
+    if width <= 0 or height <= 0 or input_stride < width or mask_stride < width:
+        return {}
+    input_raw = _read(process, input_data, input_stride * height * 4)
+    mask_raw = _read(process, mask_data, mask_stride * height)
+    if input_raw is None or mask_raw is None:
+        return {}
+
+    directory = os.path.dirname(prefix)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    input_path = f"{prefix}_input_descriptor.bin"
+    mask_path = f"{prefix}_mask_descriptor.bin"
+    with open(input_path, "wb") as handle:
+        handle.write(input_raw)
+    with open(mask_path, "wb") as handle:
+        handle.write(mask_raw)
+    dumps = {
+        "input_descriptor": {
+            "path": input_path,
+            "bytes": len(input_raw),
+            "sha256": hashlib.sha256(input_raw).hexdigest(),
+            "width": width,
+            "height": height,
+            "stride": input_stride,
+        },
+        "mask_descriptor": {
+            "path": mask_path,
+            "bytes": len(mask_raw),
+            "sha256": hashlib.sha256(mask_raw).hexdigest(),
+            "width": mask_desc.get("width_0x10", 0),
+            "height": mask_desc.get("height_0x14", 0),
+            "stride": mask_stride,
+        },
+    }
+    state["bulk_dumps"] = dumps
+    return dumps
+
+
 def _append_sample(sample):
     state = _state()
     if len(state["samples"]) < state["sample_limit"]:
@@ -555,6 +611,11 @@ def hit(frame, bp_loc, internal_dict):
         )
         state["record_formula_299eb0"] = formula
         sample["record_formula_299eb0"] = formula
+        sample["bulk_dumps"] = _dump_bulk_source_inputs(
+            process,
+            sample["input_descriptor"],
+            sample["mask_descriptor_target_plus_0x208"],
+        )
     elif site_va == 0x29A192:
         sample["header_src_return_ptr"] = state.get("header_src_return_ptr")
         sample["header_src_qwords_0x40"] = _qword_list(

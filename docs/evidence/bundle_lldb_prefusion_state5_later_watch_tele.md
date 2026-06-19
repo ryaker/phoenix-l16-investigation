@@ -22,6 +22,8 @@ It does not prove public state names, final acceptance/rejection semantics, down
 - Runners:
   `tools/lldb_probes/prefusion_state5_later_watch/run_tele.sh`
   `tools/lldb_probes/prefusion_state5_later_watch/run_150.sh`
+- Verifier:
+  `tools/lldb_probes/prefusion_state5_later_watch/verify_state5_later_watch.py`
 - Raw output directory:
   `runs/prefusion_state5_later_watch/`
 
@@ -64,6 +66,13 @@ The probe:
 
 Only the `State-5 target-2 samples` are admitted for the downstream state-5 claim. Other watchpoint samples can occur after the watched memory no longer decodes as the same `(state=5,target=2)` record and are not used as evidence here.
 
+Repo-local verifier output:
+
+```text
+70mm: OK armed=[31, 68] state5_hits=11 state5_vas=0x241d3b,0x241d85,0x245383,0x24538f,0x25d15c,0x25d16c
+150mm: OK armed=[17] state5_hits=5 state5_vas=0x241d3b,0x245383,0x25d15c,0x25d16c
+```
+
 ## State-5 Downstream VA Buckets
 
 The stopped PC is the instruction after the watched read/write.
@@ -105,4 +114,4 @@ Lane A should move from generic "what does state `5` do?" to the concrete downst
 
 `0x244560 -> 0x25d090`
 
-The next proof target is whether the `0x25d090` outputs or active-block state changes feed an image-effecting descriptor/materialization path, a final acceptance/rejection policy, or another bounded non-reducer helper.
+Follow-up evidence now bounds the immediate `0x25d090` active-block effect and the `0x244560` / `0x245a40` caller-side decision cascade into `0x2457c0` coordinate-output custody. The remaining proof target is downstream image/source contribution, final acceptance/rejection policy, or another bounded non-reducer helper beyond that coordinate-output path.

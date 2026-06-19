@@ -20,6 +20,10 @@ Runtime packets reused from the admitted downstream-watch proof:
 - `runs/prefusion_node_sentinel_downstream_watch/node_sentinel_downstream_70mm.json`
 - `runs/prefusion_node_sentinel_downstream_watch/node_sentinel_downstream_150mm.json`
 
+Verifier:
+
+- `tools/lldb_probes/prefusion_node_sentinel_downstream_watch/verify_state_22ae60_copy_surfaces.py`
+
 Fresh static captures:
 
 - `runs/prefusion_state_22ae60_point_ba/static_disasm_22ae60_22aeb0.log`
@@ -47,6 +51,20 @@ jq -s -e 'all(.[]; .process_exit_status == 0 and (.errors|length == 0) and .driv
 ```
 
 It returned `true`.
+
+The repo-local verifier rechecks clean completion, exact sampled caller buckets,
+still-sentinel pair bytes for every admitted caller-bucket sample, the
+`0x20bd60` post-copy invariant, the presence of the static anchor captures, and
+Radiance HDR output custody:
+
+```text
+$ python3 tools/lldb_probes/prefusion_node_sentinel_downstream_watch/verify_state_22ae60_copy_surfaces.py
+static: OK captures=8
+28mm: OK callers=0x20adf6:6,0x20bffa:6,0x20caca:6,0x20d309:31,0x239c34:6,0x239fd9:6
+35mm: OK callers=0x20adf6:6,0x20bffa:6,0x20caca:7,0x20d309:30,0x239c34:6,0x239fd9:6
+70mm: OK callers=0x20adf6:6,0x20bffa:6,0x20caca:6,0x20d309:0,0x239c34:6,0x239fd9:6
+150mm: OK callers=0x20adf6:4,0x20bffa:4,0x20caca:5,0x20d309:18,0x239c34:5,0x239fd9:4
+```
 
 Sampled `0xe0ae0` caller counts from the four admitted JSONs:
 
@@ -126,7 +144,10 @@ image accumulation by itself.
 
 ### `0x20ca00`
 
-The sampled `0x20caca` and `0x20d309` copy callers are inside body `0x20ca00`.
+The sampled `0x20caca` and `0x20d309` copy callers are inside callback body
+`0x20ca00`. Later typeinfo/vtable proof identifies it exactly as the
+substantive `+0x30` callback of a `void(int,int,int)` lambda inside
+`lt::Triangulator::refine3dPoints()`, not the method entry.
 
 Static disassembly proves this body:
 
@@ -173,9 +194,9 @@ acceptance / rejection behavior.
    while the watched pair remains `(-1.0, -1.0)`.
 4. Static disassembly classifies `0x20bd60` / `"point BA"` as keyed record
    materialization, `0x25e4b0` as the no-map `0x25e0c0` row-producer variant,
-   `0x20dca0` as keyed record storage, `0x20ca00` as a Ceres-setup surface with
-   positive-coordinate gates, and `0x239ac0` / `0x239e00` as keyed pair-vector
-   propagation.
+   `0x20dca0` as keyed record storage, `0x20ca00` as the named Triangulator
+   lambda callback with Ceres setup and positive-coordinate gates, and
+   `0x239ac0` / `0x239e00` as keyed pair-vector propagation.
 
 ## Safe Conclusion
 

@@ -32,6 +32,8 @@ reducer closure, or final acceptance/rejection.
   [state_helper_150mm.lldb](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/state_helpers_23c5f0_f33d0_runtime/state_helper_150mm.lldb)
 - Runtime harness:
   [run_four_zoom.sh](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/state_helpers_23c5f0_f33d0_runtime/run_four_zoom.sh)
+- Runtime/static follow-up verifier:
+  [verify_1f0ce0_producer.py](/Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/state_helpers_23c5f0_f33d0_runtime/verify_1f0ce0_producer.py)
 - Raw runtime outputs:
   `runs/state_helpers_23c5f0_f33d0_runtime/state_helper_28mm.{log,json,hdr}`,
   `runs/state_helpers_23c5f0_f33d0_runtime/state_helper_35mm.{log,json,hdr}`,
@@ -81,16 +83,23 @@ does not prove runtime liveness by itself.
 All four canonical bridge HDR runs completed, wrote `10432x7824` HDR output,
 and exited with process status `0`.
 
-| Zoom | LRI | JSON exit | `0x23c5f0` hits | `0xf33d0` hits | JSON errors | Step cap |
+| Zoom | LRI | JSON exit | `0x23c5f0` hits | Stable `0x1f0ce0 -> 0xf33d0` producer packets | JSON errors | Step cap |
 |---|---|---:|---:|---:|---:|---|
-| `28mm` | `L16_02130` | `0` | `4` | `54` | `0` | `false` |
-| `35mm` | `L16_03041` | `0` | `4` | `54` | `0` | `false` |
-| `70mm` | `L16_03434` | `0` | `4` | `55` | `0` | `false` |
-| `150mm` | `L16_02285` | `0` | `4` | `50` | `0` | `false` |
+| `28mm` | `L16_02130` | `0` | `4` | `20` | `0` | `false` |
+| `35mm` | `L16_03041` | `0` | `4` | `20` | `0` | `false` |
+| `70mm` | `L16_03434` | `0` | `4` | `20` | `0` | `false` |
+| `150mm` | `L16_02285` | `0` | `4` | `20` | `0` | `false` |
 
 The breakpoint hit-count fields and the probe's internal count fields match in
 every run. No run hit the configured cap of `4096`, and the configured sample
 limit of `2048` is larger than every full run's total captured event count.
+
+The current raw JSONs are from an enriched 2026-06-11 rerun of the same probe
+family. The enrichment adds destination object key fields and raw source/dest
+spans at `0xf33d0`; it does not change the static boundary of the helper.
+Total full-render `0xf33d0` hit counts outside the stable `0x1f0ce0` producer
+edge vary across accepted reruns and are not admitted here as algorithm
+constants. Use those totals only as run-local liveness evidence.
 
 ## `0x23c5f0` Runtime Callers
 
@@ -112,21 +121,63 @@ accepted canonical quartet.
 Every captured `0xf33d0` hit used selector `0` or selector `1`. No captured
 runtime hit used the static error selector path.
 
+The stable constructor-side producer subset is:
+
 | Caller return VA | Selector | `28mm` | `35mm` | `70mm` | `150mm` |
 |---|---:|---:|---:|---:|---:|
 | `0x1f132d` | `0` | `10` | `10` | `10` | `10` |
 | `0x1f1350` | `1` | `10` | `10` | `10` | `10` |
-| `0x2115a1` | `1` | `4` | `4` | `4` | `4` |
-| `0x217bc3` | `1` | `2` | `3` | `3` | `3` |
-| `0x22bb28` | `1` | `1` | `0` | `2` | `0` |
-| `0x22df4a` | `1` | `1` | `1` | `0` | `0` |
-| `0x22e75a` | `1` | `0` | `0` | `0` | `1` |
-| `0x23d392` | `1` | `26` | `26` | `26` | `22` |
 
 The `0x23d392` caller return VA is inside the static `0x23c5f0` body, following
 the static direct call at `0x23d38d -> 0xf33d0`. This proves the
 `0x23c5f0 -> 0xf33d0` selector-`1` path is runtime-live across all four
-canonical zoom tiers.
+canonical zoom tiers. Its exact full-render hit count is not used here as a
+stable constant.
+
+## Constructor-Side `0x1f0ce0` Producer Edge
+
+A follow-up static/runtime verifier now bounds the constructor-side producer
+that accounts for the largest `0xf33d0` caller family:
+
+```bash
+python3 tools/lldb_probes/state_helpers_23c5f0_f33d0_runtime/verify_1f0ce0_producer.py
+```
+
+Verifier output:
+
+The verifier also requires each admitted paired output file to start with the
+Radiance HDR magic bytes.
+
+```text
+static_1f0ce0_calls_and_selector_setup=OK
+28mm: OK producer_keys=A1,A2,A3,A4,A5,B1,B2,B3,B4,B5 selector_pair_source_equal=10/10 full_public=A1,A2,A3,A4,A5 pose_only_public=B4 k_not_public=B1,B2,B3,B4,B5
+35mm: OK producer_keys=A1,A2,A3,A4,A5,B1,B2,B3,B4,B5 selector_pair_source_equal=10/10 full_public=A1,A2,A3,A4,A5 pose_only_public=B4 k_not_public=B1,B2,B3,B4,B5
+70mm: OK producer_keys=B1,B2,B3,B4,B5,C1,C2,C3,C4,C5 selector_pair_source_equal=10/10 full_public=none pose_only_public=B4,C5 k_not_public=B1,B2,B3,B4,B5,C1,C2,C3,C4,C5
+150mm: OK producer_keys=B1,B2,B3,B4,B5,C1,C2,C3,C4,C5 selector_pair_source_equal=10/10 full_public=none pose_only_public=B4,C5 k_not_public=B1,B2,B3,B4,B5,C1,C2,C3,C4,C5
+cross_tier=B4_pose_stable_K_variants4,C5_pose_stable_K_variants2,A1-A5_wide_stable
+```
+
+The verifier checks installed `libcp.dylib` bytes for the relevant
+`0x1f0ce0` call edges, selector `0` setup before `0x1f1328 -> 0xf33d0`,
+selector `1` setup before `0x1f134b -> 0xf33d0`, and the scale-field load
+window after `0xf3350`. The refreshed static check also guards the K stack
+local at `rbp-0xb8`, the pose stack local at `rbp-0x278`, the three-int stack
+local at `rbp-0x288`, and the four K-field scale multiplies before both
+selector-bank copies. It then checks the existing four-zoom runtime packets for
+the `0x1f132d` / `0x1f1350` return sites.
+
+This proves:
+
+- the constructor-side producer copies the same source records into selector
+  `0` and selector `1` banks for each captured key;
+- wide A1-A5 records at this edge are exact public K/pose fixed32 records;
+- B4/C5 poses are exact public copies where observed;
+- B4 K is already zoom-variant across all four focal tiers, and C5 K is
+  already zoom-variant across the tele tiers.
+
+This is producer-edge derived-K boundary proof only. It does not decode the
+complete K derivation formula and does not assign public field names to the
+full `CalibStage` packet.
 
 ## Proven Boundary
 
@@ -139,7 +190,13 @@ canonical zoom tiers.
   at `0xf33d0`; the selector error path is not observed in these runs.
 - The `0x23c5f0 -> 0xf33d0` callsite at static call `0x23d38d` / return
   `0x23d392` is runtime-live across the accepted canonical quartet and uses
-  selector `1` in every captured hit.
+  selector `1` in captured hits.
+- The constructor-side `0x1f0ce0 -> 0xf33d0` producer edge is runtime-live
+  across the accepted canonical quartet and copies identical packets into
+  selector `0` and selector `1` banks per key.
+- The same producer edge localizes the B4/C5 K public-origin gap: B4/C5 poses
+  are exact public copies, while their K packets are zoom-variant non-exact
+  records before downstream State-helper composition.
 
 ## Non-Claims
 
@@ -151,6 +208,9 @@ canonical zoom tiers.
 - This does not prove all transitive helper behavior beneath `0x23c5f0`.
 - This does not prove behavior outside the accepted canonical no-auto-LRIS
   bridge HDR quartet.
+- This does not decode the complete producer formula for B/C K variants.
+- This does not assign public protobuf field names to the full `CalibStage`
+  records populated by `0xf33d0`.
 - This does not close `CLM-PREFUSION-002`.
 
 ## Consequence For Blocker Work

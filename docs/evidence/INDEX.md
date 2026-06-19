@@ -60,15 +60,19 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
 - `bundle_proof_prefusion_candidate_scoring_family_four_zoom.md`
   Installed-bundle plus LLDB runtime proof bounding the `0x24c320` / `0x24d610` prefusion candidate-scoring families and local patch/search helpers on the canonical four-zoom bridge HDR quartet.
 - `bundle_lldb_prefusion_candidate_output_custody_four_zoom.md`
-  Installed-bundle plus repo-local LLDB proof binding the `0x24c320` / `0x24d610` candidate-scoring output vectors to the shared `0x2439b0` record-state gate by exact output-vector pointer continuity across complete canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. This is scorer-output custody proof, not reducer closure.
+  Installed-bundle plus repo-local LLDB proof, with repo-local verifier, binding the `0x24c320` / `0x24d610` candidate-scoring output vectors to the shared `0x2439b0` record-state gate by exact output-vector pointer continuity across complete canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR renders. This is scorer-output custody proof, not reducer closure.
 - `bundle_lldb_prefusion_record_state_gate_histogram_four_zoom.md`
-  Installed-bundle plus repo-local LLDB proof bounding `0x2439b0` as a live record-state gate for the custody-bound candidate-scorer output vectors: admitted wide family-A runs are unchanged at the boundary, admitted tele family-B runs promote target-2 records from state `3` to state `4`, and sampled downstream `0x241fd0` / `0x2416d0` / watched-store sites did not match the exact known scorer-output vector under this probe. This is record-state boundary proof, not reducer closure or final acceptance/rejection.
+  Installed-bundle plus repo-local LLDB proof, with repo-local verifier, bounding `0x2439b0` as a live record-state gate for the custody-bound candidate-scorer output vectors: admitted wide family-A runs are unchanged at the boundary, admitted tele family-B runs promote target-2 records from state `3` to state `4`, and sampled downstream `0x241fd0` / `0x2416d0` / watched-store sites did not match the exact known scorer-output vector under this probe. This is record-state boundary proof, not reducer closure or final acceptance/rejection.
 - `bundle_lldb_prefusion_promoted_record_watch_tele.md`
-  LLDB hardware data-watch proof that selected tele records promoted by `0x2439b0` from `(state=3,target=2)` to `(state=4,target=2)` are later consumed in clean canonical `70mm` / `150mm` renders and at least one watched record per tele seed advances to `(state=5,target=2)` through `0x2416d0`. This is downstream consumer proof for watched promoted records, not public state semantics, final image contribution, reducer closure, or final acceptance/rejection.
+  LLDB hardware data-watch proof, with repo-local verifier, that selected tele records promoted by `0x2439b0` from `(state=3,target=2)` to `(state=4,target=2)` are later consumed in clean canonical `70mm` / `150mm` renders and at least one watched record per tele seed advances to `(state=5,target=2)` through `0x2416d0`. This is downstream consumer proof for watched promoted records, not public state semantics, final image contribution, reducer closure, or final acceptance/rejection.
 - `bundle_lldb_prefusion_state5_selected_index_path_tele.md`
-  LLDB runtime proof that promoted target-2 record indices captured at `0x2439b0` later enter concrete `0x2416d0` selected-index vectors under clean canonical `70mm` / `150mm` renders, and that the small promoted sets captured here are observed reaching `(state=5,target=2)` stores. This is selected-index/state-relabel proof, not public acceptance semantics, final image contribution, reducer closure, or final acceptance/rejection.
+  LLDB runtime proof, with repo-local verifier, that promoted target-2 record indices captured at `0x2439b0` later enter concrete `0x2416d0` selected-index vectors under clean canonical `70mm` / `150mm` renders, and that the small promoted sets captured here are observed reaching `(state=5,target=2)` stores. This is selected-index/state-relabel proof, not public acceptance semantics, final image contribution, reducer closure, or final acceptance/rejection.
 - `bundle_lldb_prefusion_state5_later_watch_tele.md`
-  LLDB hardware data-watch proof that watched promoted tele records that become `(state=5,target=2)` continue downstream into the `0x244560` heavy-consumer family and the already-bounded `0x25d090` candidate block-geometry / active-block helper family. This is later state/candidate/geometry flow, not image-effect proof, reducer closure, or final acceptance/rejection.
+  LLDB hardware data-watch proof, with repo-local verifier, that watched promoted tele records that become `(state=5,target=2)` continue downstream into the `0x244560` heavy-consumer family and the already-bounded `0x25d090` candidate block-geometry / active-block helper family. This is later state/candidate/geometry flow, not image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_block_geometry_effect_four_zoom.md`
+  LLDB runtime proof bounding the `0x25d090` helper's admitted four-zoom effect as block-owned pair-vector growth plus descriptor-build / geometry-predicate / active-byte gating. Complete canonical no-auto-LRIS bridge HDR runs hit `44` entries per focal tier; active entries reach `0x25d2a0`, accepted entries grow both block pair-vector families and return true, and the only active-byte clears are two `70mm` geometry rejects. This is block-state effect proof, not image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_block_decision_cascade_four_zoom.md`
+  LLDB runtime proof that the `0x244560` / `0x245a40` caller-side block-active decisions after paired `0x25d090` calls keep exactly one block active, record zero abort decisions, avoid the watched sentinel-fill path, and continue into `0x2457c0` callsites across the canonical no-auto-LRIS quartet. This is downstream block-decision / coordinate-output custody proof, not image-effect proof, reducer closure, or final acceptance/rejection.
 - `bundle_lldb_prefusion_state5_coord_output_four_zoom.md`
   LLDB runtime proof that `0x2457c0` is live and normally returning across the canonical `28mm`, `35mm`, `70mm`, and `150mm` bridge HDR quartet, sampled hits at the admitted `0x24593b` store-path site have `record+0x24 == 5`, and every admitted return leaves finite non-sentinel coordinate pairs in `state+0x1e8`. This is coordinate-output materialization proof, not image-effect proof, reducer closure, or final acceptance/rejection.
 - `bundle_lldb_prefusion_state5_coord_consumer_watch_four_zoom.md`
@@ -77,22 +81,62 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   LLDB hardware read/write-watch proof that representative finite non-sentinel destination pairs copied out by the State-helper `0xe8e70` path are touched again by `0xe8e70` vector-copy work across the canonical four-zoom bridge HDR quartet. Static/runtime evidence binds the admitted later caller frames to State-helper recopy sites plus higher node-vector materialization/copy sites at `0x22a61a -> 0xe8e70 -> 0x22a61f` and `0x22c93a -> 0xe8e70 -> 0x22c93f`. This is coordinate-vector custody / propagation proof, not image-effect proof, reducer closure, or final acceptance/rejection.
 - `bundle_lldb_prefusion_state5_coord_node_dest_watch_four_zoom.md`
   LLDB hardware read/write-watch proof that representative finite non-sentinel destination pairs copied into the `0x22a61a -> 0xe8e70 -> 0x22a61f` node-vector destination reach non-copy candidate/index/scoring-selection code under `0x21b2e0` and its `0x21c4f0` callback path across the canonical four-zoom bridge HDR quartet. The capped window proves at least one finite node-destination pair per run, not all copied pairs; it is not image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_node_dest_sentinel_custody_four_zoom.md`
+  LLDB same-address custody proof, with repo-local verifier, that one finite non-sentinel coordinate pair copied into the `0x22a61a -> 0xe8e70 -> 0x22a61f` node-vector destination per canonical focal tier is later the same runtime address rewritten by `0x21b923` / `0x21b92a` into `(-1.0, -1.0)`, then sampled in downstream touches while still sentinel. This links the node-destination consumer, sentinel-write, and sampled downstream-touch boundaries for representative pairs only; it is not all-pairs proof, image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_node_dest_20b5e0_branch_custody_four_zoom.md`
+  LLDB same-address branch-custody proof, with repo-local verifier, that one finite non-sentinel coordinate pair copied into the `0x22a61a -> 0xe8e70 -> 0x22a61f` node-vector destination per canonical focal tier is later sentinelized at the same runtime address, then reaches `0x20b912` at that same address and single-steps through `0x20b91d -> 0x20ba90` and `0x20baab -> 0x20bafd` without visiting the local update-write block at `0x20bac0..0x20bac8`. This links copied node-destination identity to the sampled `0x20b5e0` local skip path only; it is not all-pairs proof, image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_node_dest_20ca00_source_copy_four_zoom.md`
+  Reused LLDB same-address proof, with repo-local verifier, that one finite non-sentinel coordinate pair copied into the `0x22a61a -> 0xe8e70 -> 0x22a61f` node-vector destination per canonical focal tier is later sentinelized at the same runtime address, then source-read at that same address by `0xe0ae0` under caller return `0x20d309`, the second local vector copy inside `0x20ca00`. This links copied node-destination identity to the `0x20ca00` source-copy surface only; it is not destination-slot proof, gate-selection proof, image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_node_dest_20ca00_source_index_four_zoom.md`
+  LLDB source/gate index proof, with repo-local verifier, that one representative copied node-destination address per canonical focal tier is source-read by `0xe0ae0` under caller return `0x20d309`, with readable local `source_index` and parent `gate_index`, and every captured candidate in the capped watchpoint window has `source_index != gate_index`. This is capped local non-selection proof for one watched address per tier; it is not destination-slot terminality, image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_node_dest_20ca00_gate_custody_selected_four_zoom.md`
+  Selected-representative LLDB same-address gate-custody proof, with repo-local verifier, joining prior `0x22a61a` copied node-destination identity through sentinelization, the `0x20d309` source copy, computed destination-slot identity, and the `0x20d363 -> 0x20d565` skip branch for one `28mm` representative (`source_index == gate_index == 5394`) and one `70mm` representative (`source_index == gate_index == 77`). The selected `35mm` row is a capped no-match window and the selected `150mm` row is a full-render no-source-copy observation for one watched address. This is representative local gate-skip custody, not all-pairs proof, image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_node_dest_20ca00_gate_crossunit_selected.md`
+  Risk-based selected cross-unit LLDB validation, with strict comparison verifier, observing the same full-sentinel `0x20d363 -> 0x20d565` gate-skip mechanism on Unit-2 in one complete `35mm` twin-capture run at index `12`. Unit-2 `28mm` / `70mm` anchors and a targeted Unit-2 `35mm` repeat are cap-limited no-match windows, so exact index and match incidence are not stable body/focal constants. This is cross-unit mechanism observation, not body-causation, all-pairs, image-effect, reducer-closure, or final-acceptance proof.
+- `bundle_static_runtime_prefusion_20ca00_gate_skip_effect.md`
+  Deterministic installed-bundle byte/import proof joined to selected Unit-1 and Unit-2 runtime packets. It proves `0x20d363 -> 0x20d565` bypasses keyed-node materialization, coordinate-to-double record writes, and imported `ceres::Problem::AddResidualBlock` at `0x20d560`, so those selected full-sentinel iterations add no residual through this local path. Post-loop `ceres::Solve` remains outside the skip; this is not all-pairs, shared-solve-output, image-effect, reducer-closure, or final-acceptance proof.
+- `bundle_static_prefusion_20ca00_triangulator_callback_identity.md`
+  Deterministic installed-bundle vtable/typeinfo and Capstone proof identifying `0x20ca00` as substantive slot `+0x30` of a `void(int,int,int)` lambda inside `lt::Triangulator::refine3dPoints()`, constructed at address point `0x657f00` and dispatched through executor `0x5670`. This corrects historical method-entry labels; callback argument names, public output meaning, runtime values, image effect, reducer closure, and final acceptance remain open.
+- `bundle_static_prefusion_20ca00_record_range_custody.md`
+  Deterministic installed-bundle SHA/Capstone proof tracing the parent owner through callable `+0x08` into the `0x20ca00` callback, binding the callback's post-solve triple to owner record fields `+0x08/+0x0c/+0x10` in a `0x14`-stride vector, and proving the immediate parent reduces positive `record+0x10` values to owner `+0x78/+0x7c`. This is internal solved-record ownership and immediate scalar-consumer proof, not public triple meaning, runtime-value, image-effect, reducer-closure, or final-acceptance proof.
+- `bundle_static_prefusion_20ca00_reprojection_cost.md`
+  Deterministic installed-bundle typeinfo/import/SHA/Capstone proof identifying `0x667240` as the one-parameter, two-residual `AutoDiffCostFunction<lt::Internal::ReProjectionCost,...>` wrapper, tracing a unit-payload `CauchyLoss` through callable `+0x28` into `AddResidualBlock`, and verifying the exact scalar-ray 3x4 reprojection residual formula. This corrects the older raw-vtable label and proves internal ray-depth-scale semantics only, not public units, LRI origin, runtime solved values, image effect, reducer closure, or final acceptance.
+- `bundle_static_runtime_index5_triangulator_depth_bound_custody.md`
+  Deterministic installed-binary SHA/Capstone/import proof, joined to four complete canonical runtime mode packets, tracing the `0x3f2c40` constructor's mode-selected endpoint pair through `state+0x100/+0x104` and Triangulator owner `+0x70/+0x74` into Ceres lower/upper bounds on the one-scalar ray-depth reprojection problem. All four canonical Unit-1 focal tiers select mode `0` and `[200.0,640000.0]`, the same endpoint pair used by the index-5 reciprocal lookup vector. This admits the lookup's internal ray-depth hypothesis-grid role, not public units, public calibration/LRI/protobuf origin or names, source-index semantics, solved values, image contribution, or final acceptance.
+- `bundle_lldb_prefusion_20ca00_solve_output_28mm.md`
+  Complete Unit-1 `28mm` solve-only runtime proof, with strict verifier, capturing 1,229 `0x20ca00` solve/write groups across ten completed callback frames. The solve changes the bounded ray-depth scalar in 279 groups; all 1,229 final selected `record+0x10` values equal the float32 solved scalar, and the immediate second transform leaves each captured triple bit-identical under this run. This is one body/focal/runtime distribution plus solved-record materialization proof, not public units/names, all-candidate behavior, shared-solve terminality, image contribution, reducer closure, or final acceptance.
+- `bundle_lldb_prefusion_node_dest_tele_scan_score_identity.md`
+  Reused same-address LLDB proof, with repo-local verifier, that one representative copied node-destination address per tele tier is later sentinelized at the same runtime address and then sampled at the same address in the `0x216f60` scan/count window and at the `0x218bc4` score/materialization guard operand site while still full `(-1.0, -1.0)`. This links tele node-destination identity to already-bounded local scan/count and score-guard surfaces; it is not same-address branch-step proof, whole-vector terminality, image-effect proof, reducer closure, or final acceptance/rejection.
 - `bundle_lldb_prefusion_node_sentinel_write_four_zoom.md`
-  LLDB runtime/static proof that the downstream `0x21b2e0` path executes coordinate-pair sentinel invalidation writes at `0x21b923` and `0x21b92a` across the canonical four-zoom bridge HDR quartet. Runtime samples show finite non-sentinel coordinate pairs before the x-lane store and x already changed to `-1.0` before the y-lane store; static disassembly proves both stores write raw bits `0xbf800000` (`-1.0`). This is coordinate invalidation/rejection write proof, not image-effect proof, reducer closure, or final acceptance/rejection.
+  LLDB runtime/static proof, with repo-local verifier, that the downstream `0x21b2e0` path executes coordinate-pair sentinel invalidation writes at `0x21b923` and `0x21b92a` across the canonical four-zoom bridge HDR quartet. Runtime samples show finite non-sentinel coordinate pairs before the x-lane store and x already changed to `-1.0` before the y-lane store; static disassembly proves both stores write raw bits `0xbf800000` (`-1.0`). This is coordinate invalidation/rejection write proof, not image-effect proof, reducer closure, or final acceptance/rejection.
 - `bundle_lldb_prefusion_node_sentinel_downstream_watch_four_zoom.md`
-  LLDB hardware read/write-watch proof that selected sentinel-marked node-vector coordinate pairs are touched later by downstream code across the canonical four-zoom bridge HDR quartet. Watchpoints were armed only after the full pair read `(-1.0, -1.0)` immediately after `0x21b92a`, and every sampled later touch still observed `(-1.0, -1.0)`. Sampled downstream surfaces include State-family copy/record propagation plus coordinate scan/scoring/materialization windows. This is downstream sentinel-coordinate custody / consumption proof, not image-effect proof, source-contribution proof, reducer closure, or final acceptance/rejection.
+  LLDB hardware read/write-watch proof, with repo-local verifier, that selected sentinel-marked node-vector coordinate pairs are touched later by downstream code across the canonical four-zoom bridge HDR quartet. Watchpoints were armed only after the full pair read `(-1.0, -1.0)` immediately after `0x21b92a`, and every sampled later touch still observed `(-1.0, -1.0)`. Sampled downstream surfaces include State-family copy/record propagation plus coordinate scan/scoring/materialization windows. This is downstream sentinel-coordinate custody / consumption proof, not image-effect proof, source-contribution proof, reducer closure, or final acceptance/rejection.
 - `bundle_static_prefusion_state_22ae60_copy_record_surfaces.md`
-  Static + reused runtime proof classifying the sampled State-family `0xe0ae0` copy callers under `0x22ae60`: `0x20bd60` / `"point BA"` is keyed record materialization, `0x25e4b0` is the no-map `0x25e0c0` row-producer variant, `0x20dca0` is keyed record storage, `0x20ca00` is selected Ceres setup with positive-coordinate gates, and `0x239ac0` / `0x239e00` are keyed pair-vector propagation surfaces. This prevents treating those sampled windows as opaque possible reducers; it does not prove image effect, reducer closure, or final acceptance/rejection.
+  Static + reused runtime proof, with repo-local verifier, classifying the sampled State-family `0xe0ae0` copy callers under `0x22ae60`: `0x20bd60` / `"point BA"` is keyed record materialization, `0x25e4b0` is the no-map `0x25e0c0` row-producer variant, `0x20dca0` is keyed record storage, `0x20ca00` is selected Ceres setup with positive-coordinate gates, and `0x239ac0` / `0x239e00` are keyed pair-vector propagation surfaces. This prevents treating those sampled windows as opaque possible reducers; it does not prove image effect, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_20ca00_copied_sentinel_gate_four_zoom.md`
+  LLDB hardware-watch proof, with repo-local verifier, following watched sentinel pairs copied by the second `0x20ca00` local vector copy at `0x20d304 -> 0xe0ae0 -> 0x20d309`. The admitted `70mm` run has one exact copied-slot match (`source_index == gate_index == 774`) whose copied destination is later read at `0x20d363` as `(-1.0, -1.0)` and branches to skip target `0x20d565`; admitted `28mm`, `35mm`, and `150mm` runs show capped no-match windows for the watched sentinel pairs. This is local copied-slot gate proof, not whole-vector terminality, image-effect proof, reducer closure, or final acceptance/rejection.
 - `bundle_static_prefusion_sentinel_216f60_scan_count_window.md`
-  Static + reused runtime proof that sampled tele sentinel-coordinate stops inside the `0x216f60` scan/count window still read `(-1.0, -1.0)`, while static disassembly proves that the local vector/scalar count paths count only pairs where both lanes are positive and require at least eight counted entries before continuing. This is local non-counting proof for sampled sentinel reads, not exhaustive terminality, image-effect proof, reducer closure, or final acceptance/rejection.
+  Static + reused runtime proof, with repo-local verifier for the reused runtime subset, that sampled tele sentinel-coordinate stops inside the `0x216f60` scan/count window still read `(-1.0, -1.0)`, while static disassembly proves that the local vector/scalar count paths count only pairs where both lanes are positive and require at least eight counted entries before continuing. This is local non-counting proof for sampled sentinel reads, not exhaustive terminality, image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_sentinel_score_guard_tele.md`
+  LLDB hardware watchpoint proof, with repo-local verifier, that selected tele sentinel-marked coordinate pairs reaching `0x218bc4` skip via `jae 0x218cb8`; the wide first-six watched sentinel pairs do not reach this guard within the watchpoint cap, and count-only wide runs prove the observed wide sentinel populations are larger than that watched subset (`152` at `28mm`, `106` at `35mm`). This is sampled tele guard-skip proof plus scoped wide non-observation/count, not image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_sentinel_score_guard_branch_step_tele.md`
+  LLDB hardware-watch plus branch-step proof, with repo-local verifier, that sampled tele sentinel-marked coordinate pairs stopping at `0x218bc4` single-step directly to `0x218cb8` while still reading `(-1.0, -1.0)`. This replaces the prior flags-only inference for the admitted samples; it is still sampled local guard proof, not whole-vector terminality, image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_static_runtime_prefusion_sentinel_score_guard_local_loop_tele.md`
+  Static + reused branch-step runtime proof, with repo-local verifier, that the admitted `70mm` / `150mm` sentinel-coordinate branch-step samples skip the local `0x218b30` positive-coordinate body containing `xmm1` accumulation, `r10d` update, and `r9d` increment; the same helper later derives its `r14` store after converting `r9d` / `r10d`. This is sampled local non-count / non-score evidence only, not whole-vector terminality, image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_sentinel_guard_direct_census_wide.md`
+  LLDB direct-breakpoint proof, with repo-local verifier, that complete canonical `28mm` and `35mm` runs collect the full observed wide sentinel populations (`152` unique completed sentinel pairs at `28mm`, `106` at `35mm`) while direct `0x218bc4` guard breakpoint hits remain zero. This proves the `0x218b30` / `0x218bc4` guard site is not live under the admitted wide runs; it is not whole-vector terminality, image-effect proof, reducer closure, or final acceptance/rejection.
 - `bundle_static_prefusion_sentinel_20b5e0_branch_window.md`
   Static + reused runtime proof that the sampled `0x20b912` downstream sentinel stops across the canonical four-zoom quartet sit immediately after an x-lane load from a still-sentinel `(-1.0, -1.0)` pair, and that the local static `0x20b5e0` branch/write window has a nonpositive/sentinel path that bypasses the `0x20bac0..0x20bac8` update writes. This is local branch-boundary proof for sampled sentinel reads, not exhaustive terminality, image-effect proof, reducer closure, or final acceptance/rejection.
+- `bundle_lldb_prefusion_sentinel_20b5e0_branch_step_four_zoom.md`
+  LLDB runtime branch-step proof that three sampled watched `0x20b912` sentinel reads per canonical focal tier step through `0x20b91d` with flags taking `jae 0x20ba90`, then through `0x20baab` with flags taking `jbe 0x20bafd`, with zero admitted traces reaching the local `0x20bac0..0x20bac8` update writes. This is direct runtime flags/branch-target proof for sampled sentinel reads, not exhaustive terminality, image-effect proof, reducer closure, or final acceptance/rejection.
 - `lldb_iramp_wrapper_accumulator_four_zoom.md`
   LLDB runtime proof that the canonical four-zoom bridge HDR quartet all hit the visible `src1` wrapper, `src2` wrapper, contributor wrapper, and IRAMP accumulator surfaces at `0x3ecc10`, `0x3ecd80`, `0x3eced0`, and `0x369fa1`.
 - `lldb_iramp_entry_signature_four_zoom.md`
   LLDB runtime proof that the canonical four-zoom bridge HDR quartet all enter `0x365960` with `src1`, `src2`, `srcs[5]`, `warps[5]`, scale, and ROI.
 - `lldb_iramp_count_use_vector_four_zoom.md`
   LLDB runtime proof that the live `0x3661b0` count-use window at `0x366a50..0x366a65` reads a vector header through `r15+0x18`, computes `(end-begin)/16`, and reaches `0x366a65` with live count `5` across 16 capped packets per canonical focal tier. This is count-use evidence only, not a complete reducer proof.
+- `lldb_iramp_terminal_consolidation_four_zoom.md`
+  LLDB runtime consolidation proof, with repo-local verifier, that the Opus-directed terminal harness cleanly captures eight samples per site across IRAMP entry, inner worker, sentinel compare, score multiply, tuple score store, reciprocal, and weighted-store sites for all four canonical focal tiers. This validates the harness and local packet arithmetic; it does not prove final source contribution or final acceptance/rejection.
 - `lri_35mm_seed_correction_true35_runtime.md`
   Direct LRI-header and corrected LLDB-runtime proof replacing the mislabeled `L16_02951` 35mm seed with true-35mm `L16_03041`, and repairing the affected runtime split rows.
 - `lldb_iramp_contributor_identity_four_zoom.md`
@@ -117,6 +161,9 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   LLDB runtime proof for the `0x402d20` scan-loop records that produce accepted key `1` at `28mm` / `35mm` and preserve sentinel `16` at `70mm` / `150mm`, plus static follow-up proving `0xf6c60` camera-ID group ordinals and `0xf2770` construction of item `+0x60` / `+0x58/+0x5c`; the `150mm` scan facts are pre-crash and not output-completion evidence.
 - `lldb_capturedimage_f2770_origin_four_zoom.md`
   LLDB runtime proof at the direct `0xe59a4 -> 0xf2770` constructor callsite across the canonical quartet: wide seeds construct keys `0,4,6,8,9,1,2,3,5,7`, tele seeds construct keys `6,8,9,14,5,7,11,10,12,13,15`, all captured items are initially active at item `+0x30 = 1`, input `+0x30` equals output item `+0x60`, and input `+0x28/+0x18` carries the same two-int pair later observed at item `+0x58/+0x5c`.
+  Follow-up Lane B audit evidence binds the constructor-family `+0x30/+0x60`,
+  `+0x34/+0x50`, `+0x38/+0x54`, `+0x40`, and `+0x48` subset to raw public
+  `LightHeader.field_12[camera]` fields without assigning semantic names.
 - `lldb_src1_contributor_payload_family_four_zoom.md`
   LLDB runtime proof that the visible `src1` lookup payload family is a `0x490` object with vtable address point `0x65f140`, while the direct contributor payload family is a `0x1f0` object with vtable address point `0x65f490`, across the canonical four-zoom bridge HDR quartet.
 - `bundle_lldb_src1_contributor_secondary_callable_families.md`
@@ -218,6 +265,8 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   LLDB runtime proof drilling into the remaining live final-compositing cases `1` and `3` across the canonical CLI bridge-HDR quartet. The case-`1` mutex / flag / condition-broadcast path hits once per render and changes the captured pointed flag byte from `0` to `1`; the case-`3` path passes `record+0x10`, `record+0x20`, `record+0x50`, `record+0x60`, and `record+0x68` into helper `0x4182a0`, whose selected normal callsites and normal return hit once per render while selected mismatch/error sites record zero hits. This is tested-path boundary/operand-custody proof only, not helper-body semantics or final output semantics.
 - `lldb_final_output_hdr_writer_boundary_four_zoom.md`
   LLDB runtime proof that the tested CLI HDR path reaches helper `0x41e180`, follows the `.hdr` branch, calls writer helper `0x2326a0`, passes a populated `10432x7824` descriptor with row bytes `166912` and bytes-per-pixel field `16`, reaches virtual writer call `0x232731`, and emits files identified as `Radiance HDR image data` across the canonical four-zoom quartet. This is CLI HDR writer-boundary and descriptor-custody proof only, not pixel correctness, copy-vs-blend behavior, source contribution, acceptance/rejection, or non-CLI sink proof.
+- `bundle_static_runtime_final_case3_output_config_four_zoom.md`
+  Static plus reused runtime proof that the live final-compositing case-`3` path carries `10432x7824` dimensions and format argument `3` through `0x4182a0`, observes output color-space selector value `4`, bypasses the format-`2` compression subpath, and reaches the tested `.hdr` writer boundary with row bytes `166912` and bytes-per-pixel field `16`. This is output-configuration and writer-custody proof only, not public enum-name proof, pixel correctness, copy-vs-blend behavior, source contribution, acceptance/rejection, or non-CLI sink proof.
 - `bundle_lldb_iramp_36cde0_scalar.md`
   Installed-bundle plus repo-local LLDB proof narrowing the third refined-tuple field: `0x36cde0` consumes the two prepared 16x16 `vec4` patches, runs patch-statistics / fixed-transform / weighted-reduction work, returns `sqrt(xmm0 * xmm1)`, and the caller stores that live `xmm0` scalar as the tuple's third float at `0x369e91`. Public field semantics remain open; the first downstream tuple consumer is covered by `bundle_lldb_iramp_tuple_downstream_consumer.md`.
 - `lldb_iramp_w5_magnitude_repro_four_zoom.md`
@@ -348,6 +397,35 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   `0x26e4c6`, `0x299c70`, and `0x267010` with source dimensions
   `2080 x 1560`, stride `2080`. Public origin, physical meaning, full-map
   statistics, and final merge effect remain open.
+- `lldb_index5_lookup_vector_public_origin_four_zoom.md`
+  LLDB runtime/static verifier for the tracked index-5
+  `StereoLayer<false>+0xe0` lookup vector. It proves `0x26c480` builds a stack
+  vector through `0x28fa60` / `0x28f5a0` / `0x28f860`, copies it into
+  `this+0xe0` through `0xf02d0`, and later reaches `0x267010` unchanged.
+  Runtime packets retain object fields `this+0x298/+0x29c = [200.0, 640000.0]`
+  and exact float32 reciprocal near/far ramps with counts `752` at `28mm` /
+  `35mm` and `1472` at `70mm` / `150mm`. The verifier finds zero full-vector
+  LRI block hits, zero full calibration fixed32-sequence hits, and zero scalar
+  calibration fixed32 hits for the vector. The endpoint/count mechanics are
+  closed by the next entry, and the separate Triangulator depth-bound custody
+  entry admits the internal reciprocal ray-depth hypothesis-grid role;
+  source-index descriptor semantics, source-record public names, public units
+  and public calibration/LRI/protobuf names, and final merge effect remain
+  open.
+- `lldb_lookup_endpoint_count_origin_four_zoom.md`
+  LLDB runtime/static verifier for the endpoint and count producer mechanics of
+  that generated index-5 lookup vector. It proves the selected canonical
+  endpoint pair `[200.0, 640000.0]` comes from the first row of static binary
+  float tables at `0x609428` / `0x609430`, is propagated through
+  `0x3ff43c -> 0x2681b0 -> 0x26ba90`, and is stored in
+  `this+0x298/+0x29c`. It also proves `0x28f5a0` computes the lookup count from
+  five `0xa8` source records in `this+0x258`, `this+0x18`, first-record scalar,
+  endpoint reciprocal span, clamp `0x1000`, and mode rounding by `this+0xc=8`,
+  reproducing counts `752` at `28mm` / `35mm` and `1472` at `70mm` / `150mm`.
+  By itself this does not prove public units/naming, source-index descriptor
+  semantics, source-record public names, or final merge effect; the separate
+  Triangulator depth-bound custody entry admits the internal reciprocal
+  ray-depth hypothesis-grid role.
 - `lldb_index5_source_object_field_origin_four_zoom.md`
   LLDB runtime/static proof for the immediate internal field assembly of the
   tracked index-5 `StereoLayer<false>+0xf8` source object: under
@@ -362,8 +440,91 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   body behind the tracked index-5 `StereoLayer<false>+0xf8` field assembly:
   accepted four-zoom probes validate the `0x299eb0 -> 0x28f490 -> 0x299fd0`
   boundaries, populated `2080 x 1560` descriptor, record-base/offset-table
-  state, and sampled `0x299fd0` record-layout formula. Public origin, physical
-  meaning, stable record constants, and final merge effect remain open.
+  state, and sampled `0x299fd0` record-layout formula. The patched probe now
+  persists the complete input descriptor and mask descriptor as binary dumps,
+  and the validators check their size/SHA plus zero exact whole-LRI and
+  public-calibration payload hits for those full arrays and sampled
+  first-record-header slices. This excludes direct byte-copy origin under the
+  checked quartet only. Public origin, physical meaning, stable record
+  constants, and final merge effect remain open.
+- `lldb_index5_depth_public_meaning_gap_audit_four_zoom.md`
+  Repo-local audit verifier and evidence synthesis for the Lane B index-5 depth
+  public-meaning gap. It admits `record+0x40` as the internally depth-labeled
+  `lt::UpsampleLayer+0x90` descriptor and independently decodes the public LRI
+  camera/config key space (`LightHeader.field_12` and 262,968-byte
+  warp/calibration `field_13`) used for runtime key alignment. Refreshed
+  `0xf2770` constructor packets also prove constructed `object+0x60` keys match
+  public `LightHeader.field_12[camera].field_2`, `object+0x50` matches raw
+  public `field_4`, `object+0x54` matches raw public `field_5`, constructor
+  input `+0x40` matches raw public `field_8`, and constructor input
+  `+0x48 * 2` matches raw public `field_10`, with observed `object+0x64=0`
+  and constructed `object+0x30=1` in that object family. Enriched `0xf33d0`
+  packets prove exact public intrinsics-block fixed32 copies for wide A1-A5 K matrix / pose records
+  and exact public pose copies for B4 plus tele C5, while B4/C5 K matrices,
+  other B/C-side packets, tele C6, full `state+0xe0`, full `state+0x448`
+  beyond the separately admitted first-payload pose fields, and the index-5
+  source records remain outside admitted public-origin closure. The index-5
+  lookup vector is separately admitted as an internally generated reciprocal
+  near/far table, not a direct public LRI/calibration table.
+  The `0x29a140` source-local full input/mask arrays now also have zero exact
+  whole-LRI and public-calibration byte hits, which narrows direct-copy origin
+  without excluding transformed public derivation.
+  Companion `0x23faf0` record-chain verification adds component-scoped public
+  matches plus zero full 0xa4-byte source-record LRI byte-copy hits.
+- `lldb_f33d0_1f0ce0_producer_four_zoom.md`
+  Static/runtime verifier for the constructor-side `0x1f0ce0 -> 0xf33d0`
+  producer edge. It proves the installed bytes still set selector `0` and
+  selector `1` before the two `0xf33d0` calls, the existing four-zoom packets
+  copy identical source records into both accepted `CalibStage` banks per key,
+  wide A1-A5 are exact public K/pose records, B4/C5 poses are exact public
+  copies, and B4/C5 K records are already zoom-variant non-exact packets at the
+  producer edge. This is derived-K boundary proof, not public field-name
+  closure for `state+0xe0`, `state+0x448`, source-index/source-record
+  semantics, or lookup-vector physical meaning.
+- `lldb_1f0ce0_k_source_trace_four_zoom.md`
+  LLDB runtime/static verifier refining the constructor-side K boundary: the
+  first usable K vector after `0x1f0b00` is an exact public same-camera fixed32
+  sequence under the 32,832-byte LRI intrinsics payload `field_13[camera=N]`;
+  helper entry `0x1f96e0` receives the same camera's two public K records and
+  public `field_6` scalars; `0xf3300` supplies runtime `object+0x54`; the
+  captured two-record helper branch linearly interpolates/extrapolates K fields
+  `0`, `2`, `4`, and `5` with float32 arithmetic; the tested `0xf3350` scale
+  window is identity; and both final `0xf33d0` selector calls receive the same
+  resulting K stack packet. Public semantic names for `field_6`, `object+0x54`,
+  selector banks, other B/C packets, and index-5 source records remain open;
+  the index-5 lookup vector is now internally classified as a generated
+  reciprocal near/far table.
+- `lldb_state_448_payload_public_origin_four_zoom.md`
+  LLDB runtime/static verifier for the first visible `state+0x448` payload-copy
+  sites. It proves payload `+0x00..+0x20` is copied from the public 32,832-byte
+  intrinsics-block pose rotation component and payload `+0x24..+0x2c` is copied
+  from the corresponding public translation component, using anchor `A1` at
+  `28mm` / `35mm` and anchor `B4` at `70mm` / `150mm`, shared across the
+  first-pass inserted keys. Tele first-pass keys are `B1..C5`, excluding
+  public-fired `C6`. The checked later `+0x30..+0x3c` source slices record zero
+  exact public fixed32-sequence hits; a separate later-box formula proof now
+  gives formula-level meaning for that `+0x30..+0x3c` slice, while full
+  `state+0x448` payload semantics, public names, and index-5 source records
+  remain open. The index-5
+  lookup vector is separately classified as an internal reciprocal near/far
+  table, not a direct public LRI table.
+- `lldb_state_448_later_box_formula_four_zoom.md`
+  LLDB runtime/static verifier for the later `state+0x448` payload
+  `+0x30..+0x3c` slice in the first visible constructor branch. It proves
+  `+0x30/+0x34` is the uniform float32 scale
+  `max(4160 / (box.x1 - box.x0), 3120 / (box.y1 - box.y0))`, `+0x38/+0x3c`
+  is the float32 box origin, the box comes from `0x145980(object)`, and the
+  size pair comes from `object+0x114/+0x118`. This closes formula-level meaning
+  for that slice only; the companion static-origin verifier names the size
+  pair as public full sensor ROI, while public field names for the
+  box-producing calibration structure and uniform scale remain open.
+- `lldb_state_448_box_producer_static_origin_four_zoom.md`
+  Static verifier for the `0x145980` box producer feeding the later
+  `state+0x448` formula. It proves the formula size pair is the LRI-stored
+  full sensor ROI `4160 x 3120`, and bounds the box as a computed
+  distortion/undistortion envelope over owner-backed calibration data. Public
+  protobuf field names for that owner-backed distortion/undistortion structure
+  remain open.
 - `lldb_source_record_payload_watch_four_zoom.md`
   LLDB hardware write-watchpoint proof for sampled source-record payload bytes
   after `0x299fd0`: accepted four-zoom probes arm watchpoints on zeroed
@@ -387,17 +548,53 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   `0x27786b`, `0x27791d`, and `0x277945` on the same target-index-5 context,
   proving sampled `%xmm2` is prepared from a `uint16` lookup through
   `rbp-0x210`, sampled `%xmm3` is prepared from the live post-add `edx`, and
-  both broadcast-ready registers match those paired scalar values. Public
-  operand origin/meaning, formation/origin of captured `%xmm4`, full-map
-  distribution, all records/lane positions, and final merge effect remain open.
+  both broadcast-ready registers match those paired scalar values. The later
+  `%xmm4` origin proof closes sampled internal `%xmm4` formation; public
+  operand origin/meaning, full-map distribution, all records/lane positions,
+  and final merge effect remain open.
 - `lldb_276860_xmm3_term_step_four_zoom.md`
   LLDB early-terminate single-step proof for a non-degenerate sampled `%xmm3`
   term: after skipping the first four target table hits, accepted four-zoom
   packets validate `preadd = trunc_i32(f32(u16[object+0x56]) *
   f32[object+0x58] * xmm4_low)`, `postadd = preadd + table`, and the final
-  `%xmm3` broadcast on one stepped target-index-5 packet per focal tier.
-  Formation/origin of captured `%xmm4`, public operand meanings, full-map
-  distribution, all records/lane positions, and final merge effect remain open.
+  `%xmm3` broadcast on one stepped target-index-5 packet per focal tier. The
+  later `%xmm4` origin proof closes sampled internal `%xmm4` formation; public
+  operand meanings, full-map distribution, all records/lane positions, and
+  final merge effect remain open.
+- `lldb_276860_xmm4_origin_four_zoom.md`
+  LLDB early-terminate single-step proof for the preceding `%xmm4` producer
+  window: accepted four-zoom packets reconstruct `%xmm4_low` exactly from
+  `xmm8 - [[rbp-0x208] + rdx]`, `object+0x60`, the observed
+  mask/blend/horizontal-sum/sign/clamp sequence, and the local
+  polynomial/exponent-bit assembly at `0x27786f..0x277903`. This closes the
+  sampled internal `%xmm4` formation boundary only; public operand meanings,
+  LRI/protobuf origins, full-map distribution, all records/lane positions, and
+  final merge effect remain open.
+- `lldb_276860_operand_source_context_four_zoom.md`
+  LLDB early-terminate packet proof for the immediate operand-custody context
+  behind that sampled `%xmm4` subtraction: accepted four-zoom packets bind
+  `%xmm8` to a same-thread load from the target object's `+0x200` vector table,
+  where the matched local store is generated from guide bytes read through
+  target `+0x288`; bind `[rbp-0x208]` to target `+0x1e8`; and bind the paired
+  table base `[rbp-0x210]` to target `+0x198`. A refreshed same-object
+  producer/watchpoint run also ties the final target qwords to internal stores
+  `0x26ca94` (`+0x198`), `0x26cbcd` (`+0x1e8`), `0x26cc01` (`+0x200`), and
+  `0x26c633` (`+0x288`), and validates the sampled `0x26c8e0` buffer layout:
+  `+0x198` capacity `16656` `uint16` entries, `+0x200 - +0x1e8 = 33312`
+  bytes, and sampled subtraction-vector delta `+16` from `+0x200`. Public
+  field names, public LRI/protobuf origins, physical meaning, full-map
+  distribution, and final merge effect remain open.
+- `lldb_index5_operand_public_origin_audit_four_zoom.md`
+  Repo-local verifier extension for the sampled `0x276860` operand public-origin
+  gap. It checks guide first-16 bytes, sampled guide-16 bytes, and the
+  subtraction vector against the whole LRI payload stream and the public
+  calibration payload subset across all four canonical focal tiers, and checks
+  the subtraction vector against public calibration fixed32 sequences. All
+  admitted 16-byte checks have zero hits; the two-byte table value is reported
+  but not used as an absence proof. The same audit carries forward the internal
+  target-field producer custody and sampled buffer layout, but this remains
+  scoped negative public-origin evidence, not public semantic naming or Lane B
+  closure.
 - `bundle_proof_calibdataprocessor_lambda_family.md`
   Installed-bundle proof for the upstream `CalibDataProcessor::State()` lambda / runner family.
 - `lldb_calib_state_operator_runtime_four_zoom.md`
@@ -461,12 +658,15 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   reducer closure, or final acceptance/rejection.
 - `lldb_state_helper_23faf0_record_chain_four_zoom.md`
   LLDB runtime proof bounding the next internal `0x23c5f0` record-chain step:
-  after `0x264440`, the `rbp-0x378` output record changes across
-  `0x23cbbc -> 0x23faf0`, remains stable through later node writes, and mapped
-  output fields are materialized into local tree-node fields in all `104`
-  admitted four-zoom groups. This is helper-record-to-local-tree custody proof,
-  not public field semantics, post-`0x23c5f0` image effect, reducer closure, or
-  final acceptance/rejection.
+  after `0x264440`, the refreshed probe captures the pre-call
+  `0x23faf0(dst=rbp-0x378, left=rbx+0x20, right=rbp-0x420)` tuple, the
+  `rbp-0x378` output record changes across the call, remains stable through
+  later node writes, and mapped output fields are materialized into local
+  tree-node fields in all `104` admitted four-zoom groups. The verifier records
+  zero exact full source-record LRI byte-copy hits while admitting only scoped
+  public component matches. This is helper-record-to-local-tree custody proof,
+  not public field semantics for the full records, post-`0x23c5f0` image effect,
+  reducer closure, or final acceptance/rejection.
 - `bundle_proof_prefusion_state_helper_chain.md`
   Installed-bundle proof bounding the first post-`State()` helper chain to setup / copy / reset work.
 - `bundle_proof_prefusion_heavy_consumers.md`
@@ -479,6 +679,10 @@ under `docs/audits/`; raw rerunnable outputs belong under ignored `runs/`.
   Installed-bundle proof that the selector callback reuses the already-bounded higher-group runner.
 - `bundle_proof_prefusion_block_geometry_helpers.md`
   Installed-bundle proof bounding candidate block-geometry helpers away from reducer closure.
+- `bundle_lldb_prefusion_block_geometry_effect_four_zoom.md`
+  LLDB runtime proof bounding the admitted four-zoom `0x25d090` effect as block-owned pair-vector growth plus descriptor-build / geometry-predicate / active-byte gating. This is block-state effect proof only; image/source contribution, final acceptance/rejection, and reducer closure remain open.
+- `bundle_lldb_prefusion_block_decision_cascade_four_zoom.md`
+  LLDB runtime proof that the downstream `0x244560` / `0x245a40` caller decisions after paired `0x25d090` calls continue with exactly one active block and reach `0x2457c0` callsites, with zero abort decisions and zero watched sentinel-fill path hits in the admitted quartet.
 - `bundle_proof_prefusion_feature_selection_lane.md`
   Installed-bundle proof bounding the visible `0x258fe0` / `0x2598a0` feature-selection lane away from reducer closure.
 - `bundle_proof_prefusion_reducer_arithmetic_static.md`

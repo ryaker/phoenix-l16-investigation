@@ -158,9 +158,9 @@ Record samples after `0x299fd0`:
 | Focal tier | Record-base pointer | Offset-table pointer | First offsets | First sampled record |
 |---|---:|---:|---|---|
 | `28mm` | nonzero | nonzero | `[0, 56, 96, 136]` | `(205, 9, 1, 16)` |
-| `35mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(25, 4, 1, 8)` |
-| `70mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(9, 8, 1, 8)` |
-| `150mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(19, 5, 1, 8)` |
+| `35mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(27, 3, 1, 8)` |
+| `70mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(0, 3, 1, 8)` |
+| `150mm` | nonzero | nonzero | `[0, 32, 56, 80]` | `(5, 2, 1, 8)` |
 
 The sampled record values are admitted only as runtime samples, not as stable
 semantic constants.
@@ -183,15 +183,47 @@ record_size = 8 + factor * rounded
 The same validator also requires the first eight output-table offsets and first
 eight record headers to match the reconstructed formula.
 
+The patched probe now also persists the two full `0x29a140` source inputs that
+feed the formula:
+
+- complete `2080 x 1560` 4-byte input descriptor:
+  `12,979,200` bytes per tier;
+- complete `2080 x 1560` byte mask descriptor at `target+0x208`:
+  `3,244,800` bytes per tier.
+
+The source-local validator verifies the persisted binary dumps by size and
+SHA-256 before admitting the reports. The Lane B aggregate verifier then checks
+those full byte arrays, plus the sampled source-local byte slices already
+present in the JSON packets:
+
+- first 32 bytes of the 4-byte input descriptor;
+- first 16 bytes of the `target+0x208` mask descriptor;
+- first 64 bytes of reconstructed first-record headers.
+
+For all four focal tiers, the full input descriptor, the full mask descriptor,
+and the three sampled byte slices have zero exact hits in the whole LRI payload
+stream and zero exact hits in the public calibration payload subset. This is a
+direct byte-copy absence check only; it does not exclude transformed,
+interpolated, or otherwise derived public origins.
+
 The sampled byte spans and mask counts in the table are evidence-run samples,
 not stable constants.
 
 | Focal tier | Computed / returned span | Mask zero / nonzero | First mask bytes | First expected records `(offset,u0,u2,one,rounded,factor,size)` |
 |---|---:|---:|---|---|
 | `28mm` | `89124024` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,205,9,1,16,3,56)`, `(56,205,9,1,16,2,40)`, `(96,205,9,1,16,2,40)`, `(136,205,9,1,16,2,40)`, `(176,205,9,1,16,2,40)`, `(216,205,9,1,16,2,40)`, `(256,205,9,1,16,2,40)`, `(296,205,9,1,16,2,40)` |
-| `35mm` | `96477512` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,25,4,1,8,3,32)`, `(32,25,4,1,8,2,24)`, `(56,25,4,1,8,2,24)`, `(80,25,4,1,8,2,24)`, `(104,25,4,1,8,2,24)`, `(128,25,2,1,8,2,24)`, `(152,25,2,1,8,2,24)`, `(176,25,2,1,8,2,24)` |
-| `70mm` | `109755992` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,9,8,1,8,3,32)`, `(32,9,8,1,8,2,24)`, `(56,9,8,1,8,2,24)`, `(80,9,8,1,8,2,24)`, `(104,9,8,1,8,2,24)`, `(128,8,9,1,16,2,40)`, `(168,8,9,1,16,2,40)`, `(208,8,9,1,16,2,40)` |
-| `150mm` | `86353544` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,19,5,1,8,3,32)`, `(32,19,5,1,8,2,24)`, `(56,19,5,1,8,2,24)`, `(80,19,5,1,8,2,24)`, `(104,19,5,1,8,2,24)`, `(128,22,3,1,8,2,24)`, `(152,22,3,1,8,2,24)`, `(176,22,3,1,8,2,24)` |
+| `35mm` | `108064312` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,27,3,1,8,3,32)`, `(32,27,3,1,8,2,24)`, `(56,27,3,1,8,2,24)`, `(80,27,3,1,8,2,24)`, `(104,27,3,1,8,2,24)`, `(128,27,3,1,8,2,24)`, `(152,27,3,1,8,2,24)`, `(176,27,3,1,8,2,24)` |
+| `70mm` | `95362208` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,0,3,1,8,3,32)`, `(32,0,3,1,8,2,24)`, `(56,0,3,1,8,2,24)`, `(80,0,3,1,8,2,24)`, `(104,0,3,1,8,2,24)`, `(128,0,3,1,8,2,24)`, `(152,0,3,1,8,2,24)`, `(176,0,3,1,8,2,24)` |
+| `150mm` | `84730560` | `811200 / 2433600` | `[0, 255, 255, 255, 255, 255, 255, 255]` | `(0,5,2,1,8,3,32)`, `(32,5,2,1,8,2,24)`, `(56,5,2,1,8,2,24)`, `(80,5,2,1,8,2,24)`, `(104,5,2,1,8,2,24)`, `(128,5,2,1,8,2,24)`, `(152,5,2,1,8,2,24)`, `(176,5,2,1,8,2,24)` |
+
+Full dump SHA-256 prefixes:
+
+| Focal tier | Input descriptor SHA-256 prefix | Mask descriptor SHA-256 prefix |
+|---|---:|---:|
+| `28mm` | `bbd1f2660e698e5a` | `1a28b93c687d4a8b` |
+| `35mm` | `8ad065d99c1e78f9` | `1a28b93c687d4a8b` |
+| `70mm` | `55e72401635b67ac` | `1a28b93c687d4a8b` |
+| `150mm` | `4354607a307874cf` | `1a28b93c687d4a8b` |
 
 The follow-on moves and continuity also validate:
 
@@ -235,6 +267,9 @@ record_header = (input_u16_0, input_u16_2, 1, rounded)
 ## Non-Claims
 
 - This proof does not decode public LRI/protobuf field origins.
+- The source-local byte-search check excludes only exact direct byte copies of
+  the persisted input/mask arrays and sampled headers, not transformed or
+  derived public origins.
 - This proof does not name the public physical quantity represented by the
   produced descriptor or lookup/source object.
 - This proof does not prove that the sampled record values are constants.
@@ -252,6 +287,7 @@ Validation commands:
 ```text
 python3 -m py_compile tools/lldb_probes/codex_29a140_source_local_producer/source_local_probe.py tools/lldb_probes/codex_29a140_source_local_producer/validate_reports.py
 python3 tools/lldb_probes/codex_29a140_source_local_producer/validate_reports.py
+python3 tools/lane_b_index5_public_meaning_audit.py
 file runs/codex_29a140_source_local_producer/source_local_28mm.hdr runs/codex_29a140_source_local_producer/source_local_35mm.hdr runs/codex_29a140_source_local_producer/source_local_70mm.hdr runs/codex_29a140_source_local_producer/source_local_150mm.hdr
 git diff --check
 ```
@@ -259,8 +295,8 @@ git diff --check
 Validator output:
 
 ```text
-source_local_150mm.json: OK target=0x7f950c70e210 record_base=0x7f9474dac040 offset_table=0x7f94dd364040 first_offsets=[0, 32, 56, 80]
-source_local_28mm.json: OK target=0x7fe00f910cf0 record_base=0x7fdf2ef00040 offset_table=0x7fdfd8000040 first_offsets=[0, 56, 96, 136]
-source_local_35mm.json: OK target=0x7ff2c07179f0 record_base=0x7ff2155d8040 offset_table=0x7ff291364040 first_offsets=[0, 32, 56, 80]
-source_local_70mm.json: OK target=0x7fe45612e470 record_base=0x7fe375700040 offset_table=0x7fe416364040 first_offsets=[0, 32, 56, 80]
+source_local_150mm.json: OK target=0x7fb44e2116d0 record_base=0x7fb3c6418040 offset_table=0x7fb41e464040 first_offsets=[0, 32, 56, 80] input_sha=4354607a307874cf mask_sha=1a28b93c687d4a8b
+source_local_28mm.json: OK target=0x7fbe37a15e40 record_base=0x7fbd67700040 offset_table=0x7fbe10c64040 first_offsets=[0, 56, 96, 136] input_sha=bbd1f2660e698e5a mask_sha=1a28b93c687d4a8b
+source_local_35mm.json: OK target=0x7fdc1a125f50 record_base=0x7fdb3f888040 offset_table=0x7fdbfa364040 first_offsets=[0, 32, 56, 80] input_sha=8ad065d99c1e78f9 mask_sha=1a28b93c687d4a8b
+source_local_70mm.json: OK target=0x7fae0f9094a0 record_base=0x7fae18138040 offset_table=0x7fade8000040 first_offsets=[0, 32, 56, 80] input_sha=55e72401635b67ac mask_sha=1a28b93c687d4a8b
 ```

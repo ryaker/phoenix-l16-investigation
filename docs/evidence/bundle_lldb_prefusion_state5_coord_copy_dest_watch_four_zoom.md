@@ -26,6 +26,8 @@ Important nuance: the watchpoints are address watches. The destination pairs are
   `tools/lldb_probes/prefusion_state5_coord_copy_dest_watch/copy_dest_watch_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_state5_coord_copy_dest_watch/run_four_zoom.sh`
+- Aggregate verifier:
+  `tools/lldb_probes/prefusion_state5_coord_flow/verify_state5_coord_flow.py`
 - Raw output directory:
   `runs/prefusion_state5_coord_copy_dest_watch/`
 

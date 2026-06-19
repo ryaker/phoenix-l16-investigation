@@ -15,8 +15,10 @@ What input record fields enter `0xf2770`, and what item fields are present
 immediately after `0xf2770` returns, before later candidate loops observe those
 items?
 
-This closes constructor-time custody for the tested item fields. It does not
-name public LRI fields or prove final merge acceptance/rejection behavior.
+This closes constructor-time custody for the tested item fields. By itself it
+does not name public LRI fields or prove final merge acceptance/rejection
+behavior. A later Lane B audit adds raw public `LightHeader.field_12` origins
+for a subset of constructor fields, referenced below.
 
 ## Tested Files
 
@@ -111,6 +113,25 @@ For every captured item in the four runs, input `+0x30` equals output item
 `+0x60`. This is runtime confirmation of the static `input+0x30 ->
 0x137d70 -> item+0x60` path under the canonical bridge HDR seeds.
 
+## Follow-Up Public Field Bridge
+
+The later
+[lldb_index5_depth_public_meaning_gap_audit_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_index5_depth_public_meaning_gap_audit_four_zoom.md)
+verifier binds a subset of these constructor fields to raw public
+`LightHeader.field_12[camera]` fields under the same canonical constructor
+family:
+
+```text
+constructor input+0x30 -> item+0x60 == LightHeader.field_12[camera].field_2
+constructor input+0x34 -> item+0x50 == LightHeader.field_12[camera].field_4
+constructor input+0x38 -> item+0x54 == LightHeader.field_12[camera].field_5
+constructor input+0x40 == LightHeader.field_12[camera].field_8
+constructor input+0x48 * 2 == LightHeader.field_12[camera].field_10
+```
+
+This is a raw public-field origin bridge only. It does not assign semantic
+public names to those fields.
+
 For every captured item in the four runs, the record at input `+0x28`, read at
 `+0x18` as two int32 fields, already contains the same pair later observed at
 item `+0x58/+0x5c`. This confirms runtime custody for those two-int fields
@@ -172,10 +193,12 @@ shape:
 
 ## Non-Conclusions
 
-- This does not prove public semantic names for input `+0x30`, input `+0x60`,
-  input `+0x28`, item `+0x30`, item `+0x58/+0x5c`, item `+0x60`, or item
-  `+0x100`.
-- This does not prove the LRI protobuf field numbers for those runtime fields.
+- This constructor-only proof does not prove public semantic names for input
+  `+0x30`, input `+0x60`, input `+0x28`, item `+0x30`, item `+0x58/+0x5c`,
+  item `+0x60`, or item `+0x100`.
+- The follow-up public-field bridge names raw LRI field numbers for the subset
+  listed above only; it does not prove LRI protobuf field numbers for the pair
+  fields, active byte, item `+0x100`, or other runtime fields.
 - This does not prove C6 is globally unused.
 - This does not prove an alternate C6 destination does or does not exist.
 - This does not identify semantic `src1` / `src2` contents.

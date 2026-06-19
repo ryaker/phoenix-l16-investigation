@@ -19,6 +19,7 @@ def reset(
     skip_sentinel_pairs=0,
     watch_hit_cap=512,
     step_cap=800000,
+    branch_trace_limit=0,
 ):
     builtins.l16_prefusion_sentinel_score_guard = {
         "label": label,
@@ -27,6 +28,7 @@ def reset(
         "skip_sentinel_pairs": skip_sentinel_pairs,
         "watch_hit_cap": watch_hit_cap,
         "step_cap": step_cap,
+        "branch_trace_limit": branch_trace_limit,
         "breakpoint_ids": {},
         "pending_by_thread": {},
         "watched_addrs": {},
@@ -42,14 +44,19 @@ def reset(
             "watchpoint_guard_known_sentinel_hits": 0,
             "watchpoint_guard_skip_by_flags": 0,
             "watchpoint_guard_not_skip_by_flags": 0,
+            "guard_branch_traces": 0,
+            "guard_branch_to_skip": 0,
+            "guard_branch_not_to_skip": 0,
             "breakpoints_disabled_after_arm_limit": 0,
             "watchpoints_disabled_after_cap": 0,
+            "watchpoints_disabled_after_branch_trace_limit": 0,
         },
         "store_y_samples": [],
         "after_store_samples": [],
         "armed": [],
         "watchpoint_samples": [],
         "guard_samples": [],
+        "guard_branch_traces": [],
         "errors": [],
         "drive_steps": 0,
         "drive_hit_step_cap": False,
@@ -168,6 +175,11 @@ def _module_va(target, pc):
     return None
 
 
+def _pc_va(thread):
+    frame = thread.GetFrameAtIndex(0)
+    return _module_va(thread.GetProcess().GetTarget(), frame.GetPC())
+
+
 def _stack(thread, max_depth=18):
     target = thread.GetProcess().GetTarget()
     frames = []
@@ -209,6 +221,19 @@ def _disable_watchpoints(debugger):
         if wp and wp.IsValid():
             wp.SetEnabled(False)
     _state()["counts"]["watchpoints_disabled_after_cap"] = 1
+
+
+def _disable_watchpoints_after_branch_limit(debugger):
+    _disable_watchpoints(debugger)
+    state = _state()
+    state["counts"]["watchpoints_disabled_after_cap"] = 0
+    state["counts"]["watchpoints_disabled_after_branch_trace_limit"] = 1
+
+
+def _step_once(thread):
+    before = _pc_va(thread)
+    thread.StepInstruction(False)
+    return {"before": before, "after": _pc_va(thread)}
 
 
 def install_breakpoints(debugger):
@@ -398,10 +423,32 @@ def _record_watchpoint_stop(debugger):
                 state["counts"]["watchpoint_guard_skip_by_flags"] += 1
             else:
                 state["counts"]["watchpoint_guard_not_skip_by_flags"] += 1
+            if state["branch_trace_limit"] and state["counts"]["guard_branch_traces"] < state["branch_trace_limit"]:
+                branch_trace = {
+                    "thread_id": thread.GetThreadID(),
+                    "watch_addr": watch_addr,
+                    "pair_at_branch": pair_now,
+                    "rflags_after_ucomiss": flags,
+                    "initial_stack": sample["stack"],
+                }
+                branch_trace["branch_step"] = _step_once(thread)
+                if branch_trace["branch_step"].get("after") == GUARD_SKIP_TARGET:
+                    state["counts"]["guard_branch_to_skip"] += 1
+                else:
+                    state["counts"]["guard_branch_not_to_skip"] += 1
+                state["counts"]["guard_branch_traces"] += 1
+                sample["branch_trace"] = branch_trace
+                sample["pc_after_branch_trace"] = _pc_va(thread)
+                _append_limited("guard_branch_traces", branch_trace)
+                if state["counts"]["guard_branch_traces"] >= state["branch_trace_limit"]:
+                    _disable_watchpoints_after_branch_limit(debugger)
         _append_limited("guard_samples", sample)
     _append_limited("watchpoint_samples", sample)
     state["counts"]["watchpoint_hits"] += 1
-    if state["counts"]["watchpoint_hits"] >= state["watch_hit_cap"]:
+    if (
+        state["counts"]["watchpoint_hits"] >= state["watch_hit_cap"]
+        and not state["counts"]["watchpoints_disabled_after_branch_trace_limit"]
+    ):
         _disable_watchpoints(debugger)
 
 

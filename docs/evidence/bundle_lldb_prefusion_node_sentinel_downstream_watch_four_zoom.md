@@ -19,6 +19,8 @@ This proves only that selected sentinel-marked node-vector coordinate pairs are 
   `tools/lldb_probes/prefusion_node_sentinel_downstream_watch/node_sentinel_downstream_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_node_sentinel_downstream_watch/run_four_zoom.sh`
+- Aggregate verifier:
+  `tools/lldb_probes/prefusion_node_sentinel_flow/verify_node_sentinel_flow.py`
 - Raw output directory:
   `runs/prefusion_node_sentinel_downstream_watch/`
 

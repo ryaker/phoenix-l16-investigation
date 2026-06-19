@@ -54,6 +54,18 @@ def _read(process, addr, size):
     return data
 
 
+def _hex(data, off, size):
+    if off + size > len(data):
+        return None
+    return data[off : off + size].hex()
+
+
+def _f32_tuple(data, off, count):
+    if off + 4 * count > len(data):
+        return None
+    return list(struct.unpack_from("<" + "f" * count, data, off))
+
+
 def _u8(data, off):
     return data[off]
 
@@ -185,7 +197,7 @@ def _optional_override(process, ptr):
 
 
 def _output_fields(process, target, ptr):
-    data = _read(process, ptr, 0x130)
+    data = _read(process, ptr, 0x1D4)
     if data is None:
         return {"ptr": ptr, "read_ok": False}
     vtable = _u64(data, 0)
@@ -215,6 +227,15 @@ def _output_fields(process, target, ptr):
         "u32_0x120": _u32(data, 0x120),
         "f32_0x124": _f32(data, 0x124),
         "f32_0x128": _f32(data, 0x128),
+        "raw_0x10c_0x12c": _hex(data, 0x10C, 0x20),
+        "stage1_0x12c_f32x8": _f32_tuple(data, 0x12C, 8),
+        "stage1_raw_0x12c_0x14c": _hex(data, 0x12C, 0x20),
+        "stage1_raw_0x150_0x170": _hex(data, 0x150, 0x20),
+        "stage1_raw_0x12c_0x180": _hex(data, 0x12C, 0x54),
+        "stage0_0x180_f32x8": _f32_tuple(data, 0x180, 8),
+        "stage0_raw_0x180_0x1a0": _hex(data, 0x180, 0x20),
+        "stage0_raw_0x1a4_0x1c4": _hex(data, 0x1A4, 0x20),
+        "stage0_raw_0x180_0x1d4": _hex(data, 0x180, 0x54),
     }
 
 

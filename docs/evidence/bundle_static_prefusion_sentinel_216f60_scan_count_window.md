@@ -11,6 +11,8 @@ It uses:
   `runs/prefusion_node_sentinel_downstream_watch/`
 - a fresh repo-local static disassembly capture:
   `runs/prefusion_node_sentinel_downstream_watch/static_disasm_216f60_217110_refresh.log`
+- repo-local aggregate verifier:
+  `tools/lldb_probes/prefusion_node_sentinel_flow/verify_node_sentinel_flow.py`
 
 This note proves a local scan/count boundary for sampled sentinel-coordinate reads. It does not prove whole-vector terminality, final image effect, source contribution, reducer closure, or final acceptance / rejection semantics.
 

@@ -213,14 +213,17 @@ def _entry_packet(process, regs):
 def _current_calib_offsets(process, dest):
     return {
         "0x12c": _read_f32_tuple(process, dest + 0x12C, 8),
+        "raw_0x12c_0x14c": _read_hex(process, dest + 0x12C, 0x20),
         "0x14c": _read_i32(process, dest + 0x14C),
         "0x150": _read_f32_tuple(process, dest + 0x150, 8),
+        "raw_0x150_0x170": _read_hex(process, dest + 0x150, 0x20),
         "0x170": _read_i32(process, dest + 0x170),
         "0x174_0x17c": [
             _read_i32(process, dest + 0x174),
             _read_i32(process, dest + 0x178),
             _read_i32(process, dest + 0x17C),
         ],
+        "raw_0x12c_0x180": _read_hex(process, dest + 0x12C, 0x54),
     }
 
 
@@ -245,7 +248,10 @@ def _post_f33d0_packet(process, regs):
             _read_i32(process, triple + 8),
         ],
         "src1_stack_f32x8": _read_f32_tuple(process, src1, 8),
+        "src1_stack_raw_0x00_0x24": _read_hex(process, src1, 0x24),
         "src2_stack_f32x8": _read_f32_tuple(process, src2, 8),
+        "src2_stack_raw_0x00_0x24": _read_hex(process, src2, 0x24),
+        "triple_stack_raw_0x00_0x0c": _read_hex(process, triple, 0xC),
     }
 
 

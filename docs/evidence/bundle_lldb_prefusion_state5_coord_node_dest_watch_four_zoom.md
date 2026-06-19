@@ -26,6 +26,8 @@ Important nuance: the admitted capped window observed the `0x22a61a -> 0x22a61f`
   `tools/lldb_probes/prefusion_state5_coord_node_dest_watch/node_dest_watch_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_state5_coord_node_dest_watch/run_four_zoom.sh`
+- Aggregate verifier:
+  `tools/lldb_probes/prefusion_state5_coord_flow/verify_state5_coord_flow.py`
 - Raw output directory:
   `runs/prefusion_state5_coord_node_dest_watch/`
 

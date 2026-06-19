@@ -25,6 +25,7 @@ def reset(
     copy_call_b=COPY_CALL_B,
     copy_ret_b=COPY_RET_B,
     site_label="copy_dest",
+    read_call_header=True,
 ):
     builtins.l16_prefusion_state5_coord_copy_dest_watch = {
         "label": label,
@@ -34,6 +35,7 @@ def reset(
         "watch_pairs_per_copy": watch_pairs_per_copy,
         "watch_hit_cap": watch_hit_cap,
         "step_cap": step_cap,
+        "read_call_header": read_call_header,
         "breakpoint_ids": {},
         "sites": {
             "call_a": {
@@ -345,7 +347,9 @@ def _copy_call(frame, thread_id, regs, pc_va):
         "source_end": regs["rdx"],
         "source_byte_len": regs["rdx"] - regs["rsi"] if regs["rdx"] >= regs["rsi"] else None,
         "source_pair_count": (regs["rdx"] - regs["rsi"]) // 8 if regs["rdx"] >= regs["rsi"] else None,
-        "dest_header_before": _vector_header(process, regs["rdi"], 8),
+        "dest_header_before": _vector_header(process, regs["rdi"], 8)
+        if state.get("read_call_header", True)
+        else {"read_ok": "skipped"},
         "registers": regs,
         "stack": _stack(frame.GetThread(), 12),
     }

@@ -49,6 +49,34 @@ Every validation artifact must identify an LRI by:
 
 Do not merge results from two LRIs only because their filenames match. Treat same-name LRIs at different paths or from different devices as distinct captures until proven otherwise.
 
+## Selective Cross-Unit Validation
+
+Cross-unit validation is claim- and risk-based. It is not a blanket rule to
+repeat every four-zoom probe on both physical units.
+
+Run a Unit-2 discriminator when a claim:
+
+- consumes per-file calibration values or assigns public calibration origins,
+- depends on camera membership, key routing, thresholds, counts, or branch
+  incidence that may change with calibration or scene content,
+- is intended to assert a unit-invariant data format or formula, or
+- has already shown a difference between Unit-1 and Unit-2 twin captures.
+
+Installed-bundle control flow, byte-guarded static disassembly, and local
+arithmetic identities do not each require a duplicate full matrix when their
+runtime input and output boundaries have already received suitable cross-unit
+sampling.
+
+The default minimal Unit-2 runtime set is one wide anchor and one tele anchor.
+Add a crop tier only when it takes a distinct route or exposes a difference.
+Every report must name omitted tiers and explain why the selected cases are the
+right discriminators.
+
+Because Unit-1 and Unit-2 twins are different captures, a differing runtime
+observation is a cross-unit twin-capture difference. Do not attribute it solely
+to physical body identity unless scene/content and instrumentation effects are
+independently controlled.
+
 ## Required Validation Classes
 
 Every parity milestone should run at least these validation classes:

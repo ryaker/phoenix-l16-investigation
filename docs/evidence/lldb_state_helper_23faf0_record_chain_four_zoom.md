@@ -29,6 +29,8 @@ or final acceptance/rejection.
   [record_chain_150mm.lldb](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/state_helper_23faf0_record_chain/record_chain_150mm.lldb)
 - Runtime harness:
   [run_four_zoom.sh](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/state_helper_23faf0_record_chain/run_four_zoom.sh)
+- Runtime verifier:
+  [verify_record_chain.py](/Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/state_helper_23faf0_record_chain/verify_record_chain.py)
 - Raw runtime outputs:
   `runs/state_helper_23faf0_record_chain/record_chain_28mm.{log,json,hdr}`,
   `runs/state_helper_23faf0_record_chain/record_chain_35mm.{log,json,hdr}`,
@@ -41,11 +43,17 @@ The `.lldb` scripts launch with `--no-auto-lris`.
 
 ```bash
 bash tools/lldb_probes/state_helper_23faf0_record_chain/run_four_zoom.sh
+python3 tools/lldb_probes/state_helper_23faf0_record_chain/verify_record_chain.py
 ```
 
 The admitted runtime facts below come from the JSON reports listed in the
 Artifacts section. Log files independently show each run wrote a `10432x7824`
 HDR output and exited with status `0`.
+
+The current rerun patches the probe to capture the pre-call `0x23faf0`
+left-record pointer only at `after_264440`, where static disassembly still has
+`rbx+0x20` as the left argument. It deliberately does not call later
+post-return `%rbx+0x20` values the left input.
 
 ## Static Boundary
 
@@ -103,6 +111,11 @@ For every four-site chain in every focal run:
 
 - `rbp-0x2d0` local integer is stable across all four sites.
 - `rbp-0x430` source-object pointer is stable across all four sites.
+- At `after_264440`, the probe captures the pre-call argument tuple
+  `0x23faf0(dst=rbp-0x378, left=rbx+0x20, right=rbp-0x420)`, and the captured
+  record addresses match those three computed pointers in every group.
+- The captured right record at `rbp-0x420` is byte-stable across the
+  `0x23faf0` call in every group.
 - `rbp-0x378` differs between `after_264440` and `after_23faf0`, proving the
   current output record is updated across the `0x23faf0` call in every group.
 - `rbp-0x378` remains unchanged between `after_23faf0` and both later node
@@ -162,6 +175,43 @@ By local key:
 This table is a runtime classification/value observation only. It does not
 assign public meanings to `0`, `9`, `11`, `rbp-0x2d0`, or node `+0xa0`.
 
+## Public Component Audit
+
+The refreshed verifier checks the full 0xa4-byte source-record spans for the
+pre-call left record, right record, output-before record, and output-after
+record in all 26 groups per focal tier. It also compares K / rotation /
+translation-shaped components against the same component-specific public
+32,832-byte intrinsics-block records used by
+[lldb_index5_depth_public_meaning_gap_audit_four_zoom.md](/Volumes/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_index5_depth_public_meaning_gap_audit_four_zoom.md).
+
+Verifier output:
+
+The verifier also requires each admitted paired output file to start with the
+Radiance HDR magic bytes.
+
+```text
+28mm: OK groups=26 full_record_lri_hits=0/104 component_nonmatches=210/312 pre_left=translation:A1x26 right=k:A2x1,A3x1,A4x1,A5x3|rotation:A2x1,A3x1,A4x1,A5x2,B4x2|translation:A2x4,A3x4,A4x4,A5x4,B4x2 output_post=rotation:A2x1,A3x1,A4x1,A5x2|translation:A2x4,A3x4,A4x4,A5x4,B4x2
+35mm: OK groups=26 full_record_lri_hits=0/104 component_nonmatches=210/312 pre_left=translation:A1x26 right=k:A2x1,A3x1,A4x1,A5x3|rotation:A2x1,A3x1,A4x1,A5x2,B4x2|translation:A2x4,A3x4,A4x4,A5x4,B4x2 output_post=rotation:A2x1,A3x1,A4x1,A5x2|translation:A2x4,A3x4,A4x4,A5x4,B4x2
+70mm: OK groups=26 full_record_lri_hits=0/104 component_nonmatches=284/312 pre_left=translation:B4x26 right=rotation:C5x1|translation:C5x1 output_post=none
+150mm: OK groups=26 full_record_lri_hits=0/104 component_nonmatches=284/312 pre_left=translation:B4x26 right=rotation:C5x1|translation:C5x1 output_post=none
+```
+
+Admitted scope:
+
+- no checked full 0xa4-byte source-record span is an exact byte copy of any
+  canonical LRI calibration payload class;
+- exact public component copies do survive inside this helper chain:
+  pre-call left-record translations match A1 at `28mm` / `35mm` and B4 at
+  `70mm` / `150mm`; the right record carries the listed wide A2-A5 K/pose and
+  B4 pose component matches, plus one C5 pose component match in each tele
+  tier;
+- many checked components remain non-matches, and the composed post-`0x23faf0`
+  tele output has no component-specific exact public match under this verifier.
+
+This is component-level public-origin evidence only. It is not a full source
+record public field decode, and it does not name `state+0xe0` or `state+0x448`
+as public protobuf structures.
+
 ## Proven Boundary
 
 - Under complete accepted no-auto-LRIS bridge HDR runs at `28mm`, `35mm`,
@@ -175,12 +225,18 @@ assign public meanings to `0`, `9`, `11`, `rbp-0x2d0`, or node `+0xa0`.
   admitted groups.
 - Node `+0xa0` is first set to `0` at `0x23ce5e`, then later receives the
   observed `{0,9,11}` distribution at `0x23d01e`.
+- The refreshed verifier binds the pre-call `0x23faf0` left/right/output
+  record pointers at `after_264440` and proves no checked full source-record
+  span is an exact LRI calibration-payload byte copy, while admitting only the
+  component-specific public matches listed above.
 
 ## Non-Claims
 
 - This does not assign public names or semantics to `rbp-0x2d0`,
   `rbp-0x378`, `rbp-0x420`, node `i32_0x20`, node `i32_0xa0`, `CalibStage`,
   or any public State value.
+- This does not prove that `state+0xe0` or `state+0x448` are public protobuf
+  records; the admitted public-origin bridge remains component-scoped.
 - This does not prove post-`0x23c5f0` downstream image effect.
 - This does not prove source contribution, reducer closure, final
   acceptance/rejection, or merge parity.

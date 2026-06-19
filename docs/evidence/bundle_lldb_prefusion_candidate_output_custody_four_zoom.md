@@ -24,6 +24,8 @@ It does not prove semantic `src1` / `src2` contents, camera membership, final co
   `tools/lldb_probes/prefusion_candidate_output_custody/custody_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_candidate_output_custody/run_four_zoom.sh`
+- Verifier:
+  `tools/lldb_probes/prefusion_candidate_output_custody/verify_candidate_output_custody.py`
 - Raw output directory:
   `runs/prefusion_candidate_output_custody/`
 
@@ -107,6 +109,19 @@ For all four admitted runs:
 - probe `errors` is empty
 - every captured family gate call has `matches_active_output_vec = true`
 - every matched `0x2439b0` entry carries the same output-vector pointer and record count as the immediately preceding family gate call
+
+The repo-local verifier rechecks the admitted JSON reports, log/HDR artifact
+presence, exact family split, expected scorer/opposite-scorer counts, four gate
+calls, four matched shared-gate entries, 0x2c-stride record-vector shape, and
+gate/shared pointer continuity:
+
+```text
+$ python3 tools/lldb_probes/prefusion_candidate_output_custody/verify_candidate_output_custody.py
+28mm: OK family=a record_count=151 gate_calls=4 shared_matches=4
+35mm: OK family=a record_count=154 gate_calls=4 shared_matches=4
+70mm: OK family=b record_count=169 gate_calls=4 shared_matches=4
+150mm: OK family=b record_count=34 gate_calls=4 shared_matches=4
+```
 
 ## Proven Facts
 

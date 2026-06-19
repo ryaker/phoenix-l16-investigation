@@ -22,6 +22,8 @@ It does not prove public state names, final acceptance/rejection semantics, fina
   `tools/lldb_probes/prefusion_promoted_record_watch/promoted_watch_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_promoted_record_watch/run_tele.sh`
+- Verifier:
+  `tools/lldb_probes/prefusion_promoted_record_watch/verify_promoted_record_watch.py`
 - Raw output directory:
   `runs/prefusion_promoted_record_watch/`
 
@@ -77,6 +79,16 @@ The selected promoted-record index sets for the admitted promotion events were:
 
 Only two representative records per run were watched; the rest of each promoted set was not data-watched.
 
+The repo-local verifier rechecks the admitted tele JSON/HDR artifacts, exact
+promoted index sets, watched representative indices, consumer VA buckets, and
+first state-5 target-2 stop:
+
+```text
+$ python3 tools/lldb_probes/prefusion_promoted_record_watch/verify_promoted_record_watch.py
+70mm: OK promoted=[31, 49, 64, 68, 77, 78, 108] armed=[31, 68] state5=0x241d3b
+150mm: OK promoted=[17, 18, 19, 20, 21, 22, 23, 26, 28, 32] armed=[17, 22] state5=0x241d6a
+```
+
 ## Consumer VA Buckets
 
 The sample counts below are capped-window hardware-watchpoint samples, not exhaustive full-render totals.
@@ -121,11 +133,10 @@ This is still not reducer closure or final acceptance/rejection. It is a concret
 
 ## Consequence For Blocker Work
 
-Future Lane A work should move from `0x2439b0` into the live `0x2416d0` / `0x241fd0` / `0x2474c0..0x2476be` consumer windows.
+Follow-up Lane A work has moved from `0x2439b0` into the live `0x2416d0` / `0x241fd0` consumer windows, state-5 later-watch, `0x25d090` block-state effects, and `0x2457c0` coordinate-output custody.
 
-The next proof target is the semantic effect of state `5` records:
+The remaining proof target is the semantic effect of state `5` records and their bounded coordinate-output descendants:
 
 - whether state `5` means accepted, suppressed, queued, or another internal category
-- what data structure receives the selected record indices from `0x2416d0`
-- whether the downstream record-indexed materialization window has image-effecting consequences
+- whether the downstream coordinate-vector materialization / propagation window has image-effecting consequences
 - how this path connects to final contributor acceptance/rejection before or after IRAMP

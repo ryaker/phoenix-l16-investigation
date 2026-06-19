@@ -23,6 +23,8 @@ This is a different capture strategy from `bundle_lldb_prefusion_record_state_ga
   `tools/lldb_probes/prefusion_state5_acceptance_path/state5_acceptance_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_state5_acceptance_path/run_tele.sh`
+- Verifier:
+  `tools/lldb_probes/prefusion_state5_acceptance_path/verify_state5_acceptance.py`
 - Raw output directory:
   `runs/prefusion_state5_acceptance_path/`
 
@@ -75,6 +77,14 @@ Installed-bundle disassembly and the probe's register/memory packets bound the l
 
 Both output files are Radiance HDR images in `runs/prefusion_state5_acceptance_path/`.
 
+The repo-local verifier rechecks the admitted JSON reports, exact expected hit counts, exact small-set overlaps, clean exit status, no step cap, no probe errors, Radiance HDR output custody, and observed `(state=5,target=2)` stores for every admitted small-set overlap:
+
+```text
+$ python3 tools/lldb_probes/prefusion_state5_acceptance_path/verify_state5_acceptance.py
+70mm: OK promotions=4 promoted_records=257 target2_entries=21 overlap_entries=5 promoted_store_hits=273 small_sets=target=2:selected=9:overlap=7;target=2:selected=8:overlap=8
+150mm: OK promotions=1 promoted_records=10 target2_entries=11 overlap_entries=2 promoted_store_hits=19 small_sets=target=2:selected=10:overlap=10
+```
+
 ### `70mm` Small-Set Evidence
 
 The first two promoted-vector events are small enough to state exactly from admitted samples:
@@ -113,11 +123,10 @@ This is still record-selection and state-relabel proof. It is not public accepta
 
 ## Consequence For Blocker Work
 
-Lane A should move downstream from "are promoted records consumed?" to "what does state `5` do next?"
+Follow-up Lane A evidence has now moved downstream from "are promoted records consumed?" into state-5 later-watch, `0x25d090` block-state effects, caller-side block decisions, and `0x2457c0` coordinate-output custody.
 
-The next proof target is the fate of state-5 records after `0x2416d0`:
+The remaining proof target is the semantic effect after that bounded state-5 / block-decision path:
 
-- identify downstream consumers of records after they become state `5`
 - determine whether state `5` records are accepted, rejected, queued, or relabeled again
-- bind selected-index vectors or state-5 records to any image-effecting descriptor/materialization path
+- bind the bounded coordinate-output / copied-coordinate path to any image-effecting descriptor/materialization path
 - keep final acceptance/rejection and reducer closure open until those effects are proven

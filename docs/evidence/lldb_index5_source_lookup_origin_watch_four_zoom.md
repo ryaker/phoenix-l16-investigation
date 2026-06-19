@@ -145,6 +145,14 @@ This narrows the internal construction path for the lookup vector and source
 object consumed by the proven `0x299c70 -> 0x267010` chain. It does not identify
 the public origin or physical meaning of either input.
 
+Follow-up:
+[lldb_index5_lookup_vector_public_origin_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_index5_lookup_vector_public_origin_four_zoom.md)
+now narrows the `StereoLayer<false>+0xe0` side of this boundary: the vector is
+internally generated through `0x28fa60` / `0x28f5a0` / `0x28f860` from retained
+`this+0x298/+0x29c = [200.0, 640000.0]` fields as an exact float32 reciprocal
+near/far ramp, copied by `0xf02d0`, and consumed unchanged by `0x267010`.
+Endpoint/count public origins and source-index descriptor semantics remain open.
+
 ## Non-Claims
 
 - This proof does not identify a public LRI/protobuf field.

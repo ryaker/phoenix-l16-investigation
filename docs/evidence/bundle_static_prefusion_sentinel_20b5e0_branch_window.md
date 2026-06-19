@@ -12,8 +12,11 @@ It uses:
 - a fresh repo-local static disassembly capture:
   `runs/prefusion_node_sentinel_downstream_watch/static_disasm_20b5e0_20bc20.log`
 
-It does not admit a new direct branch-runtime probe. A hot direct branch-census
-attempt was discarded because it did not produce completed JSON evidence.
+This note itself does not admit a direct branch-runtime probe. A hot direct
+branch-census attempt was discarded because it did not produce completed JSON
+evidence. Follow-up evidence in
+`bundle_lldb_prefusion_sentinel_20b5e0_branch_step_four_zoom.md` admits a
+lighter branch-step runtime proof for sampled `0x20b912` sentinel reads.
 
 This note proves the local static branch/write boundary around runtime-observed
 `0x20b912` sentinel reads. It does not prove whole-vector terminality, final
@@ -92,6 +95,7 @@ still `(-1.0, -1.0)`, and static disassembly proves that this helper window has
 a local nonpositive/sentinel branch path that bypasses the `0x20bac0..0x20bac8`
 update-write block.
 
-This is a local branch-boundary fact for sampled sentinel reads. It is not a
-runtime flags/branch-stop proof, not exhaustive over all sentinel entries, and
-not final acceptance / rejection or image-effect proof.
+This document is a local branch-boundary fact for sampled sentinel reads. The
+follow-up branch-step bundle supplies the direct runtime flags / branch-target
+proof for sampled `0x20b912` reads. Neither note is exhaustive over all sentinel
+entries, final acceptance / rejection proof, or image-effect proof.

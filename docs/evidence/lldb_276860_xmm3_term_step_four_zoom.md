@@ -116,8 +116,10 @@ The numeric rows above are sampled packet observations, not stable constants.
 
 ## Not Proven
 
-- Formation, public meaning, or public LRI/protobuf origin of the captured
-  `%xmm4` value.
+- Public meaning or public LRI/protobuf origin of the captured `%xmm4` value.
+  The later
+  [lldb_276860_xmm4_origin_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_276860_xmm4_origin_four_zoom.md)
+  proof closes sampled internal `%xmm4` formation only.
 - Public meaning or public LRI/protobuf origin of `object+0x56`,
   `object+0x58`, the table at `rbp-0x210`, or the table index.
 - Full-map payload distribution, all records, all lane positions, or stability

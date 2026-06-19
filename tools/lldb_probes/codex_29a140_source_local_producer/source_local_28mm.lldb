@@ -1,5 +1,5 @@
 command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_29a140_source_local_producer/source_local_probe.py
-script source_local_probe.reset("28mm L16_02130 0x29a140 source-local producer", 5, 260)
+script source_local_probe.reset("28mm L16_02130 0x29a140 source-local producer", 5, 260, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_29a140_source_local_producer/source_local_28mm_full")
 settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
 platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_29a140_source_local_producer
 target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process

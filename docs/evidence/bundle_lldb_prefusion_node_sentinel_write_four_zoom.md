@@ -24,6 +24,8 @@ This proves only that the sentinel coordinate-invalidating store path is live un
   `tools/lldb_probes/prefusion_node_sentinel_write/node_sentinel_write_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_node_sentinel_write/run_four_zoom.sh`
+- Aggregate verifier:
+  `tools/lldb_probes/prefusion_node_sentinel_flow/verify_node_sentinel_flow.py`
 - Raw output directory:
   `runs/prefusion_node_sentinel_write/`
 

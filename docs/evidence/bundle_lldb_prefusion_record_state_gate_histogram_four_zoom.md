@@ -25,6 +25,8 @@ It does not prove semantic `src1` / `src2` contents, public names for record sta
   `tools/lldb_probes/prefusion_record_state_gate_histogram/custody_state_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_record_state_gate_histogram/run_four_zoom.sh`
+- Verifier:
+  `tools/lldb_probes/prefusion_record_state_gate_histogram/verify_record_state_gate_histogram.py`
 - Raw output directory:
   `runs/prefusion_record_state_gate_histogram/`
 
@@ -89,6 +91,19 @@ For all four admitted runs:
 - `drive_hit_step_cap` is `false`
 - probe `errors` is empty
 - sampled selector/promoter/store records matching the known scorer-output vector are empty
+
+The repo-local verifier rechecks the admitted JSON/HDR artifacts, exact
+before/after aggregate histograms, family split, record counts, matched active
+vector continuity, empty exact-vector downstream samples, clean process exit,
+and the scoped `70mm` breakpoint-cap marker:
+
+```text
+$ python3 tools/lldb_probes/prefusion_record_state_gate_histogram/verify_record_state_gate_histogram.py
+28mm: OK family=a gates=4 record_count=151 promoted_target2=0
+35mm: OK family=a gates=4 record_count=154 promoted_target2=0
+70mm: OK family=b gates=3 record_count=169 promoted_target2=19
+150mm: OK family=b gates=3 record_count=34 promoted_target2=12
+```
 
 ## Proven Facts
 

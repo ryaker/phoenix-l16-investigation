@@ -26,6 +26,8 @@ Important nuance: the watchpoints are address watches. The pairs are finite non-
   `tools/lldb_probes/prefusion_state5_coord_consumer_watch/coord_consumer_watch_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_state5_coord_consumer_watch/run_four_zoom.sh`
+- Aggregate verifier:
+  `tools/lldb_probes/prefusion_state5_coord_flow/verify_state5_coord_flow.py`
 - Raw output directory:
   `runs/prefusion_state5_coord_consumer_watch/`
 

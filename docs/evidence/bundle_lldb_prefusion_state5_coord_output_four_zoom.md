@@ -24,6 +24,8 @@ It does not prove public state names, public target meanings, image contribution
   `tools/lldb_probes/prefusion_state5_coord_output/state5_coord_output_150mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_state5_coord_output/run_four_zoom.sh`
+- Aggregate verifier:
+  `tools/lldb_probes/prefusion_state5_coord_flow/verify_state5_coord_flow.py`
 - Raw output directory:
   `runs/prefusion_state5_coord_output/`
 
@@ -118,4 +120,4 @@ Lane A can now treat `0x2457c0` as bounded through four-zoom runtime:
 
 `0x244560 -> 0x2457c0 -> state+0x1e8 coordinate vector`
 
-The next proof target is the downstream consumer of `state+0x1e8` after `0x2457c0` returns, and whether that consumer reaches image-effecting work, final acceptance/rejection policy, or another bounded non-reducer helper.
+Follow-up evidence has now bounded representative downstream `state+0x1e8` copy-out and propagation paths. The remaining proof target is whether the copied / propagated coordinate vectors reach image-effecting work, final acceptance/rejection policy, or another bounded non-reducer helper.

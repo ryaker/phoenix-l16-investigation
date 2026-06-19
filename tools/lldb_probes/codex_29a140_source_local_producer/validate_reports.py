@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import hashlib
 import json
 import pathlib
 
@@ -99,6 +100,23 @@ def validate_report(path):
         formula["zero_mask_count"] + formula["nonzero_mask_count"] == formula["pixel_count"],
         f"{path.name}: mask census count mismatch {formula}",
     )
+    dumps = packet.get("bulk_dumps") or after_299eb0.get("bulk_dumps") or {}
+    require(dumps, f"{path.name}: missing full input/mask dumps")
+    expected_dump_sizes = {
+        "input_descriptor": formula["input_stride"] * formula["height"] * 4,
+        "mask_descriptor": formula["mask_stride"] * formula["height"],
+    }
+    for dump_name, expected_size in expected_dump_sizes.items():
+        dump = dumps.get(dump_name) or {}
+        dump_path = pathlib.Path(dump.get("path", ""))
+        require(dump_path.exists(), f"{path.name}: missing {dump_name} dump {dump_path}")
+        raw = dump_path.read_bytes()
+        require(len(raw) == expected_size, f"{path.name}: {dump_name} dump size mismatch")
+        require(dump.get("bytes") == expected_size, f"{path.name}: {dump_name} metadata size mismatch")
+        require(
+            hashlib.sha256(raw).hexdigest() == dump.get("sha256"),
+            f"{path.name}: {dump_name} sha mismatch",
+        )
 
     output = after_299fd0["output_local"]
     require(output["control_u32_0x00"] == 8, f"{path.name}: final control not 8")
@@ -185,7 +203,9 @@ def main():
             f"{path.name}: OK target={packet['target_object']:#x} "
             f"record_base={records['record_base']:#x} "
             f"offset_table={records['offset_table']:#x} "
-            f"first_offsets={records['first_offsets'][:4]}"
+            f"first_offsets={records['first_offsets'][:4]} "
+            f"input_sha={packet['bulk_dumps']['input_descriptor']['sha256'][:16]} "
+            f"mask_sha={packet['bulk_dumps']['mask_descriptor']['sha256'][:16]}"
         )
 
 

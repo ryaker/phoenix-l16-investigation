@@ -79,6 +79,11 @@ def _read_f64_tuple(process, addr, count):
     return list(struct.unpack_from("<" + "d" * count, data, 0))
 
 
+def _read_hex(process, addr, size):
+    data = _read(process, addr, size)
+    return data.hex() if data is not None else None
+
+
 def _libcp_base(target):
     for module in target.module_iter():
         if str(module.GetFileSpec().GetFilename()) == "libcp.dylib":
@@ -121,6 +126,7 @@ def _record_packet(process, addr):
         return None
     return {
         "addr": addr,
+        "raw_0x00_0xa4": _read_hex(process, addr, 0xA4),
         "f32_0x00x8": _read_f32_tuple(process, addr, 8),
         "i32_0x20": _read_i32(process, addr + 0x20),
         "i32_0x24_0x2c": [
@@ -178,12 +184,22 @@ def _packet_for_site(process, regs, site_name):
     rbp = regs["rbp"]
     local_i32 = _read_i32(process, rbp - 0x2D0)
     _inc_local(site_name, local_i32)
+    dst = rbp - 0x378
+    right = rbp - 0x420
     base = {
         "local_i32_minus_0x2d0": local_i32,
-        "helper_record_rbp_minus_0x420": _record_packet(process, rbp - 0x420),
-        "compose_output_rbp_minus_0x378": _record_packet(process, rbp - 0x378),
+        "helper_record_rbp_minus_0x420": _record_packet(process, right),
+        "compose_output_rbp_minus_0x378": _record_packet(process, dst),
         "source_object_ptr_minus_0x430": _read_u64(process, rbp - 0x430),
     }
+    if site_name == "after_264440":
+        left = regs["rbx"] + 0x20
+        base["pre_call_23faf0_args"] = {
+            "dst_rbp_minus_0x378": dst,
+            "left_rbx_plus_0x20": left,
+            "right_rbp_minus_0x420": right,
+        }
+        base["pre_call_left_record_rbx_plus_0x20"] = _record_packet(process, left)
     if site_name == "after_node_field_writes":
         base["tree_node_rbx"] = _node_packet(process, regs["rbx"])
     if site_name == "after_node_a0_write":

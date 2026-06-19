@@ -139,7 +139,10 @@ For every admitted paired packet:
   the `ecx` lookup index, or the `edx` post-add scalar.
 - The follow-up `lldb_276860_xmm3_term_step_four_zoom.md` validates one
   non-degenerate sampled `%xmm3` pre-add term per focal tier from captured
-  `%xmm4`; formation/origin of that `%xmm4` value remains open.
+  `%xmm4`. The later
+  [lldb_276860_xmm4_origin_four_zoom.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/lldb_276860_xmm4_origin_four_zoom.md)
+  proof closes sampled internal `%xmm4` formation, but not public meaning or
+  public LRI/protobuf origin.
 - Full-map payload distribution, all records, all lane positions, or stability
   beyond the sampled target-index-5 packets.
 - Whether these sampled scalar operands are final costs, intermediate costs, or

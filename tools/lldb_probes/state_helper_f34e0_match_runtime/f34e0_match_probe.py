@@ -76,6 +76,11 @@ def _read_f32_tuple(process, addr, count):
     return list(struct.unpack_from("<" + "f" * count, data, 0))
 
 
+def _read_hex(process, addr, size):
+    data = _read(process, addr, size)
+    return data.hex() if data is not None else None
+
+
 def _libcp_base(target):
     for module in target.module_iter():
         if str(module.GetFileSpec().GetFilename()) == "libcp.dylib":
@@ -135,28 +140,34 @@ def _append_event(event):
 def _current_offsets(process, obj):
     return {
         "current_0x12c_f32x8": _read_f32_tuple(process, obj + 0x12C, 8),
+        "current_raw_0x12c_0x14c": _read_hex(process, obj + 0x12C, 0x20),
         "current_0x14c_i32": _read_i32(process, obj + 0x14C),
         "current_0x150_f32x8": _read_f32_tuple(process, obj + 0x150, 8),
+        "current_raw_0x150_0x170": _read_hex(process, obj + 0x150, 0x20),
         "current_0x170_i32": _read_i32(process, obj + 0x170),
         "current_0x174_0x17c_i32": [
             _read_i32(process, obj + 0x174),
             _read_i32(process, obj + 0x178),
             _read_i32(process, obj + 0x17C),
         ],
+        "current_raw_0x12c_0x180": _read_hex(process, obj + 0x12C, 0x54),
     }
 
 
 def _factory_offsets(process, obj):
     return {
         "factory_0x180_f32x8": _read_f32_tuple(process, obj + 0x180, 8),
+        "factory_raw_0x180_0x1a0": _read_hex(process, obj + 0x180, 0x20),
         "factory_0x1a0_i32": _read_i32(process, obj + 0x1A0),
         "factory_0x1a4_f32x8": _read_f32_tuple(process, obj + 0x1A4, 8),
+        "factory_raw_0x1a4_0x1c4": _read_hex(process, obj + 0x1A4, 0x20),
         "factory_0x1c4_i32": _read_i32(process, obj + 0x1C4),
         "factory_0x1c8_0x1d0_i32": [
             _read_i32(process, obj + 0x1C8),
             _read_i32(process, obj + 0x1CC),
             _read_i32(process, obj + 0x1D0),
         ],
+        "factory_raw_0x180_0x1d4": _read_hex(process, obj + 0x180, 0x54),
     }
 
 

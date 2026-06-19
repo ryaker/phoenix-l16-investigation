@@ -30,6 +30,8 @@ closed. It only bounds this one `0x218b30` scoring/materialization guard site.
   `tools/lldb_probes/prefusion_sentinel_guard_direct_census/sentinel_guard_direct_35mm.lldb`
 - Runner:
   `tools/lldb_probes/prefusion_sentinel_guard_direct_census/run_wide_direct.sh`
+- Verifier:
+  `tools/lldb_probes/prefusion_sentinel_guard_direct_census/verify_sentinel_guard_direct_census.py`
 - Raw output directory:
   `runs/prefusion_sentinel_guard_direct_census/`
 
@@ -85,6 +87,16 @@ jq -s -e '.[0].process_exit_status == 0 and .[0].drive_hit_step_cap == false and
 ```
 
 The command returned `true`.
+
+The repo-local verifier rechecks clean completion, exact completed-sentinel
+counts, unique sentinel address counts, zero direct guard hits, and absence of
+guard-breakpoint cap hits, and Radiance HDR output custody:
+
+```text
+$ python3 tools/lldb_probes/prefusion_sentinel_guard_direct_census/verify_sentinel_guard_direct_census.py
+28mm: OK completed_sentinels=152 unique_addrs=152 guard_hits=0
+35mm: OK completed_sentinels=106 unique_addrs=106 guard_hits=0
+```
 
 The HDR verification command:
 

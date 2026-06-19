@@ -56,6 +56,11 @@ def _read_i32(process, addr):
     return struct.unpack_from("<i", data, 0)[0] if data is not None else None
 
 
+def _read_u8(process, addr):
+    data = _read(process, addr, 1)
+    return data[0] if data is not None else None
+
+
 def _read_u64(process, addr):
     data = _read(process, addr, 8)
     return struct.unpack_from("<Q", data, 0)[0] if data is not None else None
@@ -66,6 +71,11 @@ def _read_f32_tuple(process, addr, count):
     if data is None:
         return None
     return list(struct.unpack_from("<" + "f" * count, data, 0))
+
+
+def _read_hex(process, addr, size):
+    data = _read(process, addr, size)
+    return data.hex() if data is not None else None
 
 
 def _libcp_base(target):
@@ -131,6 +141,9 @@ def _f33d0_packet(process, regs):
     return {
         "selector_r8d": selector,
         "dest_rdi": rdi,
+        "dest_u8_0x30": _read_u8(process, rdi + 0x30),
+        "dest_i32_0x60": _read_i32(process, rdi + 0x60),
+        "dest_i32_0x64": _read_i32(process, rdi + 0x64),
         "src1_rsi": rsi,
         "src2_rdx": rdx,
         "triple_rcx": rcx,
@@ -142,28 +155,37 @@ def _f33d0_packet(process, regs):
             _read_i32(process, rcx + 8),
         ],
         "src1_f32x8": _read_f32_tuple(process, rsi, 8),
+        "src1_raw_0x00_0x24": _read_hex(process, rsi, 0x24),
         "src2_f32x8": _read_f32_tuple(process, rdx, 8),
+        "src2_raw_0x00_0x24": _read_hex(process, rdx, 0x24),
+        "triple_raw_0x00_0x0c": _read_hex(process, rcx, 0xC),
         "dest_pre_factory_offsets": {
             "0x180": _read_f32_tuple(process, rdi + 0x180, 8),
+            "raw_0x180_0x1a0": _read_hex(process, rdi + 0x180, 0x20),
             "0x1a0": _read_i32(process, rdi + 0x1A0),
             "0x1a4": _read_f32_tuple(process, rdi + 0x1A4, 8),
+            "raw_0x1a4_0x1c4": _read_hex(process, rdi + 0x1A4, 0x20),
             "0x1c4": _read_i32(process, rdi + 0x1C4),
             "0x1c8_0x1d0": [
                 _read_i32(process, rdi + 0x1C8),
                 _read_i32(process, rdi + 0x1CC),
                 _read_i32(process, rdi + 0x1D0),
             ],
+            "raw_0x180_0x1d4": _read_hex(process, rdi + 0x180, 0x54),
         },
         "dest_pre_current_offsets": {
             "0x12c": _read_f32_tuple(process, rdi + 0x12C, 8),
+            "raw_0x12c_0x14c": _read_hex(process, rdi + 0x12C, 0x20),
             "0x14c": _read_i32(process, rdi + 0x14C),
             "0x150": _read_f32_tuple(process, rdi + 0x150, 8),
+            "raw_0x150_0x170": _read_hex(process, rdi + 0x150, 0x20),
             "0x170": _read_i32(process, rdi + 0x170),
             "0x174_0x17c": [
                 _read_i32(process, rdi + 0x174),
                 _read_i32(process, rdi + 0x178),
                 _read_i32(process, rdi + 0x17C),
             ],
+            "raw_0x12c_0x180": _read_hex(process, rdi + 0x12C, 0x54),
         },
     }
 
