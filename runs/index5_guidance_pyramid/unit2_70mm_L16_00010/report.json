@@ -1,0 +1,63 @@
+{
+  "done": true,
+  "errors": [],
+  "hits": 2341,
+  "label": "unit2_70mm L16_00010 guidance pyramid",
+  "levels": [
+    {
+      "bytes": 12740,
+      "h": 49,
+      "index": 0,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010/guidance_level0_65x49.rgba8",
+      "sha256": "3846e56bd08c9c95bb5f56e831308d0dbebef861ca9d233a3831d11ab32b62d8",
+      "stride": 65,
+      "w": 65
+    },
+    {
+      "bytes": 50960,
+      "h": 98,
+      "index": 1,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010/guidance_level1_130x98.rgba8",
+      "sha256": "d9c82c9b31d0df3fb06b24e83a28e1dd707d55c4997095938ea8d09a25922d30",
+      "stride": 130,
+      "w": 130
+    },
+    {
+      "bytes": 202800,
+      "h": 195,
+      "index": 2,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010/guidance_level2_260x195.rgba8",
+      "sha256": "2053de228d50fb1c2fbb1e6479f110960a7598c200eca5fb5b8de51eeab83292",
+      "stride": 260,
+      "w": 260
+    },
+    {
+      "bytes": 811200,
+      "h": 390,
+      "index": 3,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010/guidance_level3_520x390.rgba8",
+      "sha256": "43f42c2cdb689a3bd96e2cbd260c0a4d4fda5e819623c480db049d44c8349fdc",
+      "stride": 520,
+      "w": 520
+    },
+    {
+      "bytes": 3244800,
+      "h": 780,
+      "index": 4,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010/guidance_level4_1040x780.rgba8",
+      "sha256": "d2065eb2b34f0dbb97dccd14ceb71eaf10e124304df3564ecd24fc004f9ff5f3",
+      "stride": 1040,
+      "w": 1040
+    },
+    {
+      "bytes": 12979200,
+      "h": 1560,
+      "index": 5,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010/guidance_level5_2080x1560.rgba8",
+      "sha256": "6586bfbfba90a3f0834206ed41c5e3103b4f9d76097f355120362a4515e0c72e",
+      "stride": 2080,
+      "w": 2080
+    }
+  ],
+  "outdir": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010"
+}
