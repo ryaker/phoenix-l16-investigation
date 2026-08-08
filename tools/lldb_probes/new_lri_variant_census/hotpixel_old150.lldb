@@ -1,0 +1,18 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/new_lri_variant_census/hotpixel_leakage_probe.py
+script hotpixel_leakage_probe.reset("old-firmware 150mm sensor-table variant")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/new_lri/variant_census
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3412f0
+breakpoint set --shlib libcp.dylib --address 0x341311
+breakpoint set --shlib libcp.dylib --address 0x34131f
+breakpoint set --shlib libcp.dylib --address 0x34132b
+breakpoint set --shlib libcp.dylib --address 0x341333
+breakpoint set --shlib libcp.dylib --address 0x341444
+breakpoint set --shlib libcp.dylib --address 0x10acd0
+script hotpixel_leakage_probe.attach(lldb.debugger, 1)
+process launch -- "/Volumes/Base Photos/New LRI/L16_00464.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/new_lri/variant_census/latest.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script hotpixel_leakage_probe.write_report("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/new_lri/variant_census/hotpixel_old150.json", lldb.debugger)
+script hotpixel_leakage_probe.report()
+quit

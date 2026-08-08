@@ -1,0 +1,15 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/movable_mirror_pose_formula/movable_mirror_pose_probe.py
+script movable_mirror_pose_probe.reset("Unit-1 28mm movable mirror pose")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x1f109c
+breakpoint set --shlib libcp.dylib --address 0x1f10a1
+breakpoint set --shlib libcp.dylib --address 0x1f10b2
+breakpoint set --shlib libcp.dylib --address 0x1f10b7
+breakpoint set --shlib libcp.dylib --address 0x1f1328
+script movable_mirror_pose_probe.attach_existing(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/movable_mirror_pose_formula/unit1_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script movable_mirror_pose_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script movable_mirror_pose_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/movable_mirror_pose_formula/unit1_28mm.json")
+quit

@@ -1,0 +1,11 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/reference_stage_maps/reference_stage_map_probe.py
+script reference_stage_map_probe.reset("Unit-2 28mm index5 depth+index", "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/reference_stage_maps/unit2_28mm", sites=[0x26E4D5, 0x26E64F])
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26e4d5
+breakpoint set --shlib libcp.dylib --address 0x26e64f
+script reference_stage_map_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/raw_sensor_layout/input_unit2_28mm.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/reference_stage_maps/unit2_28mm/output.dng" --profile 3 --export-fmt 4 --no-auto-lris
+script reference_stage_map_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/reference_stage_maps/unit2_28mm/report.json")
+quit

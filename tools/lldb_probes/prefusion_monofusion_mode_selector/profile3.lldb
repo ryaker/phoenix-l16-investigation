@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_monofusion_mode_selector/mode_selector_probe.py
+script mode_selector_probe.reset("Unit-1 35mm profile 3", 3, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode_selector/profile3.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode_selector
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x406743
+breakpoint set --shlib libcp.dylib --address 0x40674b
+breakpoint set --shlib libcp.dylib --address 0x1b1389
+breakpoint set --shlib libcp.dylib --address 0x1b39c6
+breakpoint set --shlib libcp.dylib --address 0x1b3b61
+breakpoint set --shlib libcp.dylib --address 0x1b3aae
+script mode_selector_probe.install(lldb.debugger, {"selector_entry": 1, "selector_return": 2, "constructor_store": 3, "worker_mode": 4, "mode0_call": 5, "mode1_call": 6})
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode_selector/profile3.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script mode_selector_probe.report()
+quit

@@ -7,10 +7,15 @@
 
 ## Statements (each unproven; do not cite as fact)
 
-> NOTE: statement (1) below was PROMOTED to fact on 2026-05-30 — parent re-verified
+> NOTE: statements (1) and (4) below were resolved by deterministic proof. Statement (1) was
+> PROMOTED on 2026-05-30; statement (4)'s proposed focal-entry/record-size explanation was REFUTED,
+> while the actual numeric mapping was PROMOTED on 2026-06-30. Statements (2) and (3) remain
+> hypotheses.
+>
+> For statement (1), parent re-verified
 > `1/3`→14, `1/288`→0 with a clean `1.0`→5627 sanity. It now lives in
 > `docs/evidence/bundle_proof_lri_calibration_origin_static.md` FACT 4. Kept here struck-through for
-> provenance. Remaining statements (2)–(4) are still hypotheses.
+> provenance.
 
 1. ~~**libcp `__const` hardcode/compute map.**~~ **PROMOTED — see evidence FACT 4.** coeff `1/3` is a
    universal `__const` (count 14, safe to hardcode); the `1/288` scale is absent (count 0, runtime-
@@ -29,8 +34,13 @@
    records from the LRI intrinsics K + distortion. Pure hypothesis — requires a peer runtime lane to
    capture the `state+0x448` node bytes, then a static byte-match against LRI intrinsics floats.
 
-4. **CalibStage banks.** Hypothesis: CalibStage stage 0/1 ("factory"/"current") correspond to the two
-   focal entries per camera, or to the wide(15061B)/tele(17762B) distortion record sizes. Unproven.
+4. ~~**CalibStage banks.** Hypothesis: CalibStage stage 0/1 ("factory"/"current") correspond to the two
+   focal entries per camera, or to the wide(15061B)/tele(17762B) distortion record sizes.~~
+   **REFUTED/PROMOTED:** the proposed focal-entry/record-size interpretation is false. Complete
+   installed writer census plus two-body watches prove `0 = factory` at `CapturedImage+0x180` and
+   `1 = current` at `+0x12c`; both are initialized from the same focus-evaluated public factory
+   calibration packet. See
+   `docs/evidence/bundle_static_runtime_calibstage_public_names_two_body.md`.
 
 ## Disproof Criteria
 

@@ -1,0 +1,13 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/distortion_table/distortion_table_probe.py
+script distortion_table_probe.reset("Unit-2 70mm distortion table")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/distortion_table
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x145738
+breakpoint set --shlib libcp.dylib --address 0x144cb4
+breakpoint set --shlib libcp.dylib --address 0x144de3
+script distortion_table_probe.attach_existing(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-10-25/L16_02894.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/distortion_table/unit2_70mm.hdr" --profile 3 --export-fmt 3
+script distortion_table_probe.drive(lldb.debugger)
+script distortion_table_probe.write_report("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/distortion_table/unit2_70mm.json")
+quit

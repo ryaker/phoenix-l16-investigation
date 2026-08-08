@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_guidance_channel_origin/guidance_dense_dump_probe.py
+script guidance_dense_dump_probe.reset("/Users/ryaker/L16_Phoenix/phoenix_out/GUID_35mm_06671", 1)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x27c062
+script guidance_dense_dump_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/New LRI/L16_06671.lri" "/private/tmp/35mm_06671.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script guidance_dense_dump_probe.write_report(lldb.debugger, "/Users/ryaker/L16_Phoenix/phoenix_out/GUID_35mm_06671.json")
+quit

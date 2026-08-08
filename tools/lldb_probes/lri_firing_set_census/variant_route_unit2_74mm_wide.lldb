@@ -1,0 +1,23 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/lri_firing_set_census/variant_route_probe.py
+script variant_route_probe.reset("Unit-2 74mm wide L16_01931")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x229ec0
+breakpoint set --shlib libcp.dylib --address 0x229f6e
+breakpoint set --shlib libcp.dylib --address 0x2481a0
+breakpoint set --shlib libcp.dylib --address 0x248580
+breakpoint set --shlib libcp.dylib --address 0x248960
+breakpoint set --shlib libcp.dylib --address 0x24c320
+breakpoint set --shlib libcp.dylib --address 0x24d610
+breakpoint set --shlib libcp.dylib --address 0x19f790
+breakpoint set --shlib libcp.dylib --address 0x1a3c00
+breakpoint set --shlib libcp.dylib --address 0x3c90a5
+breakpoint set --shlib libcp.dylib --address 0xe6d90
+breakpoint set --shlib libcp.dylib --address 0x3b2313
+breakpoint set --shlib libcp.dylib --address 0x3cb593
+script variant_route_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-06-26/L16_01931.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/lri_firing_set_census/variant_route_unit2_74mm_wide.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script variant_route_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script variant_route_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/lri_firing_set_census/variant_route_unit2_74mm_wide.json")
+quit

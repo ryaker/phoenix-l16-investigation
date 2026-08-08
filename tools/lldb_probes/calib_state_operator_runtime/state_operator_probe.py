@@ -61,6 +61,119 @@ def _u64s(data):
     return list(struct.unpack("<" + "Q" * (len(data) // 8), data))
 
 
+def _qword(process, addr):
+    data = _read(process, addr, 8)
+    return struct.unpack("<Q", data)[0] if data is not None else None
+
+
+def _shared_pair(process, addr):
+    data = _read(process, addr, 16)
+    if data is None:
+        return {"addr": addr, "read_ok": False}
+    pointer, control = struct.unpack("<QQ", data)
+    return {
+        "addr": addr,
+        "read_ok": True,
+        "pointer": pointer,
+        "control": control,
+    }
+
+
+def _vector_header(process, addr):
+    data = _read(process, addr, 24)
+    if data is None:
+        return {"addr": addr, "read_ok": False}
+    begin, end, capacity = struct.unpack("<QQQ", data)
+    return {
+        "addr": addr,
+        "read_ok": True,
+        "begin": begin,
+        "end": end,
+        "capacity": capacity,
+        "bytes": end - begin if begin <= end else None,
+    }
+
+
+def _qword_prefix(process, addr, count=3):
+    data = _read(process, addr, count * 8)
+    return {
+        "addr": addr,
+        "read_ok": data is not None,
+        "qwords": _u64s(data) if data is not None else None,
+    }
+
+
+def _state5_handles(process, closure_addr):
+    inner = _qword(process, closure_addr + 8)
+    if inner is None:
+        return {"closure": closure_addr, "read_ok": False}
+    owner = _qword(process, inner + 0x10)
+    sibling = _qword(process, inner + 0x28)
+    if owner is None or sibling is None:
+        return {
+            "closure": closure_addr,
+            "inner": inner,
+            "owner": owner,
+            "sibling": sibling,
+            "read_ok": False,
+        }
+
+    upstream = {
+        "inner_30": _shared_pair(process, inner + 0x30),
+        "inner_40": _shared_pair(process, inner + 0x40),
+        "inner_50": _shared_pair(process, inner + 0x50),
+        "inner_a0": _shared_pair(process, inner + 0xA0),
+    }
+    owner_pairs = {
+        "owner_00": _shared_pair(process, owner + 0x00),
+        "owner_28": _shared_pair(process, owner + 0x28),
+        "owner_38": _shared_pair(process, owner + 0x38),
+        "owner_48": _shared_pair(process, owner + 0x48),
+    }
+    sibling_pairs = {
+        "sibling_00": _shared_pair(process, sibling + 0x00),
+        "sibling_10": _shared_pair(process, sibling + 0x10),
+        "sibling_20": _shared_pair(process, sibling + 0x20),
+        "sibling_30": _shared_pair(process, sibling + 0x30),
+    }
+
+    def same_pair(*pairs):
+        return all(pair.get("read_ok") for pair in pairs) and len(
+            {(pair.get("pointer"), pair.get("control")) for pair in pairs}
+        ) == 1
+
+    mappings = {
+        "inner_40_owner_00_sibling_00": same_pair(
+            upstream["inner_40"], owner_pairs["owner_00"], sibling_pairs["sibling_00"]
+        ),
+        "inner_50_owner_28_sibling_10": same_pair(
+            upstream["inner_50"], owner_pairs["owner_28"], sibling_pairs["sibling_10"]
+        ),
+        "inner_30_owner_38_sibling_20": same_pair(
+            upstream["inner_30"], owner_pairs["owner_38"], sibling_pairs["sibling_20"]
+        ),
+        "inner_a0_owner_48_sibling_30": same_pair(
+            upstream["inner_a0"], owner_pairs["owner_48"], sibling_pairs["sibling_30"]
+        ),
+    }
+
+    top_pointer = owner_pairs["owner_00"].get("pointer")
+    keyed_pointer = owner_pairs["owner_28"].get("pointer")
+    return {
+        "closure": closure_addr,
+        "inner": inner,
+        "owner": owner,
+        "sibling": sibling,
+        "read_ok": True,
+        "upstream_pairs": upstream,
+        "owner_pairs": owner_pairs,
+        "sibling_pairs": sibling_pairs,
+        "mapping_equalities": mappings,
+        "top_record_vector": _vector_header(process, top_pointer),
+        "keyed_record_tree_prefix": _qword_prefix(process, keyed_pointer),
+    }
+
+
 def _libcp_base(target):
     for module in target.module_iter():
         if str(module.GetFileSpec().GetFilename()) == "libcp.dylib":
@@ -178,6 +291,30 @@ def attach_existing(debugger):
     print("L16_STATE_OPERATOR_ATTACHED", json.dumps(state["breakpoint_ids"], sort_keys=True))
 
 
+def attach_selected_existing(debugger, vas):
+    state = _state()
+    target = debugger.GetSelectedTarget()
+    selected = [int(va) for va in vas]
+    if target.GetNumBreakpoints() < len(selected):
+        state["errors"].append("not enough existing selected breakpoints")
+        print("L16_STATE_OPERATOR_ATTACH_ERROR not enough selected breakpoints")
+        return
+    start = target.GetNumBreakpoints() - len(selected)
+    for index, va in enumerate(selected):
+        if va not in OPERATORS:
+            state["errors"].append(f"unknown selected operator 0x{va:x}")
+            continue
+        bp = target.GetBreakpointAtIndex(start + index)
+        if not bp or not bp.IsValid():
+            state["errors"].append(f"missing selected breakpoint for 0x{va:x}")
+            continue
+        bp.SetScriptCallbackFunction("state_operator_probe.hit")
+        bp_id = bp.GetID()
+        state["breakpoint_ids"][f"0x{va:x}"] = bp_id
+        state["breakpoint_vas"][str(bp_id)] = va
+    print("L16_STATE_OPERATOR_ATTACHED", json.dumps(state["breakpoint_ids"], sort_keys=True))
+
+
 def hit(frame, bp_loc, internal_dict):
     state = _state()
     bp_id = bp_loc.GetBreakpoint().GetID()
@@ -192,15 +329,16 @@ def hit(frame, bp_loc, internal_dict):
         thread = frame.GetThread()
         process = thread.GetProcess()
         regs = _registers(frame)
-        state["samples"][key].append(
-            {
-                "site_va": _module_va(process.GetTarget(), frame.GetPC()),
-                "operator": OPERATORS[va],
-                "registers": regs,
-                "object_prefix_rdi": _object_prefix(process, regs["rdi"]),
-                "stack": _stack(thread),
-            }
-        )
+        sample = {
+            "site_va": _module_va(process.GetTarget(), frame.GetPC()),
+            "operator": OPERATORS[va],
+            "registers": regs,
+            "object_prefix_rdi": _object_prefix(process, regs["rdi"]),
+            "stack": _stack(thread),
+        }
+        if va == 0x22AE60:
+            sample["state5_handles"] = _state5_handles(process, regs["rdi"])
+        state["samples"][key].append(sample)
 
     if state["counts"][key] >= state["hit_cap"]:
         debugger = frame.GetThread().GetProcess().GetTarget().GetDebugger()

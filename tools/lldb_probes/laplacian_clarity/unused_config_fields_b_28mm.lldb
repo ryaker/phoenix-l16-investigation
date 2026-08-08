@@ -1,0 +1,11 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/laplacian_clarity/unused_config_fields_watch_probe.py
+script unused_config_fields_watch_probe.reset("28mm higher/mid", [0x14, 0x18])
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/laplacian_clarity
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x2e4cf0
+script unused_config_fields_watch_probe.install(lldb.debugger, 1)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/laplacian_clarity/unused_fields_b_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script unused_config_fields_watch_probe.drive_until_exit(lldb.debugger)
+script unused_config_fields_watch_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/laplacian_clarity/unused_fields_b_28mm.json")
+quit

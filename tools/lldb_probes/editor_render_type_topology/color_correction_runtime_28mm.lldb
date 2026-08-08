@@ -1,0 +1,28 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/editor_render_type_topology/color_correction_runtime_probe.py
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology
+platform shell cp /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/lri_process_probe /private/tmp/lri_process_probe_color_correction
+target create /private/tmp/lri_process_probe_color_correction
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3bb867
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/private/tmp/color_correction_runtime_unused.hdr" --profile 3 --render-type 1 --render-only --sync-render --gui-level-sweep --no-auto-lris
+script color_correction_runtime_probe.arm(lldb.debugger, 1)
+continue
+script color_correction_runtime_probe.capture_entry(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology")
+continue
+script color_correction_runtime_probe.capture_first_conversion_call(lldb.debugger)
+continue
+script color_correction_runtime_probe.capture_converter(lldb.debugger)
+continue
+script color_correction_runtime_probe.capture_converter_branch(lldb.debugger)
+continue
+script color_correction_runtime_probe.capture_first_conversion_result(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology")
+continue
+script color_correction_runtime_probe.capture_correction_predicate(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology")
+continue
+script color_correction_runtime_probe.capture_correction_result(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology")
+continue
+script color_correction_runtime_probe.capture_auxiliary_gate(lldb.debugger)
+continue
+script color_correction_runtime_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/color_correction_runtime_28mm.json")
+quit

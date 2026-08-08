@@ -1,0 +1,14 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_index5_lookup_vector_public_origin/lookup_vector_public_probe.py
+script lookup_vector_public_probe.reset("35mm L16_03041 index-5 lookup-vector public-origin probe", 5, 32)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_index5_lookup_vector_public_origin
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26bbd0
+breakpoint set --shlib libcp.dylib --address 0xf043e
+breakpoint set --shlib libcp.dylib --address 0x267010
+script lookup_vector_public_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_index5_lookup_vector_public_origin/lookup_vector_public_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script lookup_vector_public_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script lookup_vector_public_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_index5_lookup_vector_public_origin/lookup_vector_public_35mm.json")
+quit

@@ -1,0 +1,12 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/raw_sensor_layout/runtime_probe.py
+script runtime_probe.reset("Unit-1 70mm", 10, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/raw_sensor_layout/runtime_unit1_70mm.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0xf4d90
+breakpoint modify -i 9 1
+process launch -- "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/raw_sensor_layout/input_unit1_70mm.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/raw_sensor_layout/unit1_70mm.jpg" --profile 3 --export-fmt 4 --no-auto-lris
+script runtime_probe.capture_stopped(lldb.debugger, 1)
+breakpoint disable 1
+process continue
+script runtime_probe.report()
+quit

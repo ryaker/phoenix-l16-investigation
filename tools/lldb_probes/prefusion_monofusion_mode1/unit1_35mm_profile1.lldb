@@ -1,0 +1,13 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_monofusion_mode1/mode1_tile_probe.py
+script mode1_tile_probe.reset("Unit-1 canonical-35mm profile-1 MonoFusion mode-1", "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode1/unit1_35mm_profile1")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode1/unit1_35mm_profile1
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x19f790
+breakpoint set --shlib libcp.dylib --address 0x1a223d
+breakpoint set --shlib libcp.dylib --address 0x1a228b
+script mode1_tile_probe.install_tile(lldb.debugger, 1, 2, 3)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode1/unit1_35mm_profile1.hdr" --profile 1 --export-fmt 3 --no-auto-lris
+script mode1_tile_probe.report("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode1/unit1_35mm_profile1.json")
+process kill
+quit

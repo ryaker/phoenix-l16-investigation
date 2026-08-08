@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/calibstage_public_names/calibstage_bank_watch_probe.py
+script calibstage_bank_watch_probe.reset("Unit-1 exact-focal 35mm CalibStage bank watch", 200000)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/calibstage_public_names
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script calibstage_bank_watch_probe.install(lldb.debugger)
+process launch -- "/private/tmp/l16_calibstage_unit1_35mm.lri" "/private/tmp/l16_calibstage_unit1_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script calibstage_bank_watch_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script calibstage_bank_watch_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/calibstage_public_names/unit1_35mm.json")
+quit

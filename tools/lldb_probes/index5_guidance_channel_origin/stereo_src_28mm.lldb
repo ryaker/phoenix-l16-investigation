@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_guidance_channel_origin/stereo_source_arg0_probe.py
+script stereo_source_arg0_probe.reset("/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/stereo_source_dump/u1_28mm", 8)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x27b7a0
+script stereo_source_arg0_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/raw_sensor_layout/input_unit1_28mm.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/stereo_source_dump/out.dng" --profile 3 --export-fmt 4 --no-auto-lris
+script stereo_source_arg0_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/stereo_source_dump/u1_28mm_report.json")
+quit

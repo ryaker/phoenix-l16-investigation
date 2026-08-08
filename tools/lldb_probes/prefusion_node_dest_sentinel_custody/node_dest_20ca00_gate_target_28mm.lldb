@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_node_dest_sentinel_custody/prefusion_node_dest_sentinel_custody_probe.py
+script prefusion_node_dest_sentinel_custody_probe.reset("28mm L16_02130 prefusion node destination 20ca00 gate targeted custody", 4096, 65536, 250000, 4, 4096, 1200000, False, 1, True, False, True, 1, 512, [118,144,149,151,152,181,203,212,237,262,264,283,285,287,312,339,344,364,365,5181,5388,5135,5384,5394,5155,5164,5202,5209,5223,5224,5247,5305,5333,5334,5337,5347,5372,5373,5380])
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_node_dest_20ca00_gate_target_custody
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script prefusion_node_dest_sentinel_custody_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_node_dest_20ca00_gate_target_custody/node_dest_20ca00_gate_target_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script prefusion_node_dest_sentinel_custody_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script prefusion_node_dest_sentinel_custody_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_node_dest_20ca00_gate_target_custody/node_dest_20ca00_gate_target_28mm.json")
+quit

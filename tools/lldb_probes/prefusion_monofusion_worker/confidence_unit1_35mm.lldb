@@ -1,0 +1,11 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_monofusion_worker/monofusion_worker_probe.py
+script monofusion_worker_probe.reset("Unit-1 35mm confidence callback L16_03041 2018-12-26")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_worker
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x1a4a09
+breakpoint set --shlib libcp.dylib --address 0x1a4a0b
+script monofusion_worker_probe.install_confidence_callbacks(lldb.debugger, 1, 2)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_worker/confidence_unit1_35mm.hdr" --profile 3 --export-fmt 3
+script monofusion_worker_probe.report_to_file("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_worker/confidence_unit1_35mm.json")
+quit

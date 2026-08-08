@@ -1,0 +1,13 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/g40_hypothesis_policy/hypothesis_policy_probe.py
+script hypothesis_policy_probe.reset("Unit-1 150mm L16_02285", "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g40_hypothesis_policy/hypothesis_150mm.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g40_hypothesis_policy
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26bebf
+breakpoint set --shlib libcp.dylib --address 0x26c15d
+breakpoint set --shlib libcp.dylib --address 0x26c277
+script hypothesis_policy_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/private/tmp/g40_hypothesis_150mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script hypothesis_policy_probe.finalize(lldb.debugger)
+quit

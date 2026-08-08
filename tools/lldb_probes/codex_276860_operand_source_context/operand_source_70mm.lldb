@@ -1,0 +1,12 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_276860_operand_source_context/operand_source_probe.py
+script operand_source_probe.reset("70mm L16_03434 0x276860 operand source context", 5, 4)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_276860_operand_source_context
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26bbd0
+script operand_source_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_276860_operand_source_context/operand_source_70mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script operand_source_probe.drive_until_capture_or_exit(lldb.debugger, 24000)
+script operand_source_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_276860_operand_source_context/operand_source_70mm.json")
+quit

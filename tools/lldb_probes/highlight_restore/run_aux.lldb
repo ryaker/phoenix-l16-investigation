@@ -1,0 +1,11 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/highlight_restore/aux.py
+script aux.reset("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/highlight_restore/aux_u1_35.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x30bdd0
+breakpoint command add 1 -s python -o "aux.hit(frame, bp_loc, internal_dict)"
+breakpoint modify -G true 1
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/highlight_restore/aux_u1_35.hdr" --profile 3 --export-fmt 3
+script aux.drive(lldb.debugger, 2000000)
+script aux.report()
+quit

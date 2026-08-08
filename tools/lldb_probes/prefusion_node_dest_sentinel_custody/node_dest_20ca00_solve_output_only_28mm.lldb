@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_node_dest_sentinel_custody/prefusion_20ca00_solve_output_probe.py
+script prefusion_20ca00_solve_output_probe.reset("Unit-1 28mm L16_02130 20ca00 solve output only")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_20ca00_solve_output_only
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script prefusion_20ca00_solve_output_probe.install_breakpoints(lldb.debugger, False)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_20ca00_solve_output_only/prefusion_20ca00_solve_output_only_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script prefusion_20ca00_solve_output_probe.report_to_file("/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_20ca00_solve_output_only/prefusion_20ca00_solve_output_only_28mm.json")
+quit

@@ -1,0 +1,9 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/fusion_neutral_apply/probe.py
+script probe.reset("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/fusion_neutral_apply/u1_28.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x1ab2d0
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/fusion_neutral_apply/out.hdr"
+script probe.cap(lldb.debugger); probe.report(lldb.debugger)
+process kill
+quit

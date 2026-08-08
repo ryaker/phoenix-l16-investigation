@@ -1,5 +1,18 @@
 # LLDB Evidence: `0xf2770` Captured-Item Constructor Inputs Across Four Zooms
 
+**Public-name follow-up (2026-06-30):** embedded-schema, two-body raw-wire,
+pinned-copy, and aggregate runtime proof now names item `+0x30` exactly as
+`CapturedImage.is_enabled`, copied from public
+`LightHeader.modules[camera].is_enabled`. See
+`bundle_static_runtime_capturedimage_is_enabled_public_origin_two_body.md`.
+Anonymous "active byte" wording below records this probe's original boundary.
+
+The later
+`bundle_static_runtime_capturedimage_capture_fields_public_origins.md`
+also names direct public copies at `CapturedImage+0x38` (`sensor_exposure`),
+`+0x40` (`sensor_analog_gain`), optional `+0x44`
+(`sensor_digital_gain`), and optional `+0x104` (`sensor_temparature`).
+
 **Date:** 2026-05-26
 **Status:** admitted evidence candidate for `CLM-PREFUSION-001`,
 `CLM-PREFUSION-002`, and `CLM-C6-001`
@@ -129,13 +142,27 @@ constructor input+0x40 == LightHeader.field_12[camera].field_8
 constructor input+0x48 * 2 == LightHeader.field_12[camera].field_10
 ```
 
-This is a raw public-field origin bridge only. It does not assign semantic
-public names to those fields.
+Companion embedded-schema proof now names those fields as
+`CameraModule.id`, `mirror_position`, `lens_position`, `sensor_exposure`, and
+decoded `sensor_temparature`. The runtime object remains a derived internal
+object; it is not thereby identified as a direct protobuf record. See
+[bundle_static_runtime_index5_public_proto_schema_names.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/bundle_static_runtime_index5_public_proto_schema_names.md).
 
 For every captured item in the four runs, the record at input `+0x28`, read at
 `+0x18` as two int32 fields, already contains the same pair later observed at
 item `+0x58/+0x5c`. This confirms runtime custody for those two-int fields
 under the tested constructor callsite.
+
+The later two-body public-origin proof closes that pair's name:
+
+```text
+constructor input+0x28/+0x18
+  -> item+0x58/+0x5c
+  = CameraModule.sensor_bayer_red_override.{x,y}
+```
+
+See
+[bundle_static_runtime_prefusion_bayer_override_public_origin_two_body.md](/Volumes/Dev/L16_Lumen_ReverseEngineering/docs/evidence/bundle_static_runtime_prefusion_bayer_override_public_origin_two_body.md).
 
 The wide sign-bit item is key `1`; the tele sign-bit item is key `15` / C6.
 Both are constructed with output item type field `+0x100 = 3`.
@@ -193,12 +220,12 @@ shape:
 
 ## Non-Conclusions
 
-- This constructor-only proof does not prove public semantic names for input
-  `+0x30`, input `+0x60`, input `+0x28`, item `+0x30`, item `+0x58/+0x5c`,
-  item `+0x60`, or item `+0x100`.
-- The follow-up public-field bridge names raw LRI field numbers for the subset
-  listed above only; it does not prove LRI protobuf field numbers for the pair
-  fields, active byte, item `+0x100`, or other runtime fields.
+- This constructor-only proof did not originally prove public semantic names;
+  later admitted evidence names input `+0x28` and item `+0x58/+0x5c` as
+  `CameraModule.sensor_bayer_red_override`, while item `+0x100` remains
+  internal.
+- The follow-up public-field bridges do not assign public protobuf identities
+  to the active byte, item `+0x100`, or other unlisted runtime fields.
 - This does not prove C6 is globally unused.
 - This does not prove an alternate C6 destination does or does not exist.
 - This does not identify semantic `src1` / `src2` contents.

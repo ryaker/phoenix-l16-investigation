@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/ccm_illuminant_selection/ccm_illuminant_selection_probe.py
+script ccm_illuminant_selection_probe.reset("Unit-1 70mm CCM illuminant selection", 1, True)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/ccm_illuminant_selection
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script ccm_illuminant_selection_probe.install(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/ccm_illuminant_selection/70mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script ccm_illuminant_selection_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/ccm_illuminant_selection/70mm.json")
+quit

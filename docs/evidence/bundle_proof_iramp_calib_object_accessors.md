@@ -19,6 +19,12 @@ It does not map the numeric `CalibStage` values to the public words `factory`
 and `current`; the installed bundle only proves the accepted numeric values and
 the error string.
 
+**Public-name follow-up (2026-06-30):**
+`bundle_static_state_e0_rawimagefactory_capturestack_identity.md` pins the
+formerly anonymous lookup context as `lt::RawImageFactory`, backed by
+`lt::CaptureStack`. Numeric factory `+0x10` / object `+0x64` and CalibStage
+mapping remain unnamed.
+
 ## Bundle + Commands
 
 - Binary:

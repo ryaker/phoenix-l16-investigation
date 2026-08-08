@@ -1,0 +1,25 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_guidance_channel_origin/collapse2_worker_probe.py
+script collapse2_worker_probe.reset("Unit-1 28mm Guidance collapse2 worker")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x27b7a0
+breakpoint set --shlib libcp.dylib --address 0x341770
+breakpoint set --shlib libcp.dylib --address 0x341885
+breakpoint set --shlib libcp.dylib --address 0x2e8cc0
+breakpoint set --shlib libcp.dylib --address 0x9e360
+breakpoint set --shlib libcp.dylib --address 0x9f360
+breakpoint set --shlib libcp.dylib --address 0xa0380
+breakpoint set --shlib libcp.dylib --address 0xa13c0
+breakpoint set --shlib libcp.dylib --address 0xa23c0
+breakpoint set --shlib libcp.dylib --address 0xa2d90
+breakpoint set --shlib libcp.dylib --address 0xa3740
+breakpoint set --shlib libcp.dylib --address 0xa4100
+breakpoint set --shlib libcp.dylib --address 0xa4ac0
+breakpoint set --shlib libcp.dylib --address 0xa50d0
+breakpoint set --shlib libcp.dylib --address 0xa56e0
+breakpoint set --shlib libcp.dylib --address 0xa5cf0
+script collapse2_worker_probe.attach(lldb.debugger)
+process launch -- "/private/tmp/l16_guidance_collapse2_unit1_28mm.lri" "/private/tmp/l16_guidance_collapse2_unit1_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script collapse2_worker_probe.write_report(lldb.debugger, "/private/tmp/l16_guidance_collapse2_unit1_28mm.json")
+quit

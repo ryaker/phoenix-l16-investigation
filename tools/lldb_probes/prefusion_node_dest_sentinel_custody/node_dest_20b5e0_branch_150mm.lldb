@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_node_dest_sentinel_custody/prefusion_node_dest_sentinel_custody_probe.py
+script prefusion_node_dest_sentinel_custody_probe.reset("150mm L16_02285 prefusion node destination sentinel custody 20b5e0 branch-step", 128, 65536, 250000, 1, 128, 800000, True, 1)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_node_dest_20b5e0_branch_custody
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script prefusion_node_dest_sentinel_custody_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_node_dest_20b5e0_branch_custody/node_dest_20b5e0_branch_150mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script prefusion_node_dest_sentinel_custody_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script prefusion_node_dest_sentinel_custody_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_node_dest_20b5e0_branch_custody/node_dest_20b5e0_branch_150mm.json")
+quit

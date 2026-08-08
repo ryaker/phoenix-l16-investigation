@@ -1,0 +1,12 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/state_448_later_box_formula/distortion_public_origin_probe.py
+script distortion_public_origin_probe.reset("Unit-1 28mm state+0x448 distortion public origin", 128, 128)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/state_448_distortion_public_origin
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x1455d5
+script distortion_public_origin_probe.attach_existing(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/state_448_distortion_public_origin/unit1_28mm.jpg" --profile 3 --export-fmt 4 --no-auto-lris
+script distortion_public_origin_probe.drive_until_exit_or_step_cap(lldb.debugger, 80000)
+script distortion_public_origin_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/state_448_distortion_public_origin/unit1_28mm.json")
+quit

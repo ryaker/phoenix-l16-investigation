@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/unsharp_formula/unsharp_formula_probe.py
+script unsharp_formula_probe.reset("@LABEL@", 512)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script unsharp_formula_probe.install(lldb.debugger)
+process launch -- "@INPUT@" "@OUTPUT@" --profile 3 --export-fmt 3 --no-auto-lris
+script unsharp_formula_probe.drive(lldb.debugger, 20000)
+script unsharp_formula_probe.write_report(lldb.debugger, "@REPORT@")
+quit

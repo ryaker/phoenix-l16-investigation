@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_node_dest_sentinel_custody/prefusion_216f60_parent_decision_probe.py
+script prefusion_216f60_parent_decision_probe.reset("Unit-1 28mm 216f60 parent decision", 64, 200000)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_216f60_parent_decision
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script prefusion_216f60_parent_decision_probe.install(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_216f60_parent_decision/parent_decision_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script prefusion_216f60_parent_decision_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script prefusion_216f60_parent_decision_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_216f60_parent_decision/parent_decision_28mm.json")
+quit

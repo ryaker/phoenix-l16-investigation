@@ -1,0 +1,12 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/g56_iramp_forward_ohta/forward_ohta_probe.py
+script forward_ohta_probe.reset("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g56_iramp_forward_ohta/forward_70mm.json", "Unit-1 70mm")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g56_iramp_forward_ohta
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --name main
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/private/tmp/g56_forward_70mm.hdr" --profile 3 --export-fmt 3
+script forward_ohta_probe.install(lldb.debugger)
+breakpoint delete 1
+process continue
+script forward_ohta_probe.report("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g56_iramp_forward_ohta/forward_70mm.json", "Unit-1 70mm")
+quit

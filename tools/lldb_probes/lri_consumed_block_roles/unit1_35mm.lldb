@@ -1,0 +1,12 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/lri_consumed_block_roles/lri_consumed_block_roles_probe.py
+script lri_consumed_block_roles_probe.reset("Unit-1 35mm")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/lri_consumed_block_roles
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --name main
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/lri_consumed_block_roles/unit1_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script lri_consumed_block_roles_probe.install(lldb.debugger)
+breakpoint delete 1
+process continue
+script lri_consumed_block_roles_probe.write_report("/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/lri_consumed_block_roles/unit1_35mm.json")
+quit

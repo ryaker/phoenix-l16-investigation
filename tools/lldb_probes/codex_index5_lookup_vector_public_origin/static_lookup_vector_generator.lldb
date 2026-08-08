@@ -1,0 +1,4 @@
+target create /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+disassemble --start-address 0xf02d0 --end-address 0xf0470
+disassemble --start-address 0x26c480 --end-address 0x26c560
+disassemble --start-address 0x28f5a0 --end-address 0x28fa60

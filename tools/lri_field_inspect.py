@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tool #4 — LRI Proto Field Decoder
 Annotate any LRI block's proto payload with field names + types.
-Field name map sourced from libcp_strings_scratch.txt.
+Core field names come from serialized FileDescriptorProto data in libcp.dylib.
 
 Usage:
   python3 tools/lri_field_inspect.py \
@@ -25,45 +25,186 @@ REPO_ROOT = Path(__file__).parent.parent
 STRINGS_FILE = REPO_ROOT / "libcp_strings_scratch.txt"
 FIELD_MAP_CACHE = Path(__file__).parent / "proto_field_map.json"
 
-# ── LightHeader field names per HwInfo-agent renumbering finding ─────────────
-# Source: multiple sessions of string + disasm evidence (not solely libcp_strings_scratch.txt)
+# Core schema map extracted from libcp.dylib's serialized descriptors. Keep this
+# aligned with verify_embedded_calibration_proto_schema.py.
 BUILTIN_FIELD_MAP = {
-    ("LightHeader", 1):  ("capture_id", "bytes", None),
-    ("LightHeader", 2):  ("timestamp_ns", "uint64", None),
-    ("LightHeader", 3):  ("scene_brightness", "float", None),
-    ("LightHeader", 4):  ("image_focal_length", "uint32", None),
-    ("LightHeader", 5):  ("image_reference_camera", "uint32", None),
-    ("LightHeader", 6):  ("capture_mode", "uint32", None),
-    ("LightHeader", 7):  ("pipeline_version", "string", None),
-    ("LightHeader", 8):  ("software_version", "string", None),
-    ("LightHeader", 9):  ("awb_mode", "uint32", None),
-    ("LightHeader", 10): ("flash_mode", "uint32", None),
-    ("LightHeader", 11): ("zoom_factor", "float", None),
+    ("LightHeader", 1):  ("image_unique_id_low", "uint64", None),
+    ("LightHeader", 2):  ("image_unique_id_high", "uint64", None),
+    ("LightHeader", 3):  ("image_time_stamp", "TimeStamp", "TimeStamp"),
+    ("LightHeader", 4):  ("image_focal_length", "int32", None),
+    ("LightHeader", 5):  ("image_reference_camera", "CameraID", None),
+    ("LightHeader", 6):  ("device_unique_id_low", "uint64", None),
+    ("LightHeader", 7):  ("device_unique_id_high", "uint64", None),
+    ("LightHeader", 8):  ("device_model_name", "string", None),
+    ("LightHeader", 9):  ("device_fw_version", "string", None),
+    ("LightHeader", 10): ("device_asic_fw_version", "string", None),
+    ("LightHeader", 11): ("device_temperature", "DeviceTemp", "DeviceTemp"),
     ("LightHeader", 12): ("modules", "repeated CameraModule", "CameraModule"),
-    ("LightHeader", 13): ("depth_config", "DepthConfig", "DepthConfig"),
-    ("LightHeader", 14): ("ev_bias", "float", None),
-    ("LightHeader", 15): ("orientation", "uint32", None),
+    ("LightHeader", 13): ("module_calibration", "repeated FactoryModuleCalibration", "FactoryModuleCalibration"),
+    ("LightHeader", 14): ("device_calibration", "FactoryDeviceCalibration", "FactoryDeviceCalibration"),
+    ("LightHeader", 15): ("gold_cc", "repeated ColorCalibrationGold", "ColorCalibrationGold"),
     ("LightHeader", 16): ("sensor_data", "repeated SensorData", "SensorData"),
-    ("LightHeader", 17): ("tof_range", "ToFRange", "ToFRange"),
-    ("LightHeader", 18): ("hw_info", "HwInfo", "HwInfo"),   # CORRECTED: was IMUData in old 01_LRI_FORMAT.md
-    ("LightHeader", 19): ("gps_metadata", "GPSMetadata", "GPSMetadata"),
-    ("LightHeader", 20): ("auto_white_balance", "AWBData", "AWBData"),
-    ("LightHeader", 21): ("scene_detection", "SceneDetection", "SceneDetection"),
-    ("LightHeader", 22): ("imu_data", "IMUData", "IMUData"),  # CORRECTED: was missing, Field 22 not 23
-    ("LightHeader", 23): ("af_debug_info", "AFDebugInfo", "AFDebugInfo"),  # CORRECTED: Field 23 not IMUData
-    ("LightHeader", 24): ("gps_data", "GPSData", "GPSData"),
-    ("LightHeader", 25): ("hdr_params", "HDRParams", "HDRParams"),
+    ("LightHeader", 17): ("tof_range", "float", None),
+    ("LightHeader", 18): ("hw_info", "HwInfo", "HwInfo"),
+    ("LightHeader", 19): ("view_preferences", "ViewPreferences", "ViewPreferences"),
+    ("LightHeader", 20): ("proximity_sensors", "ProximitySensors", "ProximitySensors"),
+    ("LightHeader", 22): ("flash_data", "FlashData", "FlashData"),
+    ("LightHeader", 23): ("imu_data", "repeated IMUData", "IMUData"),
+    ("LightHeader", 24): ("af_info", "AFDebugInfo", "AFDebugInfo"),
+    ("LightHeader", 25): ("gps_data", "GPSData", "GPSData"),
+    ("LightHeader", 26): ("compatibility", "Compatibility", "Compatibility"),
+    ("LightHeader", 27): ("face_data", "repeated FaceData", "FaceData"),
 
-    # CameraModule fields per lri_header_camera_config.md (field_12 sub-message)
-    ("CameraModule", 1):  ("cam_inner_meta", "bytes", None),       # sub-msg, role unknown
-    ("CameraModule", 2):  ("camera_id", "uint32", None),           # 0-15 (A1..C6)
-    ("CameraModule", 3):  ("const_1", "uint32", None),             # constant 1
-    ("CameraModule", 4):  ("mirror_encoder_adc", "uint32", None),  # 0 fixed, ~230-900 movable
-    ("CameraModule", 5):  ("exposure_ticks", "uint32", None),      # ~700-11000
-    ("CameraModule", 8):  ("timestamp_counter", "uint64", None),   # monotonic ~1e5-1e7
-    ("CameraModule", 10): ("focus_lens_step", "uint32", None),     # ~40-80
-    ("CameraModule", 15): ("reserved_0", "uint32", None),
-    ("CameraModule", 16): ("reserved_1", "uint32", None),
+    ("FactoryDeviceCalibration", 1): ("flash", "FlashCalibration", "FlashCalibration"),
+    ("FactoryDeviceCalibration", 2): ("tof", "ToFCalibration", "ToFCalibration"),
+    ("FactoryDeviceCalibration", 3): ("time_stamp", "TimeStamp", "TimeStamp"),
+
+    ("SensorData", 1): ("type", "SensorType", None),
+    ("SensorData", 2): ("data", "SensorCharacterization", "SensorCharacterization"),
+    ("SensorData", 3): ("time_stamp", "TimeStamp", "TimeStamp"),
+    ("SensorCharacterization", 1): ("black_level", "float", None),
+    ("SensorCharacterization", 2): ("white_level", "float", None),
+    ("SensorCharacterization", 3): ("cliff_slope", "float", None),
+    ("SensorCharacterization", 4): ("vst_model", "repeated SensorCharacterization.VstNoiseModel", "SensorCharacterization.VstNoiseModel"),
+    ("SensorCharacterization.VstNoiseModel", 1): ("gain", "uint32", None),
+    ("SensorCharacterization.VstNoiseModel", 2): ("threshold", "float", None),
+    ("SensorCharacterization.VstNoiseModel", 3): ("scale", "float", None),
+    ("SensorCharacterization.VstNoiseModel", 4): ("red", "SensorCharacterization.VstNoiseModel.VstModel", "SensorCharacterization.VstNoiseModel.VstModel"),
+    ("SensorCharacterization.VstNoiseModel", 5): ("green", "SensorCharacterization.VstNoiseModel.VstModel", "SensorCharacterization.VstNoiseModel.VstModel"),
+    ("SensorCharacterization.VstNoiseModel", 6): ("blue", "SensorCharacterization.VstNoiseModel.VstModel", "SensorCharacterization.VstNoiseModel.VstModel"),
+    ("SensorCharacterization.VstNoiseModel", 7): ("panchromatic", "SensorCharacterization.VstNoiseModel.VstModel", "SensorCharacterization.VstNoiseModel.VstModel"),
+    ("SensorCharacterization.VstNoiseModel.VstModel", 1): ("a", "float", None),
+    ("SensorCharacterization.VstNoiseModel.VstModel", 2): ("b", "float", None),
+
+    ("FlashCalibration", 1): ("ledcool_lux", "float", None),
+    ("FlashCalibration", 2): ("ledcool_max_lumens", "float", None),
+    ("FlashCalibration", 3): ("ledcool_cct", "float", None),
+    ("FlashCalibration", 4): ("ledwarm_lux", "float", None),
+    ("FlashCalibration", 5): ("ledwarm_max_lumens", "float", None),
+    ("FlashCalibration", 6): ("ledwarm_cct", "float", None),
+    ("ToFCalibration", 1): ("offset_distance", "float", None),
+    ("ToFCalibration", 2): ("offset_measurement", "float", None),
+    ("ToFCalibration", 3): ("xtalk_distance", "float", None),
+    ("ToFCalibration", 4): ("xtalk_measurement", "float", None),
+
+    ("ViewPreferences", 1): ("f_number", "float", None),
+    ("ViewPreferences", 2): ("ev_offset", "float", None),
+    ("ViewPreferences", 3): ("disable_cropping", "bool", None),
+    ("ViewPreferences", 4): ("hdr_mode", "ViewPreferences.HDRMode", None),
+    ("ViewPreferences", 5): ("view_preset", "ViewPreferences.ViewPresets", None),
+    ("ViewPreferences", 6): ("scene_mode", "ViewPreferences.SceneMode", None),
+    ("ViewPreferences", 7): ("awb_mode", "ViewPreferences.AWBMode", None),
+    ("ViewPreferences", 9): ("orientation", "ViewPreferences.Orientation", None),
+    ("ViewPreferences", 10): ("image_gain", "float", None),
+    ("ViewPreferences", 11): ("image_integration_time_ns", "uint64", None),
+    ("ViewPreferences", 12): ("user_rating", "uint32", None),
+    ("ViewPreferences", 13): ("aspect_ratio", "ViewPreferences.AspectRatio", None),
+    ("ViewPreferences", 14): ("crop", "ViewPreferences.Crop", "ViewPreferences.Crop"),
+    ("ViewPreferences", 15): ("awb_gains", "ViewPreferences.ChannelGain", "ViewPreferences.ChannelGain"),
+    ("ViewPreferences", 16): ("is_on_tripod", "bool", None),
+    ("ViewPreferences", 17): ("qc_lux_index", "float", None),
+    ("ViewPreferences", 18): ("display_gain", "float", None),
+    ("ViewPreferences", 19): ("display_integration_time_ns", "uint64", None),
+    ("ViewPreferences.Crop", 1): ("start", "Point2F", "Point2F"),
+    ("ViewPreferences.Crop", 2): ("size", "Point2F", "Point2F"),
+    ("ViewPreferences.ChannelGain", 1): ("r", "float", None),
+    ("ViewPreferences.ChannelGain", 2): ("g_r", "float", None),
+    ("ViewPreferences.ChannelGain", 3): ("g_b", "float", None),
+    ("ViewPreferences.ChannelGain", 4): ("b", "float", None),
+
+    ("GPSData", 1): ("latitude", "double", None),
+    ("GPSData", 2): ("longitude", "double", None),
+    ("GPSData", 3): ("timestamp", "uint64", None),
+    ("GPSData", 4): ("dop", "double", None),
+    ("GPSData", 5): ("track", "GPSData.Track", "GPSData.Track"),
+    ("GPSData", 6): ("heading", "GPSData.Heading", "GPSData.Heading"),
+    ("GPSData", 7): ("altitude", "GPSData.Altitude", "GPSData.Altitude"),
+    ("GPSData", 8): ("speed", "double", None),
+    ("GPSData", 9): ("processing_method", "GPSData.ProcessingMethod", None),
+    ("GPSData.Track", 1): ("value", "double", None),
+    ("GPSData.Track", 2): ("ref", "GPSData.ReferenceNorth", None),
+    ("GPSData.Heading", 1): ("value", "double", None),
+    ("GPSData.Heading", 2): ("ref", "GPSData.ReferenceNorth", None),
+    ("GPSData.Altitude", 1): ("value", "double", None),
+    ("GPSData.Altitude", 2): ("ref", "GPSData.ReferenceAltitude", None),
+
+    ("Point2F", 1): ("x", "float", None),
+    ("Point2F", 2): ("y", "float", None),
+    ("Point2I", 1): ("x", "sint32", None),
+    ("Point2I", 2): ("y", "sint32", None),
+    ("Point3F", 1): ("x", "float", None),
+    ("Point3F", 2): ("y", "float", None),
+    ("Point3F", 3): ("z", "float", None),
+
+    ("CameraModule", 1):  ("af_info", "CameraModule.AFInfo", "CameraModule.AFInfo"),
+    ("CameraModule", 2):  ("id", "CameraID", None),
+    ("CameraModule", 3):  ("is_enabled", "bool", None),
+    ("CameraModule", 4):  ("mirror_position", "int32", None),
+    ("CameraModule", 5):  ("lens_position", "int32", None),
+    ("CameraModule", 7):  ("sensor_analog_gain", "float", None),
+    ("CameraModule", 8):  ("sensor_exposure", "uint64", None),
+    ("CameraModule", 9):  ("sensor_data_surface", "CameraModule.Surface", "CameraModule.Surface"),
+    ("CameraModule", 10): ("sensor_temparature", "sint32", None),
+    ("CameraModule", 11): ("sensor_is_horizontal_flip", "bool", None),
+    ("CameraModule", 12): ("sensor_is_vertical_flip", "bool", None),
+    ("CameraModule", 13): ("sensor_bayer_red_override", "Point2I", "Point2I"),
+    ("CameraModule", 14): ("sensor_digital_gain", "float", None),
+    ("CameraModule", 15): ("frame_index", "uint32", None),
+    ("CameraModule", 16): ("sensor_dpc_on", "bool", None),
+    ("CameraModule", 17): ("sensor_exp_start_offset", "sint32", None),
+    ("CameraModule", 18): ("sensor_scan_speed", "float", None),
+
+    ("CameraModule.Surface", 1): ("start", "Point2I", "Point2I"),
+    ("CameraModule.Surface", 2): ("size", "Point2I", "Point2I"),
+    ("CameraModule.Surface", 3): ("format", "CameraModule.Surface.FormatType", None),
+    ("CameraModule.Surface", 4): ("row_stride", "uint32", None),
+    ("CameraModule.Surface", 5): ("data_offset", "uint64", None),
+    ("CameraModule.Surface", 6): ("data_scale", "Point2F", "Point2F"),
+
+    ("FactoryModuleCalibration", 1): ("camera_id", "CameraID", None),
+    ("FactoryModuleCalibration", 2): ("color", "repeated ColorCalibration", "ColorCalibration"),
+    ("FactoryModuleCalibration", 3): ("geometry", "GeometricCalibration", "GeometricCalibration"),
+    ("FactoryModuleCalibration", 4): ("vignetting", "VignettingCharacterization", "VignettingCharacterization"),
+    ("FactoryModuleCalibration", 5): ("hot_pixel_map", "HotPixelMap", "HotPixelMap"),
+    ("FactoryModuleCalibration", 6): ("dead_pixel_map", "DeadPixelMap", "DeadPixelMap"),
+    ("FactoryModuleCalibration", 7): ("time_stamp", "TimeStamp", "TimeStamp"),
+
+    ("VignettingCharacterization", 1): ("crosstalk", "VignettingCharacterization.CrosstalkModel", "VignettingCharacterization.CrosstalkModel"),
+    ("VignettingCharacterization", 2): ("vignetting", "repeated VignettingCharacterization.MirrorVignettingModel", "VignettingCharacterization.MirrorVignettingModel"),
+    ("VignettingCharacterization", 3): ("relative_brightness", "float", None),
+    ("VignettingCharacterization", 4): ("lens_hall_code", "int32", None),
+    ("VignettingCharacterization.CrosstalkModel", 1): ("width", "uint32", None),
+    ("VignettingCharacterization.CrosstalkModel", 2): ("height", "uint32", None),
+    ("VignettingCharacterization.CrosstalkModel", 3): ("data", "repeated Matrix4x4F", "Matrix4x4F"),
+    ("VignettingCharacterization.CrosstalkModel", 4): ("data_packed", "repeated float", None),
+    ("VignettingCharacterization.VignettingModel", 1): ("width", "uint32", None),
+    ("VignettingCharacterization.VignettingModel", 2): ("height", "uint32", None),
+    ("VignettingCharacterization.VignettingModel", 3): ("data", "repeated float", None),
+    ("VignettingCharacterization.MirrorVignettingModel", 1): ("hall_code", "int32", None),
+    ("VignettingCharacterization.MirrorVignettingModel", 2): ("vignetting", "VignettingCharacterization.VignettingModel", "VignettingCharacterization.VignettingModel"),
+
+    ("GeometricCalibration", 1): ("mirror_type", "GeometricCalibration.MirrorType", None),
+    ("GeometricCalibration", 2): ("per_focus_calibration", "repeated GeometricCalibration.CalibrationFocusBundle", "GeometricCalibration.CalibrationFocusBundle"),
+    ("GeometricCalibration", 3): ("distortion", "Distortion", "Distortion"),
+    ("GeometricCalibration", 4): ("lens_hall_code_range", "Range2F", "Range2F"),
+    ("GeometricCalibration", 5): ("focus_distance_range", "Range2F", "Range2F"),
+    ("GeometricCalibration", 6): ("angle_optical_center_mapping", "GeometricCalibration.AngleOpticalCenterMapping", "GeometricCalibration.AngleOpticalCenterMapping"),
+
+    ("GeometricCalibration.CalibrationFocusBundle", 1): ("focus_distance", "float", None),
+    ("GeometricCalibration.CalibrationFocusBundle", 2): ("intrinsics", "GeometricCalibration.Intrinsics", "GeometricCalibration.Intrinsics"),
+    ("GeometricCalibration.CalibrationFocusBundle", 3): ("extrinsics", "GeometricCalibration.Extrinsics", "GeometricCalibration.Extrinsics"),
+    ("GeometricCalibration.CalibrationFocusBundle", 4): ("sensor_temp", "sint32", None),
+    ("GeometricCalibration.CalibrationFocusBundle", 5): ("device_temp", "DeviceTemp", "DeviceTemp"),
+    ("GeometricCalibration.CalibrationFocusBundle", 6): ("focus_hall_code", "float", None),
+
+    ("GeometricCalibration.Intrinsics", 1): ("k_mat", "Matrix3x3F", "Matrix3x3F"),
+    ("GeometricCalibration.Intrinsics", 2): ("rms_error", "float", None),
+    ("GeometricCalibration.Extrinsics", 1): ("canonical", "GeometricCalibration.Extrinsics.CanonicalFormat", "GeometricCalibration.Extrinsics.CanonicalFormat"),
+    ("GeometricCalibration.Extrinsics", 2): ("moveable_mirror", "GeometricCalibration.Extrinsics.MovableMirrorFormat", "GeometricCalibration.Extrinsics.MovableMirrorFormat"),
+    ("GeometricCalibration.Extrinsics.CanonicalFormat", 1): ("rotation", "Matrix3x3F", "Matrix3x3F"),
+    ("GeometricCalibration.Extrinsics.CanonicalFormat", 2): ("translation", "Point3F", "Point3F"),
+    ("GeometricCalibration.Extrinsics.CanonicalFormat", 3): ("stereo_error", "float", None),
+    ("GeometricCalibration.Extrinsics.CanonicalFormat", 4): ("reprojection_error", "float", None),
 
     ("HwInfo", 1): ("camera", "repeated CameraModuleHwInfo", "CameraModuleHwInfo"),
     ("HwInfo", 2): ("body_serial", "string", None),
@@ -272,7 +413,9 @@ def format_value(wire_type: int, raw_value, field_name: str, type_hint: str) -> 
                 pass
             return f"<{len(raw_value)} bytes>"
     elif wire_type == 0:
-        # Check if it might be a float disguised as varint (shouldn't be, but check type_hint)
+        if type_hint == "sint32":
+            decoded = (raw_value >> 1) ^ -(raw_value & 1)
+            return f"{decoded} (zigzag raw={raw_value})"
         return str(raw_value)
     elif wire_type == 5:
         # 32-bit: could be float or uint32

@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/g42_cost_operand_pairing/g42_cost_probe.py
+script g42_cost_probe.reset("70mm L16_03434 G-42 STRICT index-5 2080x1560 (B4 anchor)", 12, 1000000000)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g42_cost_operand_pairing
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x276860
+breakpoint set --shlib libcp.dylib --address 0x2732f0
+breakpoint set --shlib libcp.dylib --address 0x2735bf
+breakpoint set --shlib libcp.dylib --address 0x2736a9
+script g42_cost_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g42_cost_operand_pairing/g42_cost_70mm_index5.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script g42_cost_probe.drive(lldb.debugger, 5000000)
+script g42_cost_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g42_cost_operand_pairing/g42_cost_70mm_index5.json")
+quit

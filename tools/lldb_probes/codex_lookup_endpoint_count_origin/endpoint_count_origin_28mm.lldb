@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_lookup_endpoint_count_origin/endpoint_count_origin_probe.py
+script endpoint_count_origin_probe.reset("28mm L16_02130 lookup endpoint/count origin", 5, 128)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_lookup_endpoint_count_origin
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26ba90
+breakpoint set --shlib libcp.dylib --address 0x26bb3c
+breakpoint set --shlib libcp.dylib --address 0x26bbd0
+breakpoint set --shlib libcp.dylib --address 0xf043e
+script endpoint_count_origin_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_lookup_endpoint_count_origin/endpoint_count_origin_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script endpoint_count_origin_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script endpoint_count_origin_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/codex_lookup_endpoint_count_origin/endpoint_count_origin_28mm.json")
+quit

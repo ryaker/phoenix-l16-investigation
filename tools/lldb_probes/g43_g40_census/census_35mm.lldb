@@ -1,0 +1,12 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/g43_g40_census/census_probe.py
+script census_probe.reset("35mm L16_03041 SGM/level census", 4, 800, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g43_g40_census/census_35mm_progress.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g43_g40_census
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x276860
+script census_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g43_g40_census/census_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script census_probe.drive(lldb.debugger, 20000000)
+script census_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g43_g40_census/census_35mm.json")
+quit

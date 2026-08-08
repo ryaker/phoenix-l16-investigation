@@ -1,0 +1,14 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/iramp_score_kernel/capture_probe.py
+script capture_probe.reset("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_score_kernel/unit1_35mm")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_score_kernel/unit1_35mm
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x369e3f
+breakpoint command add 1 -s python -o "capture_probe.capture(frame, bp_loc, internal_dict)"
+breakpoint modify -a true 1
+breakpoint set --shlib libcp.dylib --address 0x369e44
+breakpoint command add 2 -s python -o "capture_probe.capture_return(frame, bp_loc, internal_dict)"
+breakpoint modify -a true 2
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_score_kernel/unit1_35mm/capture.hdr" --profile 3 --export-fmt 3
+script capture_probe.report()
+quit

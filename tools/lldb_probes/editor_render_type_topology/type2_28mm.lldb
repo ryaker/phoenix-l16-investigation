@@ -1,0 +1,21 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/editor_render_type_topology/topology_probe.py
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --name _ZN5CIAPI14StaticShutdownEv
+breakpoint set --shlib libcp.dylib --address 0x3b8ba0
+breakpoint set --shlib libcp.dylib --address 0x3eb3c0
+breakpoint set --shlib libcp.dylib --address 0x3ec770
+breakpoint set --shlib libcp.dylib --address 0x365960
+breakpoint set --shlib libcp.dylib --address 0x3ecc10
+breakpoint set --shlib libcp.dylib --address 0x3ecd80
+breakpoint set --shlib libcp.dylib --address 0x3eced0
+breakpoint set --shlib libcp.dylib --address 0x1b37a0
+breakpoint set --shlib libcp.dylib --address 0x299c70
+breakpoint set --shlib libcp.dylib --address 0x267010
+breakpoint set --shlib libcp.dylib --address 0x23faf0
+breakpoint modify --auto-continue true 2 3 4 5 6 7 8 9 10 11 12
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/private/tmp/editor_type2_unused.hdr" --profile 3 --render-type 2 --render-only --sync-render --no-auto-lris
+script topology_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/type2_28mm.json", "profile3 export request type 2, canonical 28mm", 2, {2:"renderer_request",3:"init_resamp",4:"process_level0",5:"iramp_entry",6:"src1_wrapper",7:"src2_wrapper",8:"contributor_wrapper",9:"monofusion_worker",10:"min_cost_index",11:"index_to_depth",12:"calibration_compose"})
+process kill
+quit

@@ -1,0 +1,26 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_guidance_channel_origin/collapse2_worker_probe.py
+script import os
+script collapse2_worker_probe.reset(os.environ["L16_PROBE_LABEL"])
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x27b7a0
+breakpoint set --shlib libcp.dylib --address 0x341770
+breakpoint set --shlib libcp.dylib --address 0x341885
+breakpoint set --shlib libcp.dylib --address 0x2e8cc0
+breakpoint set --shlib libcp.dylib --address 0x9e360
+breakpoint set --shlib libcp.dylib --address 0x9f360
+breakpoint set --shlib libcp.dylib --address 0xa0380
+breakpoint set --shlib libcp.dylib --address 0xa13c0
+breakpoint set --shlib libcp.dylib --address 0xa23c0
+breakpoint set --shlib libcp.dylib --address 0xa2d90
+breakpoint set --shlib libcp.dylib --address 0xa3740
+breakpoint set --shlib libcp.dylib --address 0xa4100
+breakpoint set --shlib libcp.dylib --address 0xa4ac0
+breakpoint set --shlib libcp.dylib --address 0xa50d0
+breakpoint set --shlib libcp.dylib --address 0xa56e0
+breakpoint set --shlib libcp.dylib --address 0xa5cf0
+script collapse2_worker_probe.attach(lldb.debugger)
+script lldb.debugger.HandleCommand('process launch -- "{}" "{}" --profile 3 --export-fmt 3 --no-auto-lris'.format(os.environ["L16_STAGED_LRI"], os.environ["L16_OUTPUT_HDR"]))
+script collapse2_worker_probe.write_report(lldb.debugger, os.environ["L16_TMP_REPORT"])
+quit

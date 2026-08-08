@@ -1,0 +1,7 @@
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/lri_process_probe
+process handle SIGSEGV -p true -s false -n false
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/type2_28mm_652x489.hdr" --profile 3 --render-type 2 --sync-render --output-size 652 489 --export-fmt 3 --no-auto-lris
+process status
+quit

@@ -1,0 +1,7 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/final_iramp_image_effect/runtime_patch.py
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set -n main --shlib lri_process
+breakpoint command add 1 -s python -o "runtime_patch.apply(frame, bp_loc, internal_dict)"
+process launch
+quit

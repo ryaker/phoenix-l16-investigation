@@ -46,6 +46,25 @@ investigation and write the durable result here or in `docs/evidence/`.
   loose untracked LRI/protobuf verifier scripts moved into
   `tools/quarantine/lri_field_verifiers_2026-06-05/` as candidate material only,
   with no claim admission.
+- `implementation_repair_handoff_2026-07-16.md` — reconciles the failed
+  `/Users/ryaker/L16_Phoenix` implementation against TRUTH v3.0.305, identifies
+  stale gaps and invented parity-path substitutions, and maps each required
+  repair to current admitted claims/evidence. It is an implementation audit,
+  not a new truth or spec authority.
+- `phoenix_implementation_reconciliation_2026-07-29.md` — pins the current
+  Phoenix source snapshot against TRUTH v3.0.342, records the still-unwired
+  selected cross-talk and MonoFusion flow/public-operand path, the duplicated
+  source affine and wrong luma weights, and the now-removable exact-reciprocal
+  portability waiver. It is an implementation audit, not claim evidence.
+- `tele_band_53pct_reconciliation_2026-08-08.md` — independently re-audits the
+  disputed Phoenix tele range-band statistic, refutes the global-vs-local bound
+  contradiction, records why the historical `53.1%` is not reproducible from
+  retained artifacts, and defines the stage-matched capture needed to localize
+  the current tele residual.
+- `phoenix_metric_claim_sweep_2026-08-08.md` — adversarially sweeps the live
+  Phoenix Pearson/within-N/flip/null narrative, separates retained measurements
+  from admissible conclusions, control-validates the Unit-2 tele repeat, and
+  records the still-mixed candidate corpus generation.
 
 ## Verified Cleanup Note
 

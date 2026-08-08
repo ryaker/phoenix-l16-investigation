@@ -1,0 +1,9 @@
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+settings set target.process.stop-on-sharedlibrary-events false
+breakpoint set --hardware --one-shot true --shlib libcp.dylib --address 0x261a50
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/reference_undistorted_planes/unit1_28mm_entry_smoke/output.dng" --profile 3 --export-fmt 4 --no-auto-lris
+register read rdi rsi rdx rcx
+memory read --format x --size 8 --count 6 `$rdi`
+memory read --format x --size 8 --count 6 `$rsi`
+process kill
+quit

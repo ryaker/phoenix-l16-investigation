@@ -1,7 +1,7 @@
 # Evidence: LRI Calibration Origin (Static, Machine-Verified)
 
 **Date:** 2026-05-30
-**Status:** VERIFIED (three machine-checked facts) + scoped observations + leads.
+**Status:** VERIFIED (four machine-checked facts) + admitted schema follow-up + scoped leads.
 **Scope:** The four canonical LRIs (28mm L16_02130, 35mm L16_03041, 70mm L16_03434, 150mm L16_02285)
 and this `libcp.dylib`. Static only — no render, no lldb.
 **Bearing:** Lane B / WSJF #2 (pair-grid producer calibration / LRI origins). Supports the standalone
@@ -61,8 +61,11 @@ all four canonical seeds are Unit-1 (`722a6e72`), and the corpus contains exactl
 (Unit-1 `722a6e72`, Unit-2 `223961c6`) organized by shot date, not unit. See
 `docs/evidence/bundle_proof_two_unit_corpus_static.md`. The repo "Unit A/B" labeling is REFUTED there,
 and `CLAUDE.md`/`AGENTS.md` are updated to the verified two-unit signatures. The cross-unit four-zoom
-test set (Unit-2 same-name twins of the canonical seeds) is listed in that proof. (Owner identity is
-external knowledge, out of scope — not a bytes-verifiable fact.)
+same-name counterparts are listed in that proof, with a later correction in
+`bundle_static_lane_b_crossunit_lri_public_carriers.md`: two same-name Unit-2 files are not exact-focal
+35mm / 70mm representatives, so future runtime validation should use exact-focal Unit-2 representatives
+or another explicitly verified exact-focal set. (Owner identity is external knowledge, out of scope — not
+a bytes-verifiable fact.)
 
 ## FACT 4 — libcp `__const` hardcode-vs-compute (independently re-verified)
 
@@ -78,6 +81,18 @@ clean result:
 
 So the `0x29ed90` upsample coefficient `1/3` is a build-universal constant Phoenix may hardcode, while
 the `1/288` scale must be reproduced from the runtime computation, not copied.
+
+## Follow-up: Embedded Public Schema Names
+
+The installed bundle's serialized protobuf descriptors now machine-name the
+previous anonymous geometry paths as
+`LightHeader.module_calibration[].geometry.per_focus_calibration[]`, including
+`intrinsics.k_mat`, `focus_hall_code`, and
+`extrinsics.canonical.rotation/translation`. They also name the full sensor ROI
+carrier as `LightHeader.modules[].sensor_data_surface.size`. A wide and tele LRI
+from each of the two calibration bodies passes the descriptor/wire verifier.
+See
+[bundle_static_runtime_index5_public_proto_schema_names.md](/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/docs/evidence/bundle_static_runtime_index5_public_proto_schema_names.md).
 
 ## Leads (NOT fact — see docs/hypotheses/)
 

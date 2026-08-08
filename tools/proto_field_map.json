@@ -1,58 +1,58 @@
 {
   "LightHeader.1": [
-    "capture_id",
-    "bytes",
+    "image_unique_id_low",
+    "uint64",
     null
   ],
   "LightHeader.2": [
-    "timestamp_ns",
+    "image_unique_id_high",
     "uint64",
     null
   ],
   "LightHeader.3": [
-    "scene_brightness",
-    "float",
-    null
+    "image_time_stamp",
+    "TimeStamp",
+    "TimeStamp"
   ],
   "LightHeader.4": [
     "image_focal_length",
-    "uint32",
+    "int32",
     null
   ],
   "LightHeader.5": [
     "image_reference_camera",
-    "uint32",
+    "CameraID",
     null
   ],
   "LightHeader.6": [
-    "capture_mode",
-    "uint32",
+    "device_unique_id_low",
+    "uint64",
     null
   ],
   "LightHeader.7": [
-    "pipeline_version",
-    "string",
+    "device_unique_id_high",
+    "uint64",
     null
   ],
   "LightHeader.8": [
-    "software_version",
+    "device_model_name",
     "string",
     null
   ],
   "LightHeader.9": [
-    "awb_mode",
-    "uint32",
+    "device_fw_version",
+    "string",
     null
   ],
   "LightHeader.10": [
-    "flash_mode",
-    "uint32",
+    "device_asic_fw_version",
+    "string",
     null
   ],
   "LightHeader.11": [
-    "zoom_factor",
-    "float",
-    null
+    "device_temperature",
+    "DeviceTemp",
+    "DeviceTemp"
   ],
   "LightHeader.12": [
     "modules",
@@ -60,19 +60,19 @@
     "CameraModule"
   ],
   "LightHeader.13": [
-    "depth_config",
-    "DepthConfig",
-    "DepthConfig"
+    "module_calibration",
+    "repeated FactoryModuleCalibration",
+    "FactoryModuleCalibration"
   ],
   "LightHeader.14": [
-    "ev_bias",
-    "float",
-    null
+    "device_calibration",
+    "FactoryDeviceCalibration",
+    "FactoryDeviceCalibration"
   ],
   "LightHeader.15": [
-    "orientation",
-    "uint32",
-    null
+    "gold_cc",
+    "repeated ColorCalibrationGold",
+    "ColorCalibrationGold"
   ],
   "LightHeader.16": [
     "sensor_data",
@@ -81,8 +81,8 @@
   ],
   "LightHeader.17": [
     "tof_range",
-    "ToFRange",
-    "ToFRange"
+    "float",
+    null
   ],
   "LightHeader.18": [
     "hw_info",
@@ -90,99 +90,294 @@
     "HwInfo"
   ],
   "LightHeader.19": [
-    "gps_metadata",
-    "GPSMetadata",
-    "GPSMetadata"
+    "view_preferences",
+    "ViewPreferences",
+    "ViewPreferences"
   ],
   "LightHeader.20": [
-    "auto_white_balance",
-    "AWBData",
-    "AWBData"
-  ],
-  "LightHeader.21": [
-    "scene_detection",
-    "SceneDetection",
-    "SceneDetection"
+    "proximity_sensors",
+    "ProximitySensors",
+    "ProximitySensors"
   ],
   "LightHeader.22": [
-    "imu_data",
-    "IMUData",
-    "IMUData"
+    "flash_data",
+    "FlashData",
+    "FlashData"
   ],
   "LightHeader.23": [
-    "af_debug_info",
+    "imu_data",
+    "repeated IMUData",
+    "IMUData"
+  ],
+  "LightHeader.24": [
+    "af_info",
     "AFDebugInfo",
     "AFDebugInfo"
   ],
-  "LightHeader.24": [
+  "LightHeader.25": [
     "gps_data",
     "GPSData",
     "GPSData"
   ],
-  "LightHeader.25": [
-    "hdr_params",
-    "HDRParams",
-    "HDRParams"
+  "LightHeader.26": [
+    "compatibility",
+    "Compatibility",
+    "Compatibility"
+  ],
+  "LightHeader.27": [
+    "face_data",
+    "repeated FaceData",
+    "FaceData"
   ],
   "CameraModule.1": [
-    "camera_id",
-    "uint32",
-    null
+    "af_info",
+    "CameraModule.AFInfo",
+    "CameraModule.AFInfo"
   ],
   "CameraModule.2": [
-    "exposure_time_ns",
-    "uint64",
+    "id",
+    "CameraID",
     null
   ],
   "CameraModule.3": [
-    "analog_gain",
-    "float",
+    "is_enabled",
+    "bool",
     null
   ],
   "CameraModule.4": [
-    "digital_gain",
-    "float",
+    "mirror_position",
+    "int32",
     null
   ],
   "CameraModule.5": [
-    "focus_distance",
-    "float",
-    null
-  ],
-  "CameraModule.6": [
     "lens_position",
-    "uint32",
+    "int32",
     null
   ],
   "CameraModule.7": [
-    "temperature",
+    "sensor_analog_gain",
     "float",
     null
   ],
   "CameraModule.8": [
-    "vcm_dac",
-    "uint32",
-    null
-  ],
-  "CameraModule.9": [
-    "enabled",
-    "bool",
-    null
-  ],
-  "CameraModule.10": [
-    "iso_speed",
-    "uint32",
-    null
-  ],
-  "CameraModule.11": [
-    "frame_duration_ns",
+    "sensor_exposure",
     "uint64",
     null
   ],
+  "CameraModule.9": [
+    "sensor_data_surface",
+    "CameraModule.Surface",
+    "CameraModule.Surface"
+  ],
+  "CameraModule.10": [
+    "sensor_temparature",
+    "sint32",
+    null
+  ],
+  "CameraModule.11": [
+    "sensor_is_horizontal_flip",
+    "bool",
+    null
+  ],
   "CameraModule.12": [
-    "awb_gains",
-    "AWBGains",
-    "AWBGains"
+    "sensor_is_vertical_flip",
+    "bool",
+    null
+  ],
+  "CameraModule.13": [
+    "sensor_bayer_red_override",
+    "Point2I",
+    "Point2I"
+  ],
+  "CameraModule.14": [
+    "sensor_digital_gain",
+    "float",
+    null
+  ],
+  "CameraModule.15": [
+    "frame_index",
+    "uint32",
+    null
+  ],
+  "CameraModule.16": [
+    "sensor_dpc_on",
+    "bool",
+    null
+  ],
+  "CameraModule.17": [
+    "sensor_exp_start_offset",
+    "sint32",
+    null
+  ],
+  "CameraModule.18": [
+    "sensor_scan_speed",
+    "float",
+    null
+  ],
+  "CameraModule.Surface.1": [
+    "start",
+    "Point2I",
+    "Point2I"
+  ],
+  "CameraModule.Surface.2": [
+    "size",
+    "Point2I",
+    "Point2I"
+  ],
+  "CameraModule.Surface.3": [
+    "format",
+    "CameraModule.Surface.FormatType",
+    null
+  ],
+  "CameraModule.Surface.4": [
+    "row_stride",
+    "uint32",
+    null
+  ],
+  "CameraModule.Surface.5": [
+    "data_offset",
+    "uint64",
+    null
+  ],
+  "CameraModule.Surface.6": [
+    "data_scale",
+    "Point2F",
+    "Point2F"
+  ],
+  "FactoryModuleCalibration.1": [
+    "camera_id",
+    "CameraID",
+    null
+  ],
+  "FactoryModuleCalibration.2": [
+    "color",
+    "repeated ColorCalibration",
+    "ColorCalibration"
+  ],
+  "FactoryModuleCalibration.3": [
+    "geometry",
+    "GeometricCalibration",
+    "GeometricCalibration"
+  ],
+  "FactoryModuleCalibration.4": [
+    "vignetting",
+    "VignettingCharacterization",
+    "VignettingCharacterization"
+  ],
+  "FactoryModuleCalibration.5": [
+    "hot_pixel_map",
+    "HotPixelMap",
+    "HotPixelMap"
+  ],
+  "FactoryModuleCalibration.6": [
+    "dead_pixel_map",
+    "DeadPixelMap",
+    "DeadPixelMap"
+  ],
+  "FactoryModuleCalibration.7": [
+    "time_stamp",
+    "TimeStamp",
+    "TimeStamp"
+  ],
+  "GeometricCalibration.1": [
+    "mirror_type",
+    "GeometricCalibration.MirrorType",
+    null
+  ],
+  "GeometricCalibration.2": [
+    "per_focus_calibration",
+    "repeated GeometricCalibration.CalibrationFocusBundle",
+    "GeometricCalibration.CalibrationFocusBundle"
+  ],
+  "GeometricCalibration.3": [
+    "distortion",
+    "Distortion",
+    "Distortion"
+  ],
+  "GeometricCalibration.4": [
+    "lens_hall_code_range",
+    "Range2F",
+    "Range2F"
+  ],
+  "GeometricCalibration.5": [
+    "focus_distance_range",
+    "Range2F",
+    "Range2F"
+  ],
+  "GeometricCalibration.6": [
+    "angle_optical_center_mapping",
+    "GeometricCalibration.AngleOpticalCenterMapping",
+    "GeometricCalibration.AngleOpticalCenterMapping"
+  ],
+  "GeometricCalibration.CalibrationFocusBundle.1": [
+    "focus_distance",
+    "float",
+    null
+  ],
+  "GeometricCalibration.CalibrationFocusBundle.2": [
+    "intrinsics",
+    "GeometricCalibration.Intrinsics",
+    "GeometricCalibration.Intrinsics"
+  ],
+  "GeometricCalibration.CalibrationFocusBundle.3": [
+    "extrinsics",
+    "GeometricCalibration.Extrinsics",
+    "GeometricCalibration.Extrinsics"
+  ],
+  "GeometricCalibration.CalibrationFocusBundle.4": [
+    "sensor_temp",
+    "sint32",
+    null
+  ],
+  "GeometricCalibration.CalibrationFocusBundle.5": [
+    "device_temp",
+    "DeviceTemp",
+    "DeviceTemp"
+  ],
+  "GeometricCalibration.CalibrationFocusBundle.6": [
+    "focus_hall_code",
+    "float",
+    null
+  ],
+  "GeometricCalibration.Intrinsics.1": [
+    "k_mat",
+    "Matrix3x3F",
+    "Matrix3x3F"
+  ],
+  "GeometricCalibration.Intrinsics.2": [
+    "rms_error",
+    "float",
+    null
+  ],
+  "GeometricCalibration.Extrinsics.1": [
+    "canonical",
+    "GeometricCalibration.Extrinsics.CanonicalFormat",
+    "GeometricCalibration.Extrinsics.CanonicalFormat"
+  ],
+  "GeometricCalibration.Extrinsics.2": [
+    "moveable_mirror",
+    "GeometricCalibration.Extrinsics.MovableMirrorFormat",
+    "GeometricCalibration.Extrinsics.MovableMirrorFormat"
+  ],
+  "GeometricCalibration.Extrinsics.CanonicalFormat.1": [
+    "rotation",
+    "Matrix3x3F",
+    "Matrix3x3F"
+  ],
+  "GeometricCalibration.Extrinsics.CanonicalFormat.2": [
+    "translation",
+    "Point3F",
+    "Point3F"
+  ],
+  "GeometricCalibration.Extrinsics.CanonicalFormat.3": [
+    "stereo_error",
+    "float",
+    null
+  ],
+  "GeometricCalibration.Extrinsics.CanonicalFormat.4": [
+    "reprojection_error",
+    "float",
+    null
   ],
   "HwInfo.1": [
     "camera",

@@ -1,0 +1,34 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/iramp_score_kernel/stage_probe.py
+script stage_probe.reset("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_score_kernel/unit1_35mm/stages.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_score_kernel/replay_36cde0
+breakpoint set --shlib libcp.dylib --address 0x36cf24
+breakpoint command add 1 -s python -o "stage_probe.hit(frame, bp_loc, internal_dict, 'fine_structure')"
+breakpoint modify -a true 1
+breakpoint set --shlib libcp.dylib --address 0x36d080
+breakpoint command add 2 -s python -o "stage_probe.hit(frame, bp_loc, internal_dict, 'fine_detail_input')"
+breakpoint modify -a true 2
+breakpoint set --shlib libcp.dylib --address 0x36d0e1
+breakpoint command add 3 -s python -o "stage_probe.hit(frame, bp_loc, internal_dict, 'fine_detail_factor')"
+breakpoint modify -a true 3
+breakpoint set --shlib libcp.dylib --address 0x36d0e5
+breakpoint command add 4 -s python -o "stage_probe.hit(frame, bp_loc, internal_dict, 'fine_combined')"
+breakpoint modify -a true 4
+breakpoint set --shlib libcp.dylib --address 0x36d31b
+breakpoint command add 5 -s python -o "stage_probe.hit(frame, bp_loc, internal_dict, 'coarse_structure')"
+breakpoint modify -a true 5
+breakpoint set --shlib libcp.dylib --address 0x36d79c
+breakpoint command add 6 -s python -o "stage_probe.hit(frame, bp_loc, internal_dict, 'coarse_detail_input')"
+breakpoint modify -a true 6
+breakpoint set --shlib libcp.dylib --address 0x36d7fd
+breakpoint command add 7 -s python -o "stage_probe.hit(frame, bp_loc, internal_dict, 'coarse_detail_factor')"
+breakpoint modify -a true 7
+breakpoint set --shlib libcp.dylib --address 0x36d804
+breakpoint command add 8 -s python -o "stage_probe.hit(frame, bp_loc, internal_dict, 'coarse_combined')"
+breakpoint modify -a true 8
+breakpoint set --shlib libcp.dylib --address 0x36e511
+breakpoint command add 9 -s python -o "stage_probe.hit(frame, bp_loc, internal_dict, 'final_geometric_mean_inputs')"
+breakpoint modify -a true 9
+process launch -- "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_score_kernel/unit1_35mm/scratch.bin" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/iramp_score_kernel/unit1_35mm/candidate.bin"
+script stage_probe.report()
+quit

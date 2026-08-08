@@ -1,0 +1,18 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/highlight_restore/probe.py
+script probe.reset("u1_35 L16_03041 highlight restore", "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/highlight_restore/u1_35.json", "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/highlight_restore/tiles")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/highlight_restore
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x343ee3
+breakpoint command add 1 -s python -o "probe.hit_params(frame, bp_loc, internal_dict)"
+breakpoint set --shlib libcp.dylib --address 0x343ef8
+breakpoint command add 2 -s python -o "probe.hit_call(frame, bp_loc, internal_dict)"
+breakpoint set --shlib libcp.dylib --address 0x343efd
+breakpoint command add 3 -s python -o "probe.hit_ret(frame, bp_loc, internal_dict)"
+breakpoint set --shlib libcp.dylib --address 0x30ba48
+breakpoint command add 4 -s python -o "probe.hit_kernel(frame, bp_loc, internal_dict)"
+breakpoint modify -G true 1 2 3 4
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/highlight_restore/u1_35.hdr" --profile 3 --export-fmt 3
+script probe.drive(lldb.debugger, 400000)
+script probe.report()
+quit

@@ -1,0 +1,16 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_guidance_channel_origin/softisp_property_probe.py
+script import os
+script softisp_property_probe.reset(os.environ["L16_PROBE_LABEL"])
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x27b7a0
+breakpoint set --shlib libcp.dylib --address 0x31b610
+breakpoint set --shlib libcp.dylib --address 0x31b692
+breakpoint set --shlib libcp.dylib --address 0x31bbd0
+breakpoint set --shlib libcp.dylib --address 0x31bbdc
+breakpoint set --shlib libcp.dylib --address 0x27c062
+script softisp_property_probe.attach(lldb.debugger)
+script lldb.debugger.HandleCommand('process launch -- "{}" "{}" --profile 3 --export-fmt 3 --no-auto-lris'.format(os.environ["L16_STAGED_LRI"], os.environ["L16_OUTPUT_HDR"]))
+script softisp_property_probe.write_report(lldb.debugger, os.environ["L16_TMP_REPORT"])
+quit

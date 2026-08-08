@@ -1,0 +1,12 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_monofusion_color_wrapper/color_wrapper_probe.py
+script color_wrapper_probe.reset("Unit-1 exact-28mm L16_02130 2018-07-23")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_color_wrapper
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x1b3530
+breakpoint set --shlib libcp.dylib --address 0x1b359e
+breakpoint set --shlib libcp.dylib --address 0x1b3744
+script color_wrapper_probe.install_callbacks(lldb.debugger, 1, 2, 3)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/private/tmp/codex_monofusion_wrapper_unit1.hdr" --profile 3 --export-fmt 3
+script color_wrapper_probe.report_to_file("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_color_wrapper/unit1_28mm.json")
+quit

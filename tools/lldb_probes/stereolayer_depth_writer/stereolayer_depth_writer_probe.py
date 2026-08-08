@@ -4,6 +4,7 @@ import struct
 
 
 SITES = {
+    0x26DB40: "mask_build_entry_0x26db40",
     0x26FB70: "writer_entry",
     0x26FBA4: "depth_copy_call_0xf340",
     0x26FBB0: "depth_copy_after_0xf340",
@@ -154,6 +155,12 @@ def _stereo_object(process, obj):
     return {
         "object": obj,
         "vtable": _read_qword(process, obj),
+        "index_0x8": _u32(_read(process, obj + 0x08, 4), 0)
+        if _read(process, obj + 0x08, 4) is not None
+        else None,
+        "sampling_pattern_0x50": _u32(_read(process, obj + 0x50, 4), 0)
+        if _read(process, obj + 0x50, 4) is not None
+        else None,
         "depth_width_0x2a0": _u32(_read(process, obj + 0x2A0, 4), 0)
         if _read(process, obj + 0x2A0, 4) is not None
         else None,
@@ -173,6 +180,8 @@ def _disable_breakpoint(debugger, name):
 
 
 def _cap(name):
+    if name == "mask_build_entry_0x26db40":
+        return 32
     if name in ("writer_entry", "depth_copy_call_0xf340", "depth_copy_after_0xf340"):
         return 32
     return 8
@@ -191,7 +200,12 @@ def hit(frame, bp_loc, internal_dict):
 
     state["counts"][name] = state["counts"].get(name, 0) + 1
     regs = _registers(frame)
-    obj = regs["rdi"] if site_va == 0x26FB70 else regs["rbx"]
+    if site_va == 0x26DB40:
+        obj = regs["rsi"]
+    elif site_va == 0x26FB70:
+        obj = regs["rdi"]
+    else:
+        obj = regs["rbx"]
     sample = {
         "site": name,
         "site_va": site_va,
@@ -201,7 +215,9 @@ def hit(frame, bp_loc, internal_dict):
         "object": _stereo_object(process, obj),
     }
 
-    if site_va in (0x26FB70, 0x26FBA4):
+    if site_va == 0x26DB40:
+        sample["mask_destination_rdi"] = _descriptor(process, regs["rdi"])
+    elif site_va in (0x26FB70, 0x26FBA4):
         sample["source_descriptor_rsi"] = _descriptor(process, regs["rsi"])
         sample["dest_depth_before"] = _descriptor(process, obj + 0x2A8)
     elif site_va == 0x26FBB0:

@@ -56,6 +56,7 @@
 #include <fstream>
 #include <functional>
 #include <vector>
+#include <atomic>
 #include <CoreFoundation/CoreFoundation.h>
 #include <ImageIO/ImageIO.h>
 
@@ -96,6 +97,8 @@ enum StateType         : int {};
 // Without setMode(2) + DepthEditor ctor, vtable slot 20 of RendererPrivate at
 // libcp+0x3b1d20 is never dispatched and depth code stays silent.
 enum RenderingMode     : int {};
+enum ParamFloat        : int {};
+enum ParamInt          : int {};
 
 // ── Image ────────────────────────────────────────────────────
 // Non-polymorphic.  Layout: shared_ptr<ImagePrivate> = 16 bytes.
@@ -137,15 +140,15 @@ private:
 // ── ImagePyramid ─────────────────────────────────────────────
 // Non-polymorphic.  Layout: shared_ptr<ImagePyramidPrivate> = 16 bytes.
 // Returned via hidden pointer (non-trivial copy ctor/dtor).
-// operator[] returns an Image by value (also via hidden pointer).
+// operator[] returns a reference to the selected 16-byte Image element.
 class ImagePyramid {
 public:
     ~ImagePyramid();
     ImagePyramid(const ImagePyramid&);
     ImagePyramid& operator=(const ImagePyramid&);
 
-    Image operator[](int level);
-    Image operator[](int level) const;
+    Image&       operator[](int level);
+    Image const& operator[](int level) const;
     int   levelCount() const;
     void  lock()   const;
     void  unlock() const;
@@ -185,6 +188,10 @@ public:
     // Valid after setInputDataStream() — contains native image dimensions.
     Transform* transform();
 
+    // ParamFloat(19) is the validated MaximumInFocusBlurPixels control.
+    void setProperty(ParamFloat, float);
+    void setProperty(ParamInt, int);
+
     ~RendererBase();
 
 protected:
@@ -205,7 +212,7 @@ private:
 //   Renderer r = Renderer::Create(RendererProfile(3));   // Desktop quality
 //   r.setInputDataStream(stream);
 //   ApplyTuning(TuningType(0), r);                        // camera calibration
-//   r.render(0, {0,0,65536,65536}, RenderType(2), false); // sync, full image
+//   r.render(0, {0,0,65536,65536}, RenderType(2), true);  // wait for full image
 //   ImagePyramid pyr = r.outputBuffer();
 //   Image lvl0 = pyr[0];
 //   auto out = make_shared<ofstream>(path, ios::binary);
@@ -217,7 +224,7 @@ public:
 
     // Synchronous full-quality render.
     // resolution=0 (base level), roi clamped to image bounds, RenderType=2 (export).
-    void render(int resolution, ROI const& roi, RenderType type, bool async);
+    void render(int resolution, ROI const& roi, RenderType type, bool wait);
 
     // Write output to stream.  Point<int> = {output_width, output_height}.
     // ExportImageFormat 3=HDR, 4=DPC/DNG (requires LRIS state loaded first).
@@ -245,6 +252,9 @@ public:
 
     // Returns the rendered output pyramid.  Level 0 is full resolution.
     ImagePyramid outputBuffer() const;
+
+    void setOutputUpdateListener(
+        std::function<void(ImagePyramid const&, ROI const&, int)> listener);
 
     void abort();
     void cancelRenderRequests();
@@ -276,6 +286,10 @@ class DepthEditor {
 public:
     explicit DepthEditor(Renderer& renderer);
     ~DepthEditor() {}  // intentionally trivial — see note above
+    float getDepthAtPoint(Point<float> const& point);
+    void pushBrushDepthEdit(struct BrushDepthEditingParams const& params);
+    void addQuickSelectStrokes(
+        struct QuickSelectDepthEditingParams const& params);
 private:
     DepthEditor() = delete;
     DepthEditor(const DepthEditor&) = delete;
@@ -283,6 +297,23 @@ private:
     // 16 bytes matching shared_ptr<DepthEditorPrivate>; treated as opaque.
     void* private_ptr_  = nullptr;
     void* private_ctrl_ = nullptr;
+};
+
+struct BrushDepthEditingParams {
+    std::vector<Point<float>> points;
+    float radius;
+    float depth;
+    bool reserved;
+};
+
+// Public packet layout recovered from ImageEditItem::addQuickSelectStrokes.
+// ROI stores the half-open level rectangle as x0,y0,x1,y1 for this API.
+struct QuickSelectDepthEditingParams {
+    std::vector<Point<float>> points;
+    float radius;
+    bool mode;
+    ROI level_rect;
+    int level;
 };
 
 // ── DirectRenderer : RendererBase ────────────────────────────
@@ -418,6 +449,12 @@ static void write_raw(const char* tiff_path, int w, int h, int stride,
            "-i \"%s\" \"%s.png\"\n\n", pix_fmt, w, h, raw_path, tiff_path);
 }
 
+extern "C" __attribute__((noinline))
+void lri_probe_output_write_target(void* address, int level, int x, int y)
+{
+    asm volatile("" : : "r"(address), "r"(level), "r"(x), "r"(y) : "memory");
+}
+
 // ============================================================
 // Main
 // ============================================================
@@ -428,6 +465,24 @@ int main(int argc, char* argv[])
             "Usage: arch -x86_64 ./lri_process <input.lri> <output.hdr|.dng|.jpg|.ppm|.tif>\n\n"
             "Full-quality Renderer path options:\n"
             "  --profile N          RendererProfile 0–3 (default 3 = Desktop quality)\n"
+            "  --render-type N      Renderer request type (default 2 = export; GUI tiles use 1)\n"
+            "  --render-only        Stop after render(); do not call the export writer\n"
+            "  --sync-render        Wait for the queued render request to finish\n"
+            "  --renderer-mode N    Set Renderer RenderingMode 0-4 before input\n"
+            "  --debug-view-id N    Set debug-view selector ParamInt(20), accepts decimal or 0x hex\n"
+            "  --maximum-in-focus-blur-pixels F Set validated ParamFloat(19) before mode switch\n"
+            "  --dof-f-number F    Set public ParamFloat(0) before prepared mode switch\n"
+            "  --dof-focus-depth F Set public ParamFloat(1) before prepared mode switch\n"
+            "  --dof-focus-center  Use DepthEditor center depth for public ParamFloat(1)\n"
+            "  --prepare-mode0-rerender Render mode 0 once, then set requested mode and rerender\n"
+            "  --construct-depth-editor Construct DepthEditor without applying a brush\n"
+            "  --brush-edit-rerender Apply one synthetic depth brush, then render again\n"
+            "  --quick-select-center Add one synthetic center QuickSelect stroke before rerender\n"
+            "  --gui-level-sweep    Render every output-pyramid level coarse to fine\n"
+            "  --inspect-output-pyramid Print output-pyramid image metadata after render\n"
+            "  --dump-output-level N PATH Dump one packed pyramid level as PATH.raw/.info\n"
+            "  --probe-output-level N Mark one level-N pixel for an LLDB write watchpoint\n"
+            "  --output-size W H    Override export writer dimensions (probe use)\n"
             "  --export-fmt N       Output format: 0=JPEG 1=PPM 2=TIFF 3=HDR 4=DNG (default 3)\n"
             "  --lris <path>        Explicit .lris state file path (required for --export-fmt 4)\n"
             "                       Auto-detected if <input>.lris exists beside the .lri\n"
@@ -449,9 +504,29 @@ int main(int argc, char* argv[])
     const char* input_path   = argv[1];
     const char* output_path  = argv[2];
     int         profile      = 3;    // RendererProfile::Desktop
+    int         render_type  = 2;    // RenderType::Export
     int         export_fmt   = 3;    // ExportImageFormat: 3=Radiance HDR (best quality)
     int         dr_profile   = 1;    // DirectRenderer profile (1=full res)
     bool        use_direct   = false;
+    bool        render_only  = false;
+    bool        sync_render  = false;
+    int         renderer_mode = -1;
+    int         debug_view_id = -1;
+    float       maximum_in_focus_blur_pixels = -1.0f;
+    float       dof_f_number = -1.0f;
+    float       dof_focus_depth = -1.0f;
+    bool        dof_focus_center = false;
+    bool        prepare_mode0_rerender = false;
+    bool        construct_depth_editor = false;
+    bool        brush_edit_rerender = false;
+    bool        quick_select_center = false;
+    bool        gui_level_sweep = false;
+    bool        inspect_output_pyramid = false;
+    int         probe_output_level = -1;
+    int         dump_output_level = -1;
+    const char* dump_output_path = nullptr;
+    int         output_width = 10432;
+    int         output_height = 7824;
     bool        write_tiff_  = true;
     const char* lris_path       = nullptr; // explicit .lris path (or auto-detected)
     const char* write_lris_path = nullptr; // path to serialize fresh render state
@@ -461,6 +536,46 @@ int main(int argc, char* argv[])
     for (int i = 3; i < argc; i++) {
         if (strcmp(argv[i], "--profile") == 0 && i+1 < argc)
             profile = atoi(argv[++i]);
+        else if (strcmp(argv[i], "--render-type") == 0 && i+1 < argc)
+            render_type = atoi(argv[++i]);
+        else if (strcmp(argv[i], "--render-only") == 0)
+            render_only = true;
+        else if (strcmp(argv[i], "--sync-render") == 0)
+            sync_render = true;
+        else if (strcmp(argv[i], "--renderer-mode") == 0 && i+1 < argc)
+            renderer_mode = atoi(argv[++i]);
+        else if (strcmp(argv[i], "--debug-view-id") == 0 && i+1 < argc)
+            debug_view_id = static_cast<int>(strtol(argv[++i], nullptr, 0));
+        else if (strcmp(argv[i], "--maximum-in-focus-blur-pixels") == 0 && i+1 < argc)
+            maximum_in_focus_blur_pixels = strtof(argv[++i], nullptr);
+        else if (strcmp(argv[i], "--dof-f-number") == 0 && i+1 < argc)
+            dof_f_number = strtof(argv[++i], nullptr);
+        else if (strcmp(argv[i], "--dof-focus-depth") == 0 && i+1 < argc)
+            dof_focus_depth = strtof(argv[++i], nullptr);
+        else if (strcmp(argv[i], "--dof-focus-center") == 0)
+            dof_focus_center = true;
+        else if (strcmp(argv[i], "--prepare-mode0-rerender") == 0)
+            prepare_mode0_rerender = true;
+        else if (strcmp(argv[i], "--construct-depth-editor") == 0)
+            construct_depth_editor = true;
+        else if (strcmp(argv[i], "--brush-edit-rerender") == 0)
+            brush_edit_rerender = true;
+        else if (strcmp(argv[i], "--quick-select-center") == 0)
+            quick_select_center = true;
+        else if (strcmp(argv[i], "--gui-level-sweep") == 0)
+            gui_level_sweep = true;
+        else if (strcmp(argv[i], "--inspect-output-pyramid") == 0)
+            inspect_output_pyramid = true;
+        else if (strcmp(argv[i], "--probe-output-level") == 0 && i+1 < argc)
+            probe_output_level = atoi(argv[++i]);
+        else if (strcmp(argv[i], "--dump-output-level") == 0 && i+2 < argc) {
+            dump_output_level = atoi(argv[++i]);
+            dump_output_path = argv[++i];
+        }
+        else if (strcmp(argv[i], "--output-size") == 0 && i+2 < argc) {
+            output_width = atoi(argv[++i]);
+            output_height = atoi(argv[++i]);
+        }
         else if (strcmp(argv[i], "--export-fmt") == 0 && i+1 < argc)
             export_fmt = atoi(argv[++i]);
         else if (strcmp(argv[i], "--direct-renderer") == 0)
@@ -613,8 +728,8 @@ int main(int argc, char* argv[])
 
     static const char* fmt_name[] = {"JPEG", "PPM", "TIFF", "HDR", "DNG"};
     const char* fname = (export_fmt >= 0 && export_fmt <= 4) ? fmt_name[export_fmt] : "?";
-    printf("%s → %s  [profile=%d fmt=%d(%s)%s]\n",
-           input_path, output_path, profile, export_fmt, fname,
+    printf("%s → %s  [profile=%d render_type=%d fmt=%d(%s)%s]\n",
+           input_path, output_path, profile, render_type, export_fmt, fname,
            (lris_path ? " +lris" : ""));
     fflush(stdout);
 
@@ -627,6 +742,17 @@ int main(int argc, char* argv[])
             exit(1);
         }
     }();
+    std::unique_ptr<CIAPI::DepthEditor> depth_editor;
+    if (construct_depth_editor || brush_edit_rerender || quick_select_center)
+        depth_editor = std::make_unique<CIAPI::DepthEditor>(renderer);
+
+    std::atomic<int> output_update_count{0};
+    if (inspect_output_pyramid || dump_output_path || probe_output_level >= 0) {
+        renderer.setOutputUpdateListener(
+            [&output_update_count](CIAPI::ImagePyramid const&, CIAPI::ROI const&, int) {
+                output_update_count.fetch_add(1, std::memory_order_relaxed);
+            });
+    }
 
     // NOTE 2026-04-18: removed --depth gate (setMode(2) + DepthEditor ctor).
     // Verification proved depth pipeline (DepthCache + StereoAsyncAPI + Triangulator)
@@ -673,15 +799,148 @@ int main(int argc, char* argv[])
         CIAPI::StaticShutdown();
         return 1;
     }
+    if (maximum_in_focus_blur_pixels >= 0.0f)
+        renderer.setProperty(static_cast<CIAPI::ParamFloat>(19),
+                             maximum_in_focus_blur_pixels);
+    if (debug_view_id >= 0)
+        renderer.setProperty(static_cast<CIAPI::ParamInt>(20), debug_view_id);
+    if (!prepare_mode0_rerender) {
+        if (dof_f_number > 0.0f)
+            renderer.setProperty(static_cast<CIAPI::ParamFloat>(0), dof_f_number);
+        if (dof_focus_depth > 0.0f)
+            renderer.setProperty(static_cast<CIAPI::ParamFloat>(1), dof_focus_depth);
+    }
+    if (renderer_mode >= 0 && !prepare_mode0_rerender)
+        renderer.setMode(static_cast<CIAPI::RenderingMode>(renderer_mode));
 
-    // Render first — no listener needed (export mode suppresses it).
+    if (probe_output_level >= 0) {
+        CIAPI::ImagePyramid pyramid = renderer.outputBuffer();
+        const int levels = pyramid.levelCount();
+        if (probe_output_level >= levels) {
+            fprintf(stderr, "Invalid pre-render output level: %d (levels=%d)\n",
+                    probe_output_level, levels);
+            CIAPI::StaticShutdown();
+            return 1;
+        }
+        pyramid.lock();
+        CIAPI::ImagePyramid const& readonly_pyramid = pyramid;
+        CIAPI::Image const& image = readonly_pyramid[probe_output_level];
+        if (image.empty() || !image.data()) {
+            fprintf(stderr, "Pre-render output level %d has no allocated data\n",
+                    probe_output_level);
+            pyramid.unlock();
+            CIAPI::StaticShutdown();
+            return 1;
+        }
+        const int x = image.width() / 2;
+        const int y = image.height() / 2;
+        auto* address = static_cast<unsigned char*>(image.data())
+                      + static_cast<size_t>(y) * image.stride()
+                      + static_cast<size_t>(x) * 4;
+        printf("OUTPUT_PROBE_TARGET level=%d x=%d y=%d address=%p\n",
+               probe_output_level, x, y, address);
+        lri_probe_output_write_target(address, probe_output_level, x, y);
+        pyramid.unlock();
+    }
+
+    // Submit the requested render schedule.
     int w = 0, h = 0;
     CIAPI::ROI roi = {0, 0, 65536, 65536};
-    try { renderer.render(1, roi, static_cast<CIAPI::RenderType>(2), false); }
+    auto request_render = [&]() {
+        if (!gui_level_sweep) {
+            renderer.render(1, roi, static_cast<CIAPI::RenderType>(render_type), sync_render);
+            return;
+        }
+        CIAPI::ImagePyramid pyramid = renderer.outputBuffer();
+        for (int level = pyramid.levelCount() - 1; level >= 0; --level)
+            renderer.render(level, roi, static_cast<CIAPI::RenderType>(render_type), sync_render);
+    };
+    try { request_render(); }
     catch (const std::exception& e) {
         fprintf(stderr, "render() failed: %s\n", e.what());
         CIAPI::StaticShutdown();
         return 1;
+    }
+
+    if (prepare_mode0_rerender) {
+        if (dof_focus_center) {
+            const CIAPI::Point<float> center = {0.5f, 0.5f};
+            dof_focus_depth = depth_editor->getDepthAtPoint(center);
+            printf("DOF_CENTER_FOCUS_DEPTH value=%.9g\n", dof_focus_depth);
+        }
+        if (dof_f_number > 0.0f)
+            renderer.setProperty(static_cast<CIAPI::ParamFloat>(0), dof_f_number);
+        if (dof_focus_depth > 0.0f)
+            renderer.setProperty(static_cast<CIAPI::ParamFloat>(1), dof_focus_depth);
+        renderer.setMode(static_cast<CIAPI::RenderingMode>(renderer_mode));
+        if (quick_select_center) {
+            CIAPI::QuickSelectDepthEditingParams selection = {
+                {{0.49f, 0.5f}, {0.51f, 0.5f}},
+                0.02f,
+                true,
+                {0, 0, 5216, 3912},
+                1,
+            };
+            depth_editor->addQuickSelectStrokes(selection);
+        }
+        try { request_render(); }
+        catch (const std::exception& e) {
+            fprintf(stderr, "prepared rerender() failed: %s\n", e.what());
+            CIAPI::StaticShutdown();
+            return 1;
+        }
+    }
+
+    if (brush_edit_rerender) {
+        const CIAPI::Point<float> center = {0.5f, 0.5f};
+        CIAPI::BrushDepthEditingParams edit = {
+            {{0.49f, 0.5f}, {0.51f, 0.5f}},
+            0.02f,
+            depth_editor->getDepthAtPoint(center) + 100.0f,
+            false,
+        };
+        depth_editor->pushBrushDepthEdit(edit);
+        request_render();
+    }
+
+    if (inspect_output_pyramid || dump_output_path) {
+        printf("OUTPUT_UPDATE_COUNT count=%d\n",
+               output_update_count.load(std::memory_order_relaxed));
+        CIAPI::ImagePyramid pyramid = renderer.outputBuffer();
+        const int levels = pyramid.levelCount();
+        printf("OUTPUT_PYRAMID levels=%d\n", levels);
+        pyramid.lock();
+        const CIAPI::ImagePyramid& readonly_pyramid = pyramid;
+        for (int level = 0; level < levels; ++level) {
+            try {
+                CIAPI::Image const& image = readonly_pyramid[level];
+                printf("OUTPUT_PYRAMID_LEVEL level=%d empty=%d width=%d height=%d "
+                       "stride=%d plane_stride=%d pixel_format=%d data=%p\n",
+                       level, image.empty() ? 1 : 0, image.width(), image.height(),
+                       image.stride(), image.planeStride(),
+                       static_cast<int>(image.pixelFormat()), image.data());
+            } catch (const std::exception& e) {
+                printf("OUTPUT_PYRAMID_LEVEL level=%d error=%s\n", level, e.what());
+            }
+        }
+        if (dump_output_path) {
+            if (dump_output_level < 0 || dump_output_level >= levels) {
+                fprintf(stderr, "Invalid output-pyramid dump level: %d\n", dump_output_level);
+                pyramid.unlock();
+                CIAPI::StaticShutdown();
+                return 1;
+            }
+            CIAPI::Image const& image = readonly_pyramid[dump_output_level];
+            write_raw(dump_output_path, image.width(), image.height(), image.stride(),
+                      image.data(), static_cast<int>(image.pixelFormat()));
+        }
+        pyramid.unlock();
+    }
+
+    if (render_only) {
+        printf("  render-only request completed.\n");
+        CIAPI::StaticShutdown();
+        return 0;
     }
 
     // SPIKE RESULT (2026-04-11): writeImage respects Point<int> as the exact output resolution.
@@ -697,7 +956,7 @@ int main(int argc, char* argv[])
     //   - LRI file protobuf parsing would work but is out of scope for this spike
     //
     // TODO: parse LRI protobuf header to get native dims for non-L16 Light cameras.
-    w = 10432; h = 7824;
+    w = output_width; h = output_height;
     fprintf(stderr, "Using L16 full-res dimensions: %dx%d\n", w, h);
 
     if (w <= 0 || h <= 0) {

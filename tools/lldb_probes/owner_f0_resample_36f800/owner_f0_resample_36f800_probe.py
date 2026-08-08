@@ -1,4 +1,5 @@
 import builtins
+import hashlib
 import json
 import struct
 
@@ -113,6 +114,24 @@ def _double_pair(process, addr):
 def _vec4(process, addr):
     data = _read(process, addr, 16)
     return _f32s(data) if data is not None else None
+
+
+def _weight_table(process, addr):
+    data = _read(process, addr, 64 * 4 * 16) if addr else None
+    if data is None:
+        return None
+    vectors = [
+        list(struct.unpack_from("<ffff", data, offset))
+        for offset in range(0, len(data), 16)
+    ]
+    return {
+        "byte_count": len(data),
+        "sha256": hashlib.sha256(data).hexdigest(),
+        "raw_hex": data.hex(),
+        "phase_tap_vec4": [
+            vectors[phase * 4 : phase * 4 + 4] for phase in range(64)
+        ],
+    }
 
 
 def _descriptor(process, addr, first_size=16):
@@ -517,6 +536,7 @@ def resample_setup_cb(frame, bp_loc, extra_args, internal_dict):
             _vec4(process, weight_table + index * 16) if weight_table else None
             for index in range(4)
         ],
+        "weight_table_complete": _weight_table(process, weight_table),
         "follow_breakpoints": follow,
         "stack": _stack(thread),
     }

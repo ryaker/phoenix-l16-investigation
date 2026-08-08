@@ -1,0 +1,12 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_plane_sweep_correspondence/plane_sweep_correspondence_probe.py
+script plane_sweep_correspondence_probe.reset("Unit-1 28mm index-5 plane-sweep correspondence", "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_plane_sweep_correspondence/unit1_28mm", 752)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /private/tmp/lri_process_index5_correspondence
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x276a01
+breakpoint set --shlib libcp.dylib --address 0x267010
+script plane_sweep_correspondence_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/private/tmp/index5_plane_sweep_correspondence_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script plane_sweep_correspondence_probe.drive(lldb.debugger, 100000)
+script plane_sweep_correspondence_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_plane_sweep_correspondence/unit1_28mm/report.json")
+quit

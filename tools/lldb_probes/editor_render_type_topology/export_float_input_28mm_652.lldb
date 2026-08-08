@@ -1,0 +1,12 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/editor_render_type_topology/export_float_input_probe.py
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology
+platform shell cp /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/lri_process_probe /private/tmp/lri_process_probe_export_float
+target create /private/tmp/lri_process_probe_export_float
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x41e599
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/type2_28mm_652x489.hdr" --profile 3 --render-type 2 --sync-render --output-size 652 489 --export-fmt 3 --no-auto-lris
+script export_float_input_probe.capture_stop(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/export_type2_28mm_652_source_f32.raw")
+continue
+script export_float_input_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/export_float_input_28mm_652.json")
+quit

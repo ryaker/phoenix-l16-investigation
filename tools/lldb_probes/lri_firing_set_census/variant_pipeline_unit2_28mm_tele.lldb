@@ -1,0 +1,32 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/lri_firing_set_census/variant_pipeline_probe.py
+script variant_pipeline_probe.reset("Unit-2 28mm tele L16_02786")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x22f0f0
+breakpoint set --shlib libcp.dylib --address 0x24c320
+breakpoint set --shlib libcp.dylib --address 0x24d610
+breakpoint set --shlib libcp.dylib --address 0x276790
+breakpoint set --shlib libcp.dylib --address 0x276860
+breakpoint set --shlib libcp.dylib --address 0x277e70
+breakpoint set --shlib libcp.dylib --address 0x275630
+breakpoint set --shlib libcp.dylib --address 0x2730c0
+breakpoint set --shlib libcp.dylib --address 0x2732f0
+breakpoint set --shlib libcp.dylib --address 0x26d750
+breakpoint set --shlib libcp.dylib --address 0x29ed90
+breakpoint set --shlib libcp.dylib --address 0x3f7040
+breakpoint set --shlib libcp.dylib --address 0x3f72f0
+breakpoint set --shlib libcp.dylib --address 0x3c90a5
+breakpoint set --shlib libcp.dylib --address 0x3ecc10
+breakpoint set --shlib libcp.dylib --address 0x3ecd80
+breakpoint set --shlib libcp.dylib --address 0x3eced0
+breakpoint set --shlib libcp.dylib --address 0x365960
+breakpoint set --shlib libcp.dylib --address 0x3661b0
+breakpoint set --shlib libcp.dylib --address 0x369fa1
+breakpoint set --shlib libcp.dylib --address 0x19f790
+breakpoint set --shlib libcp.dylib --address 0x1a3c00
+script variant_pipeline_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-10-24/L16_02786.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/lri_firing_set_census/variant_pipeline_unit2_28mm_tele.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script variant_pipeline_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script variant_pipeline_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/lri_firing_set_census/variant_pipeline_unit2_28mm_tele.json")
+quit

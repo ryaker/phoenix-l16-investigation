@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_stereo_residual_policy/skip_mask_task_probe.py
+script skip_mask_task_probe.reset("Unit-1 28mm index-5 skip-mask task rectangles")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_stereo_residual_policy
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x26db40
+script skip_mask_task_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_stereo_residual_policy/skip_mask_tasks_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script skip_mask_task_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_stereo_residual_policy/skip_mask_tasks_28mm.json")
+quit

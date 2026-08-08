@@ -1,0 +1,15 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/editor_render_type_topology/display_pipeline_tile_probe.py
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology
+platform shell cp /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/lri_process_probe /private/tmp/lri_process_probe_display_tile
+target create /private/tmp/lri_process_probe_display_tile
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x3bb867
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/private/tmp/editor_display_tile_unused.hdr" --profile 3 --render-type 1 --render-only --sync-render --gui-level-sweep --no-auto-lris
+script display_pipeline_tile_probe.capture_before(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/display_pipeline_tile_before.raw")
+thread step-inst-over
+script display_pipeline_tile_probe.capture_after(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/display_pipeline_tile_after.raw")
+breakpoint disable 1
+continue
+script display_pipeline_tile_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/display_pipeline_tile_28mm.json")
+quit

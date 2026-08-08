@@ -3,6 +3,14 @@
 **Date:** 2026-04-13
 **Purpose:** Document the LRI binary fields that tell Phoenix (1) which cameras fired for a given capture, and (2) which mirror/encoder config each movable camera used. Pure binary RE against real LRI files — no reliance on spike conclusions.
 
+**Schema correction (2026-06-19):** `libcp.dylib` embeds the complete
+`camera_module.proto` and `lightheader.proto` descriptors. Machine extraction
+proves the field names and types used below. Earlier guesses that field 5 was
+exposure-related, field 8 was timestamp-like, and field 10 was a focus step are
+refuted; the exact names are `lens_position`, `sensor_exposure`, and
+`sensor_temparature` (the installed schema's spelling). See
+`docs/evidence/bundle_static_runtime_index5_public_proto_schema_names.md`.
+
 **Verified on three real LRIs (three different zoom levels, same camera unit):**
 - `/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri` — 28mm (zoom=28)
 - `/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri` — 70mm (zoom=70)
@@ -63,16 +71,20 @@ Decoded as protobuf. Fields observed across all verified captures:
 
 | field | wire_type | meaning | notes |
 |------:|:---------:|---|---|
-| 2 | varint | **camera_id** (0..15) | 0–4 = A1..A5, 5–9 = B1..B5, 10–15 = C1..C6 |
-| 3 | varint | constant `1` | (role?) |
-| 4 | varint | **mirror encoder ADC reading** at capture time | 0 for fixed-mirror cams; ~230..900 for movables |
-| 5 | varint | **exposure**-related (monotonic with brightness, ~700..11000) | ID-consistent; likely per-camera exposure time in ticks |
-| 8 | varint | **timestamp-ish** (monotonic per capture, ~10⁵..10⁷) | possibly IMU frame counter |
-| 10 | varint | small int (~40..80, varies with zoom) | ? (focus lens step?) |
-| 15 | varint | `0` always | |
-| 16 | varint | `1` always | |
+| 2 | varint | `CameraModule.id` (`CameraID`) | 0–4 = A1..A5, 5–9 = B1..B5, 10–15 = C1..C6 |
+| 3 | varint | `CameraModule.is_enabled` (`bool`) | defaults to `true` |
+| 4 | varint | `CameraModule.mirror_position` (`int32`) | capture-time mirror position; 0 for fixed mirrors |
+| 5 | varint | `CameraModule.lens_position` (`int32`) | live lens-position code used by focus-dependent intrinsics evaluation |
+| 7 | fixed32 | `CameraModule.sensor_analog_gain` (`float`) | required |
+| 8 | varint | `CameraModule.sensor_exposure` (`uint64`) | required |
+| 9 | bytes | `CameraModule.sensor_data_surface` | includes `size = 4160 x 3120` |
+| 10 | varint | `CameraModule.sensor_temparature` (`sint32`) | zigzag encoded; spelling is from installed schema |
+| 15 | varint | `CameraModule.frame_index` (`uint32`) | optional |
+| 16 | varint | `CameraModule.sensor_dpc_on` (`bool`) | defaults to `true` |
 
-For this deliverable, the relevant fields are **2** (cam id) and **4** (encoder). Everything else is annotated for future spec work.
+For this deliverable, the config-selection fields remain **2** (`id`) and **4**
+(`mirror_position`). The additional names above are descriptor-proven and are
+used by the Lane B public-origin evidence.
 
 ### LightHeader top-level fields also useful
 

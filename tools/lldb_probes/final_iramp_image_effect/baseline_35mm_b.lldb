@@ -1,0 +1,5 @@
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/final_iramp_image_effect/unit1_35mm
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/final_iramp_image_effect/unit1_35mm/baseline_b.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+quit

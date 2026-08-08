@@ -1,0 +1,11 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_guidance_channel_origin/hot_pixel_decision_probe.py
+script hot_pixel_decision_probe.reset("Unit-1 28mm Guidance hot-pixel isolation decisions", 96)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x27b7a0
+breakpoint set --shlib libcp.dylib --address 0x2e9afd
+script hot_pixel_decision_probe.attach(lldb.debugger)
+process launch -- "/private/tmp/l16_guidance_hot_pixel_decision_unit1_28mm.lri" "/private/tmp/l16_guidance_hot_pixel_decision_unit1_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script hot_pixel_decision_probe.write_report(lldb.debugger, "/private/tmp/l16_guidance_hot_pixel_decision_unit1_28mm.json")
+quit

@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_20ca00_copied_sentinel_gate/prefusion_20ca00_copied_sentinel_gate_probe.py
+script prefusion_20ca00_copied_sentinel_gate_probe.reset("35mm L16_03041 prefusion 20ca00 copied sentinel gate", 256, 3, 4096, 3, 512, 1200000)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_20ca00_copied_sentinel_gate
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script prefusion_20ca00_copied_sentinel_gate_probe.install_breakpoints(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_20ca00_copied_sentinel_gate/copied_sentinel_gate_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script prefusion_20ca00_copied_sentinel_gate_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script prefusion_20ca00_copied_sentinel_gate_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_20ca00_copied_sentinel_gate/copied_sentinel_gate_35mm.json")
+quit

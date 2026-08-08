@@ -1,0 +1,12 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/output_orientation_policy/output_orientation_policy_probe.py
+script output_orientation_policy_probe.reset("Unit-1 35mm ORIENTATION_ROT90_CCW")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/output_orientation_policy
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --name main
+process launch -- "/Volumes/Base Photos/Light/2018-01-24/L16_00202.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/output_orientation_policy/unit1_35mm_ccw.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script output_orientation_policy_probe.install(lldb.debugger)
+breakpoint delete 1
+process continue
+script output_orientation_policy_probe.write_report("/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/output_orientation_policy/unit1_35mm_ccw.json")
+quit

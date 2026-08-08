@@ -1,0 +1,18 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/codex_1f0ce0_k_source_trace/k_source_trace_probe.py
+script k_source_trace_probe.reset("35mm L16_03041 1f0ce0 K source trace", 512, 4096)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_1f0ce0_k_source_trace
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x1f0d36
+breakpoint set --shlib libcp.dylib --address 0x1f96e0
+breakpoint set --shlib libcp.dylib --address 0x1f0ee5
+breakpoint set --shlib libcp.dylib --address 0x1f0fed
+breakpoint set --shlib libcp.dylib --address 0x1f1047
+breakpoint set --shlib libcp.dylib --address 0x1f1328
+breakpoint set --shlib libcp.dylib --address 0x1f134b
+script k_source_trace_probe.attach_existing(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_1f0ce0_k_source_trace/k_source_trace_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script k_source_trace_probe.drive_until_exit_or_step_cap(lldb.debugger, 60000)
+script k_source_trace_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/codex_1f0ce0_k_source_trace/k_source_trace_35mm.json")
+quit

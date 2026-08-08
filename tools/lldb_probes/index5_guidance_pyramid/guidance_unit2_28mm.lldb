@@ -1,0 +1,11 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_guidance_pyramid/guidance_pyramid_probe.py
+script guidance_pyramid_probe.reset("unit2_28mm guidance pyramid", "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_28mm")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_28mm
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x276a01
+script guidance_pyramid_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-04/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_28mm/report.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script guidance_pyramid_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_28mm/report.json")
+quit

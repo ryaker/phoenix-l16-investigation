@@ -1,0 +1,11 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/g43_direction_vectors/g43_spatial_probe.py
+script g43_spatial_probe.reset("35mm index-5 negative SGM sweep", -1, 32)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x276860
+script g43_spatial_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g43_direction_vectors/g43_spatial_neg_35mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script g43_spatial_probe.drive(lldb.debugger)
+script g43_spatial_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/g43_direction_vectors/g43_spatial_neg_35mm.json")
+quit

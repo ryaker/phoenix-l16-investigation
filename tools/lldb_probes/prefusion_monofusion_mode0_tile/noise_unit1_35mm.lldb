@@ -1,0 +1,13 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_monofusion_mode0_tile/noise_probe.py
+script noise_probe.reset("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode0_tile/unit1_35mm")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x1a4524
+breakpoint set --shlib libcp.dylib --address 0x1a464d
+breakpoint set --shlib libcp.dylib --address 0x1a4652
+breakpoint command add -F noise_probe.on_muview 1
+breakpoint command add -F noise_probe.on_entry 2
+breakpoint command add -F noise_probe.on_return 3
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/private/tmp/codex_noise_unit1_35.hdr" --profile 3 --export-fmt 3
+script noise_probe.report()
+quit

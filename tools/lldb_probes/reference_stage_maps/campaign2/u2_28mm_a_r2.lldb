@@ -1,0 +1,14 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/reference_stage_maps/reference_stage_map_probe.py
+script reference_stage_map_probe.reset("campaign2 u2_28mm_a r2", "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/reference_stage_maps/campaign/u2_28mm_a_r2")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/reference_stage_maps/campaign/u2_28mm_a_r2
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x26e4d5
+breakpoint set --shlib libcp.dylib --address 0x26e64f
+breakpoint set --shlib libcp.dylib --address 0x26ac18
+breakpoint set --shlib libcp.dylib --address 0x41eb5a
+script reference_stage_map_probe.attach(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2017-12-01/L16_00007.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/reference_stage_maps/campaign/u2_28mm_a_r2/output.dng" --profile 3 --export-fmt 4 --no-auto-lris
+script reference_stage_map_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/reference_stage_maps/campaign/u2_28mm_a_r2/report.json")
+quit

@@ -1,0 +1,16 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_monofusion_identity/monofusion_runtime_probe.py
+script monofusion_runtime_probe.reset("Unit-1 28mm L16_02130 2018-07-23")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_identity
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x406774
+breakpoint set --shlib libcp.dylib --address 0x1b17c0
+breakpoint set --shlib libcp.dylib --address 0x1b2722
+breakpoint set --shlib libcp.dylib --address 0x1b3530
+breakpoint set --shlib libcp.dylib --address 0x406c2f
+breakpoint set --shlib libcp.dylib --address 0x40721b
+breakpoint set --shlib libcp.dylib --address 0x407458
+script monofusion_runtime_probe.install_callbacks(lldb.debugger, {"field20_store": 1, "initialize_entry": 2, "initialize_commit": 3, "process_entry": 4, "process_return": 5, "wide_adapter": 6, "tele_adapter": 7})
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_identity/unit1_28mm.hdr" --profile 3 --export-fmt 3
+script monofusion_runtime_probe.report_to_file("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_identity/unit1_28mm.json")
+quit

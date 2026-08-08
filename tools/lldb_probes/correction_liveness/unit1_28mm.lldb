@@ -1,0 +1,14 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/correction_liveness/correction_liveness_probe.py
+script correction_liveness_probe.reset("Unit-1 28mm")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/correction_liveness
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --name main
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/correction_liveness/unit1_28mm.hdr" --profile 3 --export-fmt 3
+script correction_liveness_probe.install(lldb.debugger)
+breakpoint delete 1
+process continue
+script correction_liveness_probe.capture_current_stops(lldb.debugger)
+process continue
+script correction_liveness_probe.write_report("/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/correction_liveness/unit1_28mm.json")
+quit

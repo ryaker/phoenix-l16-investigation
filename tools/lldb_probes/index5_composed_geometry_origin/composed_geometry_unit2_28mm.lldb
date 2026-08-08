@@ -1,0 +1,15 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/index5_composed_geometry_origin/composed_geometry_origin_probe.py
+script composed_geometry_origin_probe.reset("Unit-2 28mm composed geometry origin")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_composed_geometry_origin
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0xe59a9
+breakpoint set --shlib libcp.dylib --address 0x3ff1bc
+breakpoint set --shlib libcp.dylib --address 0x3ff1d6
+breakpoint set --shlib libcp.dylib --address 0x3ff43c
+script composed_geometry_origin_probe.attach_existing(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-04/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_composed_geometry_origin/composed_geometry_unit2_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script composed_geometry_origin_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script composed_geometry_origin_probe.write_report(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_composed_geometry_origin/composed_geometry_unit2_28mm.json")
+quit

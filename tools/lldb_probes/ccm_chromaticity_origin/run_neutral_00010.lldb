@@ -1,0 +1,10 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/ccm_chromaticity_origin/neutral_origin_probe.py
+script neutral_origin_probe.reset("/private/tmp/neutral_00010.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x1bd270
+breakpoint command add -F neutral_origin_probe.on_entry 1
+process launch -- "/private/tmp/L16_00010.lri" "/private/tmp/neutral_00010.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script neutral_origin_probe.write_report(lldb.debugger)
+quit

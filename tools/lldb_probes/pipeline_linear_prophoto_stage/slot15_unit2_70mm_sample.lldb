@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/pipeline_linear_prophoto_stage/slot15_branch_incidence_probe.py
+script slot15_branch_incidence_probe.reset("Unit-2 70mm slot-15 positive equal-branch sample", 8, 20000, True)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/pipeline_linear_prophoto_stage
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script slot15_branch_incidence_probe.install_tele(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-10-25/L16_02894.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/pipeline_linear_prophoto_stage/slot15_unit2_70mm_sample.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script slot15_branch_incidence_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/pipeline_linear_prophoto_stage/slot15_unit2_70mm_sample.json")
+quit

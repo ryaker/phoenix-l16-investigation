@@ -1,0 +1,10 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_monofusion_mode0_tile/mode0_entry_census.py
+script mode0_entry_census.reset("Unit-1 exact-35mm L16_03041", "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode0_tile/unit1_35mm/entry_census.json", 60)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_monofusion_mode0_tile/unit1_35mm
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x1a3c00
+script mode0_entry_census.install(lldb.debugger, 1)
+process launch -- "/Volumes/Base Photos/Light/2018-12-26/L16_03041.lri" "/private/tmp/codex_monofusion_census_u135.hdr" --profile 3 --export-fmt 3
+script mode0_entry_census.flush()
+quit

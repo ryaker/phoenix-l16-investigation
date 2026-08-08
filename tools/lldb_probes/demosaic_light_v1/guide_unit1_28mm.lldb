@@ -1,0 +1,21 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/demosaic_light_v1/guide_runtime_probe.py
+script guide_runtime_probe.reset("/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/demosaic_light_v1/guide_runtime_unit1_28mm.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process launch --stop-at-entry -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/demosaic_light_v1/guide_unit1_28mm.hdr"
+breakpoint set --hardware --shlib libcp.dylib --address 0x2ec660
+process continue
+script guide_runtime_probe.capture_stencil(lldb.debugger, 1)
+process continue
+script guide_runtime_probe.capture_stencil_output(lldb.debugger)
+process continue
+script guide_runtime_probe.capture_stage2(lldb.debugger)
+process continue
+script guide_runtime_probe.capture_stage2_output(lldb.debugger)
+process continue
+script guide_runtime_probe.capture_stage3(lldb.debugger)
+process continue
+script guide_runtime_probe.capture_stage3_output(lldb.debugger)
+process continue
+script guide_runtime_probe.report(lldb.debugger)
+quit

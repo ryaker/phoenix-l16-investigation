@@ -1,0 +1,13 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/editor_render_type_topology/output_write_watch_probe.py
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology
+platform shell cp /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/lri_process_probe /private/tmp/lri_process_probe_editor_watch
+target create /private/tmp/lri_process_probe_editor_watch
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --name lri_probe_output_write_target
+script output_write_watch_probe.attach(lldb.debugger, 1, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/type1_28mm_level4_source_f32.raw")
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/private/tmp/editor_output_write_unused.hdr" --profile 3 --render-type 1 --render-only --sync-render --gui-level-sweep --probe-output-level 4 --inspect-output-pyramid --dump-output-level 4 /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/type1_28mm_level4_watch --no-auto-lris
+script output_write_watch_probe.capture_watch_stop(lldb.debugger)
+script output_write_watch_probe.resume_if_stopped(lldb.debugger)
+script output_write_watch_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/editor_render_type_topology/output_write_watch_level4_28mm.json")
+quit

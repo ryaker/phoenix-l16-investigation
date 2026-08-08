@@ -1,0 +1,11 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/output_rgbe_writer/output_rgbe_writer_probe.py
+script output_rgbe_writer_probe.reset("Unit-1 28mm final RGBE writer")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/output_rgbe_writer
+target create /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x90764
+script output_rgbe_writer_probe.attach_existing(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/output_rgbe_writer/unit1_28mm.hdr" --profile 3 --export-fmt 3
+script output_rgbe_writer_probe.drive(lldb.debugger)
+script output_rgbe_writer_probe.write_report("/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/output_rgbe_writer/unit1_28mm.json")
+quit

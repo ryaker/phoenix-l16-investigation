@@ -1,0 +1,11 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/prefusion_src2_source_camera_identity/src2_source_camera_probe.py
+script src2_source_camera_probe.reset("Unit-2 70mm visible src2 source camera")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set -H --shlib libcp.dylib --address 0x406b48
+breakpoint set -H --shlib libcp.dylib --address 0x406b5e
+script src2_source_camera_probe.install_callbacks(lldb.debugger, 1, 2)
+process launch -- "/Volumes/Base Photos/Light/2018-10-25/L16_02894.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/prefusion_src2_source_camera_identity/unit2_70mm.hdr" --profile 3 --export-fmt 3
+script src2_source_camera_probe.report()
+process kill
+quit

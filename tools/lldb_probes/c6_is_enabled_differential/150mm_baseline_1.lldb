@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/c6_is_enabled_differential/c6_is_enabled_differential_probe.py
+script c6_is_enabled_differential_probe.reset("150mm baseline repeat 1", False)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/c6_is_enabled_differential
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script c6_is_enabled_differential_probe.install(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/c6_is_enabled_differential/150mm_baseline_1.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script c6_is_enabled_differential_probe.report_to_file(lldb.debugger, "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/c6_is_enabled_differential/150mm_baseline_1.json")
+quit

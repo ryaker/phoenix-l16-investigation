@@ -1,0 +1,10 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/nlm_topology_boundary/nlm_topology_boundary_probe.py
+script nlm_topology_boundary_probe.reset("Unit-1 28mm PatchNLM topology/boundary")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/nlm_topology_boundary
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+script nlm_topology_boundary_probe.install(lldb.debugger, "parent")
+process launch -- "/Users/ryaker/L16_02130_nlm_topology.lri" "/Users/ryaker/nlm_topology_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script nlm_topology_boundary_probe.drive(lldb.debugger, 50000)
+script nlm_topology_boundary_probe.write_report(lldb.debugger, "/Users/ryaker/Dev/L16_Lumen_ReverseEngineering/runs/nlm_topology_boundary/unit1_28mm.json")
+quit

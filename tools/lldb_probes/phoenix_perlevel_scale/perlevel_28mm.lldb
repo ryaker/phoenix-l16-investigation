@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/phoenix_perlevel_scale/perlevel_scale_probe.py
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+breakpoint set --shlib libcp.dylib --address 0x276860
+breakpoint command add -F perlevel_scale_probe.on_cost_worker
+process launch -- "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" "/tmp/perlevel_28mm.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script perlevel_scale_probe.summary(lldb.debugger)
+quit

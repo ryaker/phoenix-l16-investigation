@@ -1,0 +1,12 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/awb_public_origin/runtime_probe.py
+script runtime_probe.reset("Unit-1 150mm", "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/awb_public_origin/unit1_150mm.json")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --hardware --shlib libcp.dylib --address 0x2eb560
+process launch -- "/Volumes/Base Photos/Light/2018-07-29/L16_02285.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/awb_public_origin/unit1_150mm.hdr"
+script runtime_probe.capture_driver(lldb.debugger, 1)
+process continue
+script runtime_probe.capture_post_square(lldb.debugger)
+script runtime_probe.report(lldb.debugger)
+process kill
+quit

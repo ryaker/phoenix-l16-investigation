@@ -15,6 +15,12 @@ It may not cite scratch docs directly unless the claim has already been admitted
 
 This spec is a scaffold. It is not yet complete enough to implement end-to-end parity without reading the blocker list.
 
+The Final Truth Completion Checklist stub pack is complete at
+`docs/TRUTH.md` version `3.0.238`. Use
+`docs/canonical/FINAL_TRUTH_SPEC_HANDOFF.md` to fill the constants,
+calibration names, C6 policy, SGM tuning, row formats, and clarity kernel
+without reopening those investigations.
+
 Before writing implementation text into any section below, confirm:
 
 - the claim is `SPEC_READY`
@@ -94,7 +100,10 @@ The required visual quality bar is:
 
 The following areas are still blocked and must not be written as closed algorithm text yet:
 
-- exact `src1` / `src2` pre-fusion reducer
-- remaining producer-side row/map calibration semantics over the ROI-derived dst-coordinate lattice
-- exact tele odd-camera routing
-- any merge acceptance / rejection logic not yet proven
+- exact distributed pre-fusion behavior behind visible `src1` / `src2`
+- residual implementation-required whole-State/Guidance/selector semantics
+  listed in `PARITY_BLOCKERS.md`
+- complete contributor acceptance / rejection and final image-consequence logic
+
+Canonical tele C6 routing is no longer on this list:
+`CLM-C6-001` is `PROVEN`/`SPEC_READY` for bridge HDR.
