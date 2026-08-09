@@ -1,0 +1,66 @@
+{
+  "done": true,
+  "errors": [
+    "img 1 insane desc {'size': [0, 0], 'stride': 0, 'data': 6700148983840}",
+    "img 3 insane desc {'size': [0, 0], 'stride': 0, 'data': 6700148983840}",
+    "img 5 insane desc {'size': [0, 0], 'stride': 0, 'data': 6700148983840}",
+    "img 7 insane desc {'size': [0, 0], 'stride': 0, 'data': 6700148983840}",
+    "img 9 insane desc {'size': [0, 0], 'stride': 0, 'data': 6700148983840}"
+  ],
+  "hits": 2341,
+  "label": "unit2_70mm L16_00010 source planes",
+  "outdir": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010_sources",
+  "planes": [
+    {
+      "bytes": 12979200,
+      "h": 1560,
+      "k": 0,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010_sources/src_image0_2080x1560.rgba8",
+      "sha256": "6586bfbfba90a3f0834206ed41c5e3103b4f9d76097f355120362a4515e0c72e",
+      "stride": 2080,
+      "w": 2080
+    },
+    {
+      "bytes": 12979200,
+      "h": 1560,
+      "k": 2,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010_sources/src_image2_2080x1560.rgba8",
+      "sha256": "1da2339634df5304341417ad55408a609f79d7a957f34da1321e9fb7f449e1b4",
+      "stride": 2080,
+      "w": 2080
+    },
+    {
+      "bytes": 12979200,
+      "h": 1560,
+      "k": 4,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010_sources/src_image4_2080x1560.rgba8",
+      "sha256": "c0d6c163b7f7bcee8a872ccfa78785b157900aa9b522778491f6e062aa0e488b",
+      "stride": 2080,
+      "w": 2080
+    },
+    {
+      "bytes": 12979200,
+      "h": 1560,
+      "k": 6,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010_sources/src_image6_2080x1560.rgba8",
+      "sha256": "efb901d36b275a8192b41ecb725756cb0a002012f21a327e4abbe863a28e35fa",
+      "stride": 2080,
+      "w": 2080
+    },
+    {
+      "bytes": 12979200,
+      "h": 1560,
+      "k": 8,
+      "path": "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/index5_guidance_pyramid/unit2_70mm_L16_00010_sources/src_image8_2080x1560.rgba8",
+      "sha256": "f28039775ffeb545ff467d6404424838bcef0766c97be5f13da7671be6c91bb2",
+      "stride": 2080,
+      "w": 2080
+    }
+  ],
+  "vec_dumps": [
+    {
+      "layer": 140312805664656,
+      "region_0x240": "90013f0200600000e0013f0200600000e0013f0200600000801f842f9d7f0000c822842f9d7f0000c822842f9d7f0000"
+    }
+  ]
+}
