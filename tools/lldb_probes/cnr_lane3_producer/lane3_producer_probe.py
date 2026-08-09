@@ -32,23 +32,27 @@ import json
 import os
 import struct
 
+BUILDER  = 0x33F480   # per-tile task builder: rcx=base image, r9=source vector
 TASK     = 0x34B3F0   # CNR route fn: rdi=context r14, rsi=denoise task rbx
 DISPATCH = 0x307EE0   # rdi=dst image, rdx=guide image
 PRODUCER = 0x308F50   # rdi=dst wrapper, rsi=&guide-struct-ptr
 STORE    = 0x30905E   # right after: mulss xmm0,xmm0 ; movss xmm0,(rdx,rcx,4)
 
-SITES = {TASK: "task_entry", DISPATCH: "dispatch", PRODUCER: "producer",
-         STORE: "lane3_store"}
+SITES = {BUILDER: "builder", TASK: "task_entry", DISPATCH: "dispatch",
+         PRODUCER: "producer", STORE: "lane3_store"}
 
 
-def reset(label="", report_path="", dispatch_cap=8, store_cap=8, task_cap=3):
+def reset(label="", report_path="", dispatch_cap=8, store_cap=8, task_cap=3,
+          builder_cap=3):
     builtins.l16_lane3 = {
         "label": label,
         "report_path": report_path,
         "dispatch_cap": dispatch_cap,
         "store_cap": store_cap,
         "task_cap": task_cap,
+        "builder_cap": builder_cap,
         "breakpoint_ids": {},
+        "builder_events": [],
         "task_events": [],
         "dispatch_events": [],
         "store_events": [],
@@ -68,12 +72,17 @@ def _u(frame, name):
 
 
 def _read(process, addr, size):
-    if not addr:
+    # Guard: userspace range only; ReadMemory raises OverflowError on
+    # negative/huge addresses (e.g. when chasing a non-vtable pointer).
+    if not addr or addr < 0x1000 or addr > 0x00007FFFFFFFFFFF:
         return None
     lldb = builtins.__import__("lldb")
     err = lldb.SBError()
-    data = process.ReadMemory(addr, size, err)
-    return data if err.Success() and len(data) == size else None
+    try:
+        data = process.ReadMemory(addr, size, err)
+    except (OverflowError, Exception):
+        return None
+    return data if err.Success() and data is not None and len(data) == size else None
 
 
 def _i32s(data):
@@ -239,17 +248,136 @@ def _task_guide(process, task_ptr):
     return guide_desc
 
 
+def _image_full(process, addr):
+    """Decode an image struct incl. the +0x38 scale field (float)."""
+    raw = _read(process, addr, 0x40)
+    if raw is None:
+        return {"addr": addr, "read_ok": False}
+    def i32(off):
+        return struct.unpack_from("<i", raw, off)[0]
+    def f32(off):
+        return struct.unpack_from("<f", raw, off)[0]
+    def u64(off):
+        return struct.unpack_from("<Q", raw, off)[0]
+    return {
+        "addr": addr, "read_ok": True,
+        "width": i32(0x10), "height": i32(0x14), "stride": i32(0x18),
+        "data_ptr": u64(0x20), "scale_0x38": f32(0x38),
+    }
+
+
+def builder(frame, bp_loc, _d):
+    """0x33f480 entry: capture the fusion source vector (r9) + base image."""
+    st = _state()
+    proc = frame.GetThread().GetProcess()
+    thread = frame.GetThread()
+    target = proc.GetTarget()
+    regs = _regs(frame)
+    # r9 is used as movq (r9,i*8),rsi -> array of image pointers.  Try both r9
+    # as the array base and *r9 (vector begin) as the base.
+    def decode_ptr_array(base, n=10):
+        out = []
+        arr = _read(proc, base, n * 8)
+        if arr is None:
+            return out
+        for i in range(n):
+            p = struct.unpack_from("<Q", arr, i * 8)[0]
+            if 0x1000 < p < 0x00007fffffffffff:
+                out.append({"idx": i, "ptr": p, "image": _image_full(proc, p)})
+            else:
+                out.append({"idx": i, "ptr": p, "image": None})
+        return out
+    r9 = regs["r9"]
+    deref = _read(proc, r9, 8)
+    r9_begin = struct.unpack_from("<Q", deref, 0)[0] if deref else 0
+    ev = {
+        "seq": len(st["builder_events"]) + 1,
+        "site_va": _va(target, frame.GetPC()),
+        "registers": regs,
+        "base_image_rcx": _image_full(proc, regs["rcx"]),
+        "arg_rdx": regs["rdx"], "arg_r8": regs["r8"],
+        "r9_as_array": decode_ptr_array(r9),
+        "r9_deref_as_array": decode_ptr_array(r9_begin) if r9_begin else [],
+        "stack": _stack(thread, target),
+    }
+    st["builder_events"].append(ev)
+    if len(st["builder_events"]) >= int(st["builder_cap"]):
+        _disable(target, "builder")
+    return False
+
+
+def _cstr(process, addr, maxlen=256):
+    if not addr:
+        return None
+    out = b""
+    for _ in range(maxlen):
+        b = _read(process, addr + len(out), 1)
+        if not b or b == b"\x00":
+            break
+        out += b
+    try:
+        return out.decode("utf-8", "replace")
+    except Exception:
+        return out.hex()
+
+
+def _rtti_name(process, obj_ptr):
+    """Itanium C++ ABI: obj[0]=vtable; vtable[-1]=typeinfo; typeinfo+8=name*."""
+    if not obj_ptr:
+        return None
+    vt = _read(process, obj_ptr, 8)
+    if not vt:
+        return None
+    vtable = struct.unpack("<Q", vt)[0]
+    ti = _read(process, vtable - 8, 8)
+    if not ti:
+        return {"vtable": vtable, "typeinfo": None}
+    typeinfo = struct.unpack("<Q", ti)[0]
+    nm = _read(process, typeinfo + 8, 8)
+    if not nm:
+        return {"vtable": vtable, "typeinfo": typeinfo, "name": None}
+    name_ptr = struct.unpack("<Q", nm)[0]
+    return {"vtable": vtable, "typeinfo": typeinfo,
+            "name": _cstr(process, name_ptr)}
+
+
+def _sym(target, addr):
+    """Resolve a runtime address to module+symbol via the SBTarget."""
+    if not addr:
+        return None
+    lldb = builtins.__import__("lldb")
+    saddr = target.ResolveLoadAddress(addr)
+    if not saddr or not saddr.IsValid():
+        return None
+    sym = saddr.GetSymbol()
+    mod = saddr.GetModule()
+    modname = str(mod.GetFileSpec().GetFilename()) if mod else None
+    return {"module": modname, "symbol": sym.GetName() if sym else None,
+            "va": _va(target, addr)}
+
+
 def task_entry(frame, bp_loc, _d):
     st = _state()
     proc = frame.GetThread().GetProcess()
     thread = frame.GetThread()
     target = proc.GetTarget()
     regs = _regs(frame)
+    task = regs["rsi"]
+    ctx = regs["rdi"]
+    # object pointers at task+0x00 / +0x08 (likely vtable/owner objects)
+    p00 = struct.unpack("<Q", _read(proc, task, 8) or b"\0"*8)[0]
+    p08 = struct.unpack("<Q", _read(proc, task + 8, 8) or b"\0"*8)[0]
     ev = {
         "seq": len(st["task_events"]) + 1,
         "site_va": _va(target, frame.GetPC()),
         "context_rdi": regs["rdi"],       # r14 render context
         "task_rsi": regs["rsi"],          # denoise task
+        "rtti_task": _rtti_name(proc, task),
+        "rtti_p00": _rtti_name(proc, p00),
+        "rtti_p08": _rtti_name(proc, p08),
+        "sym_p00": _sym(target, p00),
+        "sym_p08": _sym(target, p08),
+        "rtti_context": _rtti_name(proc, ctx),
         "task_guide": _task_guide(proc, regs["rsi"]),
         # a window of the context, in case the guide ptr matches a context slot
         "context_head_hex": _raw(proc, regs["rdi"], 0x120),
@@ -315,6 +443,7 @@ def install(debugger):
     st = _state()
     target = debugger.GetSelectedTarget()
     cbs = {
+        BUILDER: "lane3_producer_probe.builder",
         TASK: "lane3_producer_probe.task_entry",
         DISPATCH: "lane3_producer_probe.dispatch",
         STORE: "lane3_producer_probe.lane3_store",

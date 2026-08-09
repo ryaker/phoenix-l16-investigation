@@ -165,21 +165,61 @@ this frame's brighter tiles give higher guide floors (`0.60..0.88`), same
 of `mean(guide^2)` across tiles/zooms — consistent with a data-driven guide, not
 a constant.
 
+## RTTI naming of the producing stage (runtime, `unit1_70mm_lane3_v4.json`)
+
+Resolving `0x34b3f0`'s `rdi` (arg1, the "context" object) through the Itanium
+C++ ABI (`obj -> vtable -> typeinfo -> name`) names the producer's owning
+scope. Bit-exact demangled type of `rdi`:
+
+```
+std::__1::__function::__func<
+    lt::Internal::Pipeline::setWhiteBalance(lt::Internal::PipelineBase::AWB)::$_22,
+    ...,
+    void (lt::SoftISP::Stats&,
+          lt::Image<unsigned short> const&,
+          lt::CapturedImage const&,
+          lt::Rectangle<int> const&)>
+```
+
+So the CNR body `0x34b3f0` (and thus the lane-3 `guide^2` production) runs
+**inside `lt::Internal::Pipeline::setWhiteBalance`'s per-tile lambda `$_22`**,
+whose call signature is
+`void(SoftISP::Stats&, Image<unsigned short> const&, CapturedImage const&, Rectangle<int> const&)`.
+This is a NAMED public pipeline stage. It is coherent with the CNR data space:
+the CNR input is squared *AWB'd* RGB (`p_c = s_c^2`), and this is the AWB
+(setWhiteBalance) stage itself, walking a 16-bit `Image` tile-by-tile (the
+`Rectangle`) with the `CapturedImage` and a `SoftISP::Stats` accumulator.
+
+The task's own `+0x00/+0x08` object pointers did not resolve to RTTI names
+(raw buffers / non-polymorphic), so the naming anchor is the enclosing
+`setWhiteBalance $_22` lambda, not the task struct.
+
+Consequence for the port: the guide is no longer an anonymous fusion buffer —
+it is a working image inside the named setWhiteBalance/AWB stage, over inputs
+(`Image<unsigned short>`, `CapturedImage`, AWB `Stats`) that **Phoenix also
+has**. The guide's half-res, smooth, brightness-tracking `[0.48,1.0]` profile
+is consistent with a normalized/downsampled version of that 16-bit image (or a
+`Stats`-derived map).
+
 ## What this licenses / forbids
 
 - LICENSED: recording that Phoenix's `applyCNR()` assumption "lane 3 is
-  IRAMP-forced to 1.0, so meanA:=1" is **disproven** for the CNR-worker path.
-- FORBIDDEN (still): porting a lane-3 plane into Phoenix. The `guide^2` law is
-  proven but `guide` itself is not yet identified as a Phoenix-reproducible
-  quantity. Coding `lane3 = (somePhoenixPlane)^2` before that plane is proven
-  would be exactly the hand-tuned substitute the D1 verifier warns against.
+  IRAMP-forced to 1.0, so meanA:=1" is **disproven** for the CNR-worker path;
+  and that the producing stage is `lt::Internal::Pipeline::setWhiteBalance`'s
+  `$_22` lambda over `Image<unsigned short>` + `CapturedImage` + AWB `Stats`.
+- FORBIDDEN (still): porting a lane-3 plane into Phoenix. `guide^2` and the
+  producing stage are proven, but WHICH of the three lambda inputs the guide
+  derives from, and its exact normalization to `[~0.48,1.0]`, is not yet
+  proven. Coding `lane3 = (somePhoenixPlane)^2` before that is settled would be
+  the hand-tuned substitute the D1 verifier warns against.
 
-## Next-step recipe (identify the guide source)
+## Next-step recipe (name the exact guide input)
 
-Extend the probe to dump the FULL guide plane (not just 4 rows) at the first
-dispatch, and dump candidate full-res planes for the same frame (guidance Y,
-merged luma), then correlate (the guide is those downsampled to half-res). Or
-break inside `0x34b3f0` at `0x34b591` and record the source buffer handed to
-`0xf340` (`rsi = rbp-0x190`) and trace where that temp was filled. Close by
-matching the guide's `first_row_sha256` / content to a named plane — NOT by
-another static sweep.
+Instrument the `setWhiteBalance $_22` lambda body: at `0x34b3f0` the three
+inputs are reachable (Image<u16>, CapturedImage, Rectangle passed to the
+lambda's `operator()` up-stack). Capture each input's dims/data at the tile,
+and match the half-res guide (`task+0x60`) to a downsample of one of them by
+content (`first_row_sha256` / value correlation). Confirm the normalization
+that maps 16-bit image values into the guide's `[~0.48,1.0]`. Extend to
+four-zoom + two-body for Codex-grade closure. NOT a static sweep (the outer
+functions' static form does not match this runtime).
