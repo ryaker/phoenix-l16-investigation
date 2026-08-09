@@ -115,15 +115,24 @@ Findings that further bound the guide:
   0x31acf0` is exactly Codex's proven 70mm/150mm src2 branch
   (`lldb_src2_406a10_branch_four_zoom.md`).
 
-### Remaining open link
+### Remaining open link (and a static/runtime caveat)
 
-The task is a stack local at `rbp-0x1e0` in `0x33f480`; its guide sub-fields
-(`task+0x50..0x68` = `rbp-0x190..-0x178`) are NOT written by direct movs, so
-they are populated by an image helper from a buffer produced earlier in the
-per-tile fusion body. Naming that per-tile producer (which fusion quantity the
-half-res brightness-tracking guide is) is the remaining step — a fusion-tile
-trace of the same character as Codex's multi-version src2 closures, NOT a
-static sweep.
+The runtime denoise task is a **heap object** (`task_rsi` = `0x3045dcca0`,
+`0x30465fca0`, `0x3041c4ca0`), reached with return address `0x33f951` inside
+`0x33f480`. But the static form of `0x33f480` at that return site passes a
+**stack** local (`leaq -0x1e0(%rbp), %rsi` at `0x33f948`) and never writes
+`task+0x60`. Those do not reconcile: the static path I read does not correspond
+to the runtime heap task (either the disassembled and runtime libcp differ for
+this outer function, or the reached target is a thunk/other slot). So the guide
+producer is NOT closed by static reading of `0x33f480`, and that stack-local
+trace is explicitly NOT asserted here.
+
+Naming the per-tile guide producer is therefore the remaining step, and the
+right instrument is a **runtime watchpoint / breakpoint on the heap task's
+`+0x60`** (or on the guide buffer's allocation) to catch who writes it — not a
+static sweep. What is proven and portable-blocking stands: `lane3 = guide^2`,
+guide is data-driven per tile, half-res, brightness-tracking, at
+`denoise_task+0x60` in the FusionCacheBayer path.
 
 **Confirmed that Codex has NOT closed this.** The `CLM-DENOISE-002` ledger row
 closes the CNR worker formula, the public vector origins, the SVD matrix
