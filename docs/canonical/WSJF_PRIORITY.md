@@ -17,10 +17,20 @@ This file prioritizes the current blocker set toward the actual end goal:
 - correct framing and participation
 - stability across `28mm`, `35mm`, `70mm`, and `150mm`
 
-## Current Priority (TRUTH 3.0.348)
+## Current Priority (TRUTH 3.0.349)
 
 This section supersedes every ranking and lane recommendation below it. The
 older tables are retained only as campaign provenance.
+
+TRUTH `3.0.349` removes stock-Lumen depth nondeterminism as a confounder. The
+bit-level mechanism is executor-parallel shared G-43 payload RMW plus a scoped
+pre-G42 scheduler-sensitive parent decision; ascending sequential `0x2d30`
+execution suppresses the complete index-5 variation across the admitted
+two-body wide/tele controls. The next highest-leverage implementation task is
+therefore a deterministic-schedule Unit-2 `70mm` level-0 boundary comparison:
+capture Lumen Guidance and four sources, composed records, G-42 cost, and G-43
+payload/argmin under that control and compare Phoenix at the first unequal
+boundary. Do not tune against an arbitrary stock-Lumen draw.
 
 TRUTH `3.0.348` completes the fresh Unit-2 `70mm` range-generation comparison.
 The installed and Phoenix range formulas both replay exactly on their own

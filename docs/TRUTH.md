@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.348
+**Version**: 3.0.349
 **Status**: Canonical root truth rebuilt from admitted claims only. Full clean-room investigation remains active; the earlier checklist-complete state was narrower than the project exit criterion.
 
 ## Canonical Authority
@@ -477,6 +477,24 @@ complete two-half `Line buf` and `Min cost buf` allocations initialize to
 with saturating-u16 addition. Installed proof is focal/body independent and
 prior worker liveness covers Unit-1 `28/35/70/150mm`; no Unit-2 G-43 packet is
 claimed.
+
+Version `3.0.349` explains why repeated stock-Lumen depth maps differ. The
+installed G-43 payload accumulation at `0x277a06..0x277a15` is a non-atomic
+shared saturating-u16 RMW. Different pthreads write the same exact payload
+address at every canonical focal tier, and a Unit-2 `70mm` overlap run records
+nine simultaneously active workers on the exact index-5 StereoLayer object.
+This is a concrete executor data race, not Skip-mask randomness,
+uninitialized G-43 scratch, or a floating-point reduction. A separate
+Unit-2 parent-gate repeat also shows pre-G42 executor-order sensitivity as a
+key-6 valid candidate (`score=0.8023583889`, side `0`) versus exact reject
+sentinel (`score=15`, side `1`); the first unsafe instruction in that upstream
+producer is not claimed. Forcing generic executor `0x2d30` through its
+installed ascending fallback stabilizes all captured pre-G42 operands and
+produces byte-identical `2080x1560` maps in two Unit-1 `28mm`, two Unit-1
+`150mm`, and three Unit-2 `70mm` repeats. Thus the observed depth
+nondeterminism is scheduler-induced and suppressible. A clean-room build must
+use deterministic task order or private path accumulators with fixed-order
+reduction rather than reproduce Lumen's race.
 
 Version `3.0.289` closes G-42's selected index-5 plane-sweep operand pairing
 and local-cost metric. Every source `k` is projected and bilinear-sampled as a
@@ -1302,6 +1320,18 @@ composed geometry, G-42 local cost, then G-43 accumulation/argmin. Numerical
 scope is this one Unit-2 `70mm` LRI with explicit debugger-perturbed
 nondeterminism; no other-scene distribution or G-42-versus-G-43 localization
 is claimed. `CLM-STEREO-001` remains `PROVEN` / `SPEC_READY`.
+
+Version `3.0.349` supersedes the remaining causal ambiguity in the preceding
+paragraph. The retained noninstrumented Unit-2 `70mm` pair is exactly
+`52.878821499%` equal, `94.360761834%` within four, with MAE
+`1.1026919995` indices. Its run-to-run variation is rooted in libcp generic-
+executor ordering, with a bit-level shared G-43 payload race proven directly
+and separate pre-G42 scheduler sensitivity observed at the calibration parent
+gate. Ascending sequential `0x2d30` callback execution suppresses the complete
+index-5 variation across the stated two-body wide/tele controls. Stock-Lumen
+comparisons retain the admitted repeat envelopes; a deterministic clean-room
+implementation additionally requires exact self-repeat equality under its
+chosen fixed schedule.
 
 ## Established But Not Fully Closed
 

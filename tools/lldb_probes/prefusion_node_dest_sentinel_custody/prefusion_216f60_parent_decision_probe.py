@@ -218,6 +218,12 @@ def consumer_hit(frame, bp_loc, _dict):
     winner = _winner(process, return_vector["begin"], return_vector["count"])
     center_index = _i32_register(frame, "ebx")
     optional_gate_count = _i32_register(frame, "r12d")
+    destination_object = _u64(process, rbp - 0x628)
+    camera_id = None
+    if destination_object not in (None, 0):
+        camera_id_raw = _read(process, destination_object + 0x60, 4)
+        if camera_id_raw is not None:
+            camera_id = struct.unpack("<I", camera_id_raw)[0]
 
     winner_index = winner.get("index")
     winner_score = (winner.get("score") or {}).get("value")
@@ -281,6 +287,8 @@ def consumer_hit(frame, bp_loc, _dict):
         "consumer_libcp_va": _module_va(target, frame.GetPC()),
         "center_index": center_index,
         "optional_gate_count": optional_gate_count,
+        "destination_object": destination_object,
+        "camera_id": camera_id,
         "return_vector": return_vector,
         "side_vector": side_vector,
         "candidate_records": candidate_records,

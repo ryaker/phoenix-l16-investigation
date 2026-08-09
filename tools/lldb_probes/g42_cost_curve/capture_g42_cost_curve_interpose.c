@@ -229,6 +229,7 @@ static void cost_hook(uint8_t *context, int32_t lower, int32_t count,
     if (capture) {
         int ok = preserve_packet(context, lower, count, curve);
         atomic_store(&capture_state, ok ? 2 : -1);
+        if (getenv("L16_G42_EXIT_AFTER_CAPTURE") != NULL) _exit(ok ? 0 : 70);
     }
 }
 

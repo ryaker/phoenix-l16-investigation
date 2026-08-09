@@ -151,6 +151,22 @@ The measured 45-pair-per-focal distributions are diagnostic. A candidate
 outside them warrants investigation; a candidate inside them is not thereby
 correct.
 
+TRUTH `3.0.349` identifies the stock-Lumen mechanism: executor-parallel G-43
+workers perform a non-atomic shared saturating-u16 payload RMW, with separate
+scoped pre-G42 executor-order sensitivity. Forcing executor `0x2d30` through
+its installed ascending fallback makes the tested Unit-1 wide/tele and Unit-2
+tele index-5 repeats byte-identical. Therefore apply two distinct rules:
+
+- comparisons against unmodified stock Lumen use the empirical focal-specific
+  repeat distributions plus every deterministic formula/artifact check above;
+- a clean-room implementation using its declared deterministic schedule must
+  repeat byte-for-byte, and deterministic controlled Lumen captures may be
+  used as exact stage references for that same schedule.
+
+Do not intentionally reproduce Lumen's data race. Use deterministic task
+order or private directional accumulators followed by a fixed-order
+saturating-u16 reduction.
+
 ### Layered parity decision
 
 A canonical parity pass requires all deterministic input, formula, routing,

@@ -23,7 +23,20 @@ Public names and diagnostic enum labels are not blockers by themselves. They
 become blockers only when the underlying operational meaning is needed to
 compute or encode the image.
 
-## Current Status (TRUTH 3.0.348)
+## Current Status (TRUTH 3.0.349)
+
+TRUTH `3.0.349` closes the mechanism behind stock-Lumen index-5 repeat
+variation. Executor-parallel G-43 workers perform a non-atomic shared
+saturating-u16 payload RMW; same-address/multi-thread writes are observed at
+all four canonical focals and the Unit-2 index-5 object has nine live
+overlapping workers. A Unit-2 parent-gate repeat also exposes pre-G42
+executor-order sensitivity. Forcing generic executor `0x2d30` into its
+installed ascending fallback produces exact repeated maps across Unit-1 wide,
+Unit-1 tele, and Unit-2 tele and stabilizes the captured pre-G42 operands.
+This removes nondeterminism as an implementation-localization ambiguity: use
+deterministic reference captures for the next Lumen/Phoenix level-0 operand,
+G-42, and G-43 comparisons. It does not reopen any selected-profile formula
+claim.
 
 TRUTH `3.0.348` replaces the missing historical Unit-2 tele band statistic
 with two fresh Lumen full-map captures and one same-generation Phoenix render.
