@@ -84,9 +84,52 @@ The copy source is a **member image of the denoise task** `rbx`, resolved at
 So the guide is exactly the image the **denoise task holds at `+0x60`** (data)
 / `+0x58` (stride) / `+0x50` (dims) / `+0x40` (bounds) / `+0x20..0x2c` (crop) —
 confirming the standing D1 lead ("which pointer arg2's task struct holds at
-+0x60"). The remaining open link is which pipeline image the *task constructor*
-assigns to `task+0x60`, set upstream in the caller chain
-`0x33f480 -> 0x31acf0 -> 0x406a10 -> ...`.
++0x60").
+
+### Task-level capture (runtime, `unit1_70mm_lane3_v2.json`)
+
+Breaking at `0x34b3f0` entry (`rdi = render context`, `rsi = denoise task`)
+reads the task guide directly. Three consecutive tasks (same context
+`0x7fcb2a808220`):
+
+| task | guide dims | stride | bounds | native mean / range |
+|------|-----------|--------|--------|---------------------|
+| 1 | 522x522 | 522 | [0,0,522,522] | 0.9985 / [0.998,1.0] |
+| 2 | 524x524 | 532 | [-8,-8,524,524] | 0.614 / [0.603,0.619] |
+| 3 | 524x524 | 532 | [-8,-8,524,524] | 0.530 / [0.480,0.593] |
+
+Findings that further bound the guide:
+
+- The guide is **per-tile**, not a single full-image plane: each task carries
+  its own guide dims (~522-524, i.e. tile + 8px halo) and a **distinct heap
+  buffer** (`0x7fcb18240040`, `0x7fcb304d42e0`, `0x7fcb20bac2e0`). So the guide
+  is produced per tile inside the fusion loop, not cropped from one image.
+- It is nearest-neighbour upsampled from **half resolution**: values repeat in
+  identical 2x2 blocks (row0==row1, columns in pairs).
+- It **tracks tile brightness**: near 1.0 on the bright tile, ~0.5 on a mid
+  tile. It is NOT a per-pixel luma of the CNR source RGB (offline test of
+  `lane3` vs the tile's own squared RGB lanes 0-2: corr ~0.4, large residual).
+- The CNR route runs **inside the FusionCacheBayer / visible-`src2` chain**:
+  full stack `0x34b3f0 <- 0x33f480(vtable+0x30 virtual call at 0x33f94f)
+  <- 0x31acf0 <- 0x406a10 <- 0x3ebb80 <- 0x3eca39 <- 0x3d47d0`. `0x406a10 ->
+  0x31acf0` is exactly Codex's proven 70mm/150mm src2 branch
+  (`lldb_src2_406a10_branch_four_zoom.md`).
+
+### Remaining open link
+
+The task is a stack local at `rbp-0x1e0` in `0x33f480`; its guide sub-fields
+(`task+0x50..0x68` = `rbp-0x190..-0x178`) are NOT written by direct movs, so
+they are populated by an image helper from a buffer produced earlier in the
+per-tile fusion body. Naming that per-tile producer (which fusion quantity the
+half-res brightness-tracking guide is) is the remaining step — a fusion-tile
+trace of the same character as Codex's multi-version src2 closures, NOT a
+static sweep.
+
+**Confirmed that Codex has NOT closed this.** The `CLM-DENOISE-002` ledger row
+closes the CNR worker formula, the public vector origins, the SVD matrix
+helper, and the *separate* `range_scale` image (which has lane 3 = 0, so it is
+not this guide). The CNR source-tile lane-3/guide producer is absent from that
+closure; D1 is open in Codex's ledger as well.
 
 ## Runtime evidence
 

@@ -32,20 +32,24 @@ import json
 import os
 import struct
 
+TASK     = 0x34B3F0   # CNR route fn: rdi=context r14, rsi=denoise task rbx
 DISPATCH = 0x307EE0   # rdi=dst image, rdx=guide image
 PRODUCER = 0x308F50   # rdi=dst wrapper, rsi=&guide-struct-ptr
 STORE    = 0x30905E   # right after: mulss xmm0,xmm0 ; movss xmm0,(rdx,rcx,4)
 
-SITES = {DISPATCH: "dispatch", PRODUCER: "producer", STORE: "lane3_store"}
+SITES = {TASK: "task_entry", DISPATCH: "dispatch", PRODUCER: "producer",
+         STORE: "lane3_store"}
 
 
-def reset(label="", report_path="", dispatch_cap=8, store_cap=8):
+def reset(label="", report_path="", dispatch_cap=8, store_cap=8, task_cap=3):
     builtins.l16_lane3 = {
         "label": label,
         "report_path": report_path,
         "dispatch_cap": dispatch_cap,
         "store_cap": store_cap,
+        "task_cap": task_cap,
         "breakpoint_ids": {},
+        "task_events": [],
         "dispatch_events": [],
         "store_events": [],
         "disabled": [],
@@ -197,6 +201,66 @@ def _maybe_kill(frame):
         frame.GetThread().GetProcess().Kill()
 
 
+def _raw(process, addr, size):
+    raw = _read(process, addr, size)
+    return raw.hex() if raw is not None else None
+
+
+def _task_guide(process, task_ptr):
+    """Decode the denoise task's guide member from its known offsets.
+
+    From static disasm of 0x34b3f0 (0x34b47d..): guide data=task+0x60,
+    stride=task+0x58, dims=task+0x50, bounds=task+0x40, crop=task+0x20..0x2c.
+    """
+    raw = _read(process, task_ptr, 0x80)
+    if raw is None:
+        return {"read_ok": False, "task_ptr": task_ptr}
+    def i32(off):
+        return struct.unpack_from("<i", raw, off)[0]
+    def u64(off):
+        return struct.unpack_from("<Q", raw, off)[0]
+    data_ptr = u64(0x60)
+    dims = (i32(0x50), i32(0x54))
+    stride = i32(0x58)
+    bounds = [i32(0x40), i32(0x44), i32(0x48), i32(0x4c)]
+    crop = [i32(0x20), i32(0x24), i32(0x28), i32(0x2c)]
+    guide_desc = {
+        "read_ok": True, "task_ptr": task_ptr, "task_hex": raw.hex(),
+        "guide_data_ptr": data_ptr, "guide_dims": dims, "guide_stride": stride,
+        "guide_bounds": bounds, "guide_crop": crop,
+        "companion_ptr_0x68": u64(0x68),
+    }
+    # native-resolution sample of the guide plane
+    if data_ptr and dims[0] > 0 and dims[1] > 0 and stride > 0:
+        d = {"read_ok": True, "width": dims[0], "height": dims[1],
+             "stride": stride, "data_ptr": data_ptr}
+        guide_desc["native_sample"] = _plane_sample(process, d, rows=6,
+                                                     max_cols=80)
+    return guide_desc
+
+
+def task_entry(frame, bp_loc, _d):
+    st = _state()
+    proc = frame.GetThread().GetProcess()
+    thread = frame.GetThread()
+    target = proc.GetTarget()
+    regs = _regs(frame)
+    ev = {
+        "seq": len(st["task_events"]) + 1,
+        "site_va": _va(target, frame.GetPC()),
+        "context_rdi": regs["rdi"],       # r14 render context
+        "task_rsi": regs["rsi"],          # denoise task
+        "task_guide": _task_guide(proc, regs["rsi"]),
+        # a window of the context, in case the guide ptr matches a context slot
+        "context_head_hex": _raw(proc, regs["rdi"], 0x120),
+        "stack": _stack(thread, target),
+    }
+    st["task_events"].append(ev)
+    if len(st["task_events"]) >= int(st["task_cap"]):
+        _disable(target, "task_entry")
+    return False
+
+
 def dispatch(frame, bp_loc, _d):
     st = _state()
     proc = frame.GetThread().GetProcess()
@@ -251,6 +315,7 @@ def install(debugger):
     st = _state()
     target = debugger.GetSelectedTarget()
     cbs = {
+        TASK: "lane3_producer_probe.task_entry",
         DISPATCH: "lane3_producer_probe.dispatch",
         STORE: "lane3_producer_probe.lane3_store",
     }

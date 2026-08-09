@@ -1,0 +1,11 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/cnr_lane3_producer/lane3_producer_probe.py
+script lane3_producer_probe.reset("Unit-1 70mm L16_03434 CNR lane-3 producer + task guide", "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer/unit1_70mm_lane3_v2.json", 8, 8, 3)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+script lane3_producer_probe.install(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer/unit1_70mm_lane3_v2.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script lane3_producer_probe.drive_until_exit_or_step_cap(lldb.debugger)
+script lane3_producer_probe.write_report(lldb.debugger)
+quit
