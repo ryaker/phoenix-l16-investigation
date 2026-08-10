@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.350
+**Version**: 3.0.351
 **Status**: Canonical root truth rebuilt from admitted claims only. Full clean-room investigation remains active; the earlier checklist-complete state was narrower than the project exit criterion.
 
 ## Canonical Authority
@@ -49,6 +49,22 @@ The prior A-E completion checklist closed the requested merge and final-stage
 items, but it did not close the whole input-to-output implementation. It must
 not be used as an investigation exit criterion.
 
+Version `3.0.351` closes the immediate representation and arithmetic of the
+selected Unit-1 `70mm` CNR fourth lane. Installed RTTI names
+`FusionCacheBayer+0xe0` exactly as `lt::TileCache<unsigned char>`; body
+`0x406a10` crops its level-0 byte plane, the live one-plane route maps each
+byte through the installed 256-float LUT (`0 -> 0`, otherwise
+`float32(sqrt((b+1)/256))`) with scalar `sqrtf(FusionCacheBayer+0xcc)`, and
+`0x308f50` squares the rounded guide into source lane 3. The tested scalar is
+exactly `1.0f`. The square is not safely replaceable by `(b+1)/256`: 118 byte
+codes differ by one ULP. Installed two- and three-plane combiners use the
+corresponding fixed-point products before the same LUT, but their route
+incidence is not generalized from this run. The earlier RTTI interpretation
+is corrected: `setWhiteBalance::$_22` is passed as CNR context; CNR does not
+execute inside that lambda. The upstream producer/public role of the byte
+plane, scalar public origin, focal/body breadth, and complete CNR tile replay
+remain open, so `CLM-DENOISE-002` remains `PARTIAL` / `BLOCKER`.
+
 Version `3.0.350` corrects the former selected-CNR completeness claim. The
 admitted RGB/matrix worker, bilateral stages, range-scale construction, and
 route remain valid at their stated scopes, but the CNR source tile has a live
@@ -56,10 +72,10 @@ fourth lane that Phoenix cannot yet reconstruct. Installed `0x308f50` writes
 that lane as `guide^2`; eight Unit-1 `70mm` dispatches all take the data-driven
 arm and never the constant-`1` empty-guide arm. The guide is a per-tile,
 half-resolution/pixel-doubled image carried by the denoise task at `+0x60`,
-and RTTI places its production inside
-`lt::Internal::Pipeline::setWhiteBalance::$_22`. Its exact source among that
-lambda's `SoftISP::Stats`, `Image<unsigned short>`, and `CapturedImage` inputs,
-and the normalization that yields the observed guide values, remain open.
+and the CNR worker receives an RTTI-named
+`lt::Internal::Pipeline::setWhiteBalance::$_22` callable as context. Version
+`3.0.351` supersedes the former inference that the guide is produced inside
+that lambda.
 `CLM-DENOISE-002` is therefore `PARTIAL` / `BLOCKER`; substituting lane 3 with
 constant `1` or a brightness-correlated proxy is forbidden.
 
@@ -1366,7 +1382,7 @@ authoritative set below.
 | `CLM-MERGE-001` | `FusionCacheBayer` is not the profile-3 bridge HDR multi-camera merge entry point. | four-focal negative architecture exclusion under the exact admitted parent/IRAMP chain | alternate profiles and GUI paths excluded |
 | `CLM-ZOOM-001` | Profile-3 `35mm` bridge behavior is public internal crop plus upsample/final rasterization, not "5B + computational synthesis". | proven narrow subset of `CLM-ZOOM-003` | no GUI/export generalization |
 | `CLM-CCM-001` | Calibration Block 6 has CCM entries for 14 cameras; A2 and C6 are missing and filtered rather than given fallback records. | A2 wide-MonoFusion and C6 tele-terminal fates are proven for canonical profile 3 | alternate profiles excluded |
-| `CLM-DENOISE-002` | Selected CNR RGB/matrix math is closed, and source lane 3 is `guide^2`; the guide comes from the named AWB-stage tile task. | transform/runtime discriminator Unit-1 `70mm`; prior CNR route/math scopes retained | exact guide source, normalization, and four-focal/two-body breadth remain open |
+| `CLM-DENOISE-002` | Selected CNR RGB/matrix math is closed; source lane 3 is the exact square of a LUT-decoded `FusionCacheBayer` `TileCache<unsigned char>` weight plane. | installed exact byte/LUT/combiner formulas; selected one-plane runtime discriminator Unit-1 `70mm`; prior CNR route/math scopes retained | upstream byte-plane producer/public role, scalar public origin, four-focal/two-body incidence, and complete tile replay remain open |
 
 Additional `CLM-PREFUSION-001` / `CLM-PREFUSION-002` addendum: four-zoom runtime proof now identifies `PipelineCache+0x8` as level-dimension metadata, not an image/composite pointer. At `28mm` and `35mm`, its five packed `(int32 width, int32 height)` entries are `(10432,7824)`, `(4160,3120)`, `(2080,1560)`, `(1040,780)`, `(520,390)`. At `70mm` and `150mm`, the entries are `(8896,6672)`, `(4160,3120)`, `(2080,1560)`, `(1040,780)`, `(520,390)`. In all four accepted bridge HDR runs, the visible `src1` and `src2` wrapper dimension fields are populated from entry `1` as `4160x3120`, and each wrapper owner stores `PipelineCache*` at owner `+0x28`. This corrects the older scratch-era temptation to read `*(PipelineCache+0x8)` as an image object; it narrows contamination around `src1` / `src2`, but it does not identify semantic `src1` / `src2` contents or close reducer math.
 

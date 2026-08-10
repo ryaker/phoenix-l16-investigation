@@ -23,15 +23,25 @@ Public names and diagnostic enum labels are not blockers by themselves. They
 become blockers only when the underlying operational meaning is needed to
 compute or encode the image.
 
-## Current Status (TRUTH 3.0.350)
+## Current Status (TRUTH 3.0.351)
+
+TRUTH `3.0.351` closes the selected Unit-1 `70mm` lane representation and
+conversion. `FusionCacheBayer+0xe0` is an exact
+`lt::TileCache<unsigned char>`; the selected one-plane route maps its level-0
+byte through the installed square-root LUT and scalar, then CNR squares the
+rounded float. The exact byte-zero rule and 118 one-ULP differences from the
+algebraic rational shortcut are pinned. `setWhiteBalance::$_22` is context,
+not an executing producer frame. The active blocker is now the upstream
+producer/public role of that byte-weight plane, the scalar's public origin,
+route incidence breadth, and a complete tile replay.
 
 TRUTH `3.0.350` reopens one selected-profile pixel formula that the previous
 CNR closure omitted. The CNR source tile's fourth lane is not constant `1`:
 installed `0x308f50` writes `guide^2`, and all eight focused Unit-1 `70mm`
 dispatches take that data-driven arm. The guide is a per-tile,
-half-resolution/pixel-doubled image at denoise-task `+0x60`, produced inside
-the RTTI-named `setWhiteBalance::$_22` lambda. Its exact source among the AWB
-lambda inputs and its normalization remain unknown. Phoenix currently uses
+half-resolution/pixel-doubled image at denoise-task `+0x60`. The former claim
+that it is produced inside `setWhiteBalance::$_22` is superseded by TRUTH
+`3.0.351`. Phoenix currently uses
 the disproven constant-`1` substitute. This is the active formula blocker.
 
 TRUTH `3.0.349` closes the mechanism behind stock-Lumen index-5 repeat
@@ -101,7 +111,7 @@ and validation.
 
 | Active claim | Blocking unknown |
 |---|---|
-| `CLM-DENOISE-002` | Exact public/runtime source and normalization of the per-tile AWB-stage guide whose square forms CNR source lane 3; then four-focal/two-body incidence and bit replay. |
+| `CLM-DENOISE-002` | Upstream producer/public role of the `FusionCacheBayer` `TileCache<unsigned char>` weight plane and public origin of scalar `+0xcc`; then focal/body route incidence and complete CNR tile replay. |
 
 TRUTH `3.0.338` closed the previously unstated mode-0 MonoFusion operand-
 pyramid producer without changing the then-zero selected-profile blocker count.

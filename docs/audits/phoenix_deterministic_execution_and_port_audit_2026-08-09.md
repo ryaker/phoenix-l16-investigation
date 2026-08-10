@@ -25,10 +25,13 @@ runtime proof now establishes that source lane 3 is data-driven
 rather than the empty-guide constant-1 arm.
 
 The guide is a half-resolution/pixel-doubled per-tile image at denoise-task
-`+0x60`, produced inside RTTI-named
-`lt::Internal::Pipeline::setWhiteBalance::$_22`. Its exact source and
-normalization remain open, so a code repair is not yet licensed. This audit
-admits that correction as `CLM-DENOISE-002 PARTIAL/BLOCKER` in TRUTH 3.0.350.
+`+0x60`. TRUTH 3.0.351 now identifies its source representation as the
+level-0 byte plane of `FusionCacheBayer+0xe0`, exact RTTI
+`lt::TileCache<unsigned char>`, and closes the installed LUT/scalar/square
+operation order. The upstream byte-plane producer/public role and scalar
+origin remain open, so a complete code repair is not yet licensed. The
+RTTI-named `setWhiteBalance::$_22` callable is passed as context and is not an
+executing producer frame.
 
 Consequence: Phoenix's current CNR covariance/noise matrix is wrong even when
 the admitted public AWB, SensorGainVars, and SVD formulas are otherwise wired.
@@ -127,10 +130,9 @@ noncanonical prefusion-fit warning.
 
 ## Next Investigation
 
-1. Follow denoise-task `+0x60` backward at runtime inside
-   `setWhiteBalance::$_22`; match its guide against the lambda's concrete
-   `Image<u16>`, `CapturedImage`, and `SoftISP::Stats` inputs and close the
-   normalization.
+1. Trace the paired `FusionCacheBayer` byte `TileCache` / `TileStorage`
+   backward to the instruction and public stage that writes its source tiles;
+   separately trace scalar `FusionCacheBayer+0xcc` to its public origin.
 2. Extend that guide/source proof across four focals and both physical bodies,
    then add a complete CNR tile replay and port it.
 3. Run the deterministic Unit-2 `70mm` level-0 boundary comparison in order:
@@ -138,4 +140,3 @@ noncanonical prefusion-fit warning.
    direction/aggregate, then argmin.
 4. Add the fresh-process Phoenix self-repeat gate from the deterministic
    execution spec.
-

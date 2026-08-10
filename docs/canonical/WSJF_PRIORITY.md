@@ -17,20 +17,22 @@ This file prioritizes the current blocker set toward the actual end goal:
 - correct framing and participation
 - stability across `28mm`, `35mm`, `70mm`, and `150mm`
 
-## Current Priority (TRUTH 3.0.350)
+## Current Priority (TRUTH 3.0.351)
 
 This section supersedes every ranking and lane recommendation below it. The
 older tables are retained only as campaign provenance.
 
-TRUTH `3.0.350` reopens `CLM-DENOISE-002` at one concrete pixel-bearing
-boundary. CNR source lane 3 is installed `guide^2`, while Phoenix uses the
-disproven constant `1`; the exact AWB-stage guide source and normalization are
-still unknown. This is WSJF rank 1: value `9`, time criticality `9`, risk
-reduction `9`, job size `3`, score `9.0`. Follow the heap denoise task's
-`+0x60` guide backward inside the RTTI-named `setWhiteBalance::$_22` lambda,
-match it against the lambda's `Image<u16>`, `CapturedImage`, and `Stats`
-inputs, close the normalization, then run four-focal/two-body discriminators.
-Do not port a brightness-correlated proxy.
+TRUTH `3.0.351` closes the immediate CNR lane representation and exact
+conversion. The source is the level-0 byte plane in
+`FusionCacheBayer+0xe0`, installed RTTI `lt::TileCache<unsigned char>`; the
+live Unit-1 `70mm` one-plane route uses the exact square-root LUT and the CNR
+square, including the byte-zero special case and binary32 rounding. WSJF rank
+1 is now its upstream producer/public role and scalar `FusionCacheBayer+0xcc`
+origin: value `9`, time criticality `9`, risk reduction `9`, job size `3`,
+score `9.0`. Trace the paired `TileStorage` producer rather than the RTTI
+`setWhiteBalance::$_22` context, then run focal/body route discriminators and
+a complete CNR tile replay. Do not port a brightness-correlated proxy or
+replace the square with `(byte+1)/256`.
 
 The deterministic-schedule Unit-2 `70mm` level-0 Guidance/source/record/G-42/
 G-43 boundary comparison from TRUTH `3.0.349` is rank 2. The Phoenix

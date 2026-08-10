@@ -165,7 +165,7 @@ this frame's brighter tiles give higher guide floors (`0.60..0.88`), same
 of `mean(guide^2)` across tiles/zooms — consistent with a data-driven guide, not
 a constant.
 
-## RTTI naming of the producing stage (runtime, `unit1_70mm_lane3_v4.json`)
+## RTTI context correction (runtime, `unit1_70mm_lane3_v4.json`)
 
 Resolving `0x34b3f0`'s `rdi` (arg1, the "context" object) through the Itanium
 C++ ABI (`obj -> vtable -> typeinfo -> name`) names the producer's owning
@@ -193,27 +193,27 @@ callback's declared inputs are `Image<unsigned short>` + `CapturedImage` + AWB
 captured state (which holds float arrays in `[0.98,1.0]`), is not yet proven.
 
 The task's own `+0x00/+0x08` object pointers did not resolve to RTTI names
-(raw buffers / non-polymorphic), so the naming anchor is the enclosing
-`setWhiteBalance $_22` lambda, not the task struct.
+(raw buffers / non-polymorphic). The only RTTI identity obtained here is the
+passed `setWhiteBalance $_22` context object; it does not name the guide's
+producer.
 
-Consequence for the port: the guide is no longer an anonymous fusion buffer —
-it is a working image inside the named setWhiteBalance/AWB stage, over inputs
-(`Image<unsigned short>`, `CapturedImage`, AWB `Stats`) that **Phoenix also
-has**. The guide's half-res, smooth, brightness-tracking `[0.48,1.0]` profile
-is consistent with a normalized/downsampled version of that 16-bit image (or a
-`Stats`-derived map).
+No source-origin consequence follows from that context pointer. In particular,
+it does not prove that the guide is produced by the white-balance callback or
+from any of the callback's declared inputs. The later installed/static plus
+runtime bundle
+`bundle_static_runtime_cnr_lane3_u8_weight_origin_unit1_70mm.md` supersedes
+that inference: at the tested scope, the guide is constructed from the
+`FusionCacheBayer+0xe0` unsigned-byte tile cache through the installed LUT.
 
 ## What this licenses / forbids
 
 - LICENSED: recording that Phoenix's `applyCNR()` assumption "lane 3 is
-  IRAMP-forced to 1.0, so meanA:=1" is **disproven** for the CNR-worker path;
-  and that the producing stage is `lt::Internal::Pipeline::setWhiteBalance`'s
-  `$_22` lambda over `Image<unsigned short>` + `CapturedImage` + AWB `Stats`.
-- FORBIDDEN (still): porting a lane-3 plane into Phoenix. `guide^2` and the
-  producing stage are proven, but WHICH of the three lambda inputs the guide
-  derives from, and its exact normalization to `[~0.48,1.0]`, is not yet
-  proven. Coding `lane3 = (somePhoenixPlane)^2` before that is settled would be
-  the hand-tuned substitute the D1 verifier warns against.
+  IRAMP-forced to 1.0, so meanA:=1" is **disproven** for the CNR-worker path,
+  and recording the exact later `guide^2` operation.
+- FORBIDDEN at this evidence level: inferring the guide source from the
+  `setWhiteBalance $_22` context object's type. Use the later byte-weight-origin
+  bundle for the exact source representation and conversion; its remaining
+  upstream producer/public-name boundary still applies.
 
 ## Next-step recipe (name the exact guide input)
 
@@ -232,10 +232,9 @@ Progress this pass (all by checking Lumen, `awb_scan`/`producer_catch` probes):
   the next guide fill -- guide buffers are not reliably re-allocated at the same
   address, so this technique cannot catch the writer.
 
-Remaining viable technique: find the REAL lambda `operator()` (dump the functor
-vtable slots -> libcp VAs; slot 4 = `0x342010` was NOT it -- args were scalars,
-not the ref set), break at it (tile entry, BEFORE the guide is filled), then arm
-the write watchpoint on the guide buffer as it is filled to capture the
-producing instruction + its source registers. Then extend four-zoom/two-body.
-NOT offline correlation (inconclusive) and NOT a static sweep (the outer
-functions' static form does not match this runtime).
+Superseded next step: the exact immediate source has since been identified as
+the `FusionCacheBayer+0xe0` `TileCache<unsigned char>`. The remaining trace is
+upstream of that cache: identify the writer into its backing `TileStorage`, the
+public semantic name and origin of those bytes, and the `+0xcc` scalar origin;
+then extend the selected route across focal tiers and a physical-body
+discriminator. Do not resume the white-balance-lambda search.
