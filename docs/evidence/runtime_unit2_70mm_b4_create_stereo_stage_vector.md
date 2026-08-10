@@ -52,3 +52,22 @@ Stage-15 output semantics; YUV/half-res reduction custody; other cameras of
 this render; formula closure for cross-talk on THIS route (the existing
 crosstalk bundles prove the formula on two bodies at four zooms; liveness here
 is consistent with them).
+
+## Addendum (same date): stage-15 OUTPUT captured
+
+`final_slot_probe.py` binds the unbound stage-return site `0x33f3eb` and
+captured the post-stage-15 payload
+(`runs/create_stereo_color_public_reconstruction/unit2_70mm_b4_stage15/`):
+
+- After stage 15 the payload's `0x70` (RGBA image) and `0xd0` (Bayer) slots
+  are GONE; only the u16 storage slot `0x100` remains (274,432 values -- the
+  same storage count the wide normalization bundle proved).
+- Stage 15 REWRITES that u16 storage: before `[51,1023]` mean 286.4 (raw
+  scale); after `[46,647]` mean 86.0; only 1,270/274,432 values unchanged;
+  median after/before ratio 0.3745 with max ratio ~0.63 -- a NONLINEAR global
+  tone transform, not a pure scale.
+- This is the missing global photometric transform between the proven
+  lens-shaded RGBA and the stereo `Images[]` bytes implicated by the stage-A
+  boundary comparison. Formula closure (static worker analysis of the
+  `0x34a610` stage + operand capture) is the next investigation item; only
+  after closure is a Phoenix port licensed.
