@@ -1,0 +1,9 @@
+command script import /Users/ryaker/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/cnr_lane3_producer/fusioncache_tuning_probe.py
+script fusioncache_tuning_probe.reset("@@LABEL@@", "@@OUTPUT@@")
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+breakpoint set --shlib libcp.dylib --address 0x4037dc
+script fusioncache_tuning_probe.install(lldb.debugger, 1)
+process launch -- "@@LRI@@" /private/tmp/codex_d1_unused.hdr --profile 3 --export-fmt 3
+script fusioncache_tuning_probe.report()
+quit
