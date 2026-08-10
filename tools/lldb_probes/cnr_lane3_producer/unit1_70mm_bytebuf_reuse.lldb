@@ -1,0 +1,11 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/cnr_lane3_producer/bytebuf_reuse_watch_probe.py
+script bytebuf_reuse_watch_probe.reset("Unit-1 70mm bytebuf reuse watch","/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer/unit1_70mm_bytebuf_reuse.json",10)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+script bytebuf_reuse_watch_probe.install(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer/unit1_70mm_bytebuf_reuse.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script bytebuf_reuse_watch_probe.drive(lldb.debugger)
+script bytebuf_reuse_watch_probe.write_report(lldb.debugger)
+quit
