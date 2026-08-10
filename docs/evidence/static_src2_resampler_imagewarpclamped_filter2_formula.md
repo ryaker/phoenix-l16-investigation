@@ -85,3 +85,51 @@ Static single-worker disassembly of `0x3ed2e0` on the pinned installed libcp;
 joins the already-admitted `processLevel1` identity bundle. It does not yet
 claim the runtime operand values, the distributed reduction that consumes the
 resampled level-1 output, or final acceptance/rejection.
+
+## Addendum (same date): OPERANDS captured (u2_70 B4 anchor)
+
+`tools/lldb_probes/src2_resampler_operands/src2_warp_operand_probe.py` at worker
+ENTRY `0x3ed2e0`, T = *( *( *(rdi+0x20) ) + 0x1e0 ), deterministic u2_70 render.
+The render invoked this worker ONCE (exit 0), consistent with the admitted fact
+that visible src2 is the tier-anchor camera only (B4 tele); the four non-anchor
+sources use a different resample path.
+
+Captured T operands (`runs/src2_resampler_operands/u2_70mm/report.json`):
+
+```text
+scale_xy  = (1.0, 1.0)                      # T+0x00, T+0x04
+center_xy = (2020.0, 1505.0)                # T+0x20, T+0x24
+H (T+0x28..0x48) = [ 0.991346  0.0       17.0 ]
+                   [ 0.0       0.991346  13.0 ]
+                   [ 0.0       0.0        1.0 ]   # pure AFFINE, no perspective
+radial LUT (4096f @ T+0x08): LUT[0]=1.0, min 0.999908, max 1.008506
+   (idx 1->1.000005, 256->1.000125, 1024->1.0024, 2048->1.008506, 4095->0.999908)
+```
+
+### Bearing (corrects the pre-capture port hypothesis)
+
+The pre-capture guess was "projective H + strong radial LUT; port
+undistort.cpp." The measurement REFUTES the strong-distortion part for the
+anchor resample:
+
+1. H is a UNIFORM-SCALE AFFINE, not a projective homography. The scale
+   `0.991346` is EXACTLY `4124/4160` -- the value Phoenix already pins as its
+   envelope-fit scale (`computeEnvelopeFit`, TRUTH.md matrix class). Phoenix's
+   envelope fit is therefore the PROVEN anchor affine, not an approximation of
+   a different transform. Translation (17,13) and center (2020,1505) are the
+   box-origin operands the envelope already models.
+2. The radial LUT is NEAR-IDENTITY (<=0.85% at its peak, sub-0.01% for the
+   inner ~half-radius). Phoenix's envelope omits this sub-1% radial term; it is
+   the only proven-but-unported component of the ANCHOR resample.
+
+So the stage-A anchor-plane residual is dominated by (a) this <=0.85% radial
+LUT, and (b) resampling-kernel differences (Lumen's 4x4 bicubic at 1/64
+subpixel vs Phoenix's envelope resampler), NOT a missing projective/strong-
+distortion warp. The port surface for the anchor shrinks to: apply the captured
+near-identity radial LUT and match the 4x4 bicubic/subpixel kernel.
+
+### Still open
+
+The four NON-anchor source planes do not pass this worker; their resample
+worker/operands are not yet captured. Whether their transforms are also affine
+(with the inter-camera R/t baked into H) or projective is the next capture.
