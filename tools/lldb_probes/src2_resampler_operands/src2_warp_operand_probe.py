@@ -29,9 +29,9 @@ def hit(frame, bp_loc, internal_dict):
     if not p1:
         return False
     T = _u64(proc, p1 + 0x1e0)           # T = *(rcx+0x1e0)
-    if not T or T in st["seen"]:
+    if not T:
         return False
-    st["seen"][T] = True
+    st["seen"][T] = st["seen"].get(T,0)+1   # count reuse of each address
     rec = {"T": hex(T), "rdi": hex(rdi)}
     hdr = _f32s(proc, T, 20)
     if hdr:

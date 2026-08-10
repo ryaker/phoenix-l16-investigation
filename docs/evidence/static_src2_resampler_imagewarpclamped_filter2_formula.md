@@ -133,3 +133,27 @@ near-identity radial LUT and match the 4x4 bicubic/subpixel kernel.
 The four NON-anchor source planes do not pass this worker; their resample
 worker/operands are not yet captured. Whether their transforms are also affine
 (with the inter-camera R/t baked into H) or projective is the next capture.
+
+## Addendum 2: 0x3ed2e0 is ANCHOR-ONLY (per-tile), non-anchor worker still open
+
+Re-capture without address-dedup (`runs/src2_resampler_operands/u2_70mm_all/`)
+shows 8 consecutive hits of `0x3ed2e0` are the IDENTICAL struct (T=0x...b21310,
+H=affine 0.991346/trans(17,13), same LUT pointer) -- i.e. the worker is invoked
+per TILE of a single source (the anchor guidance), never with a second
+transform. So `0x3ed2e0` resamples the anchor guidance only.
+
+Independent check: Lumen non-anchor source planes ARE pre-resampled. R-channel
+correlation of Lumen image1/2/4 vs Phoenix rises from ~-0.25 (envelope OFF) to
+~0.97 (envelope ON), same signature as the anchor. (image3 stays ~0 both ways
+-- a separate Phoenix<->Lumen camera-ordering question, not a resample issue.)
+
+Conclusion: the four non-anchor source planes are geometrically resampled by a
+DIFFERENT worker than `0x3ed2e0`, which is not yet identified or captured.
+Corpus check (2026-08-10): Codex has NOT closed it -- `initresamp_per_key_
+wrapper_read_path` proves `0x3eced0` is only a read+sqrt-normalize (not a
+geometric warp) and "does not prove the exact upstream N-to-1 reducer";
+`iramp_live_signature_and_warp_records` "does not prove the exact closed-form
+algebra for the transform fields"; CLM-PREFUSION-002 is OPEN/BLOCKER. The next
+measurement is to identify the non-anchor source resample worker (candidate:
+the SourceImageCache / src1 ReferenceImageCache resample path) and capture its
+per-source transform operands.
