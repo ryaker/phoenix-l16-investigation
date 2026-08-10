@@ -11,5 +11,6 @@ Each section file should cover one subsystem only, for example:
 - `05_WARP_COORDS.md`
 - `06_MERGE.md`
 - `07_OUTPUT_AND_VALIDATION.md`
+- `08_DETERMINISTIC_EXECUTION.md`
 
 Use `SECTION_TEMPLATE.md` when creating a new section.

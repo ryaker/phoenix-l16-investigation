@@ -23,7 +23,16 @@ Public names and diagnostic enum labels are not blockers by themselves. They
 become blockers only when the underlying operational meaning is needed to
 compute or encode the image.
 
-## Current Status (TRUTH 3.0.349)
+## Current Status (TRUTH 3.0.350)
+
+TRUTH `3.0.350` reopens one selected-profile pixel formula that the previous
+CNR closure omitted. The CNR source tile's fourth lane is not constant `1`:
+installed `0x308f50` writes `guide^2`, and all eight focused Unit-1 `70mm`
+dispatches take that data-driven arm. The guide is a per-tile,
+half-resolution/pixel-doubled image at denoise-task `+0x60`, produced inside
+the RTTI-named `setWhiteBalance::$_22` lambda. Its exact source among the AWB
+lambda inputs and its normalization remain unknown. Phoenix currently uses
+the disproven constant-`1` substitute. This is the active formula blocker.
 
 TRUTH `3.0.349` closes the mechanism behind stock-Lumen index-5 repeat
 variation. Executor-parallel G-43 workers perform a non-atomic shared
@@ -85,14 +94,14 @@ TRUTH `3.0.342` closes a portable exact mapping for the current-reference
 unrefined SSE reciprocal primitive, removing exact division as an implementation
 substitute across the admitted demosaic/denoise/MonoFusion/IRAMP formulas.
 
-No selected profile-3 supported-input parity blocker is currently admitted.
-The clean-room investigation remains active for end-to-end reconstruction
-depth, unsupported/alternate routes, implementation alignment, and validation;
-those scopes do not reopen a formula already admitted at its stated boundary.
+One selected profile-3 supported-input parity blocker is currently admitted.
+The clean-room investigation also remains active for end-to-end
+reconstruction depth, unsupported/alternate routes, implementation alignment,
+and validation.
 
 | Active claim | Blocking unknown |
 |---|---|
-| - | None |
+| `CLM-DENOISE-002` | Exact public/runtime source and normalization of the per-tile AWB-stage guide whose square forms CNR source lane 3; then four-focal/two-body incidence and bit replay. |
 
 TRUTH `3.0.338` closed the previously unstated mode-0 MonoFusion operand-
 pyramid producer without changing the then-zero selected-profile blocker count.

@@ -17,10 +17,25 @@ This file prioritizes the current blocker set toward the actual end goal:
 - correct framing and participation
 - stability across `28mm`, `35mm`, `70mm`, and `150mm`
 
-## Current Priority (TRUTH 3.0.349)
+## Current Priority (TRUTH 3.0.350)
 
 This section supersedes every ranking and lane recommendation below it. The
 older tables are retained only as campaign provenance.
+
+TRUTH `3.0.350` reopens `CLM-DENOISE-002` at one concrete pixel-bearing
+boundary. CNR source lane 3 is installed `guide^2`, while Phoenix uses the
+disproven constant `1`; the exact AWB-stage guide source and normalization are
+still unknown. This is WSJF rank 1: value `9`, time criticality `9`, risk
+reduction `9`, job size `3`, score `9.0`. Follow the heap denoise task's
+`+0x60` guide backward inside the RTTI-named `setWhiteBalance::$_22` lambda,
+match it against the lambda's `Image<u16>`, `CapturedImage`, and `Stats`
+inputs, close the normalization, then run four-focal/two-body discriminators.
+Do not port a brightness-correlated proxy.
+
+The deterministic-schedule Unit-2 `70mm` level-0 Guidance/source/record/G-42/
+G-43 boundary comparison from TRUTH `3.0.349` is rank 2. The Phoenix
+implementation audit and exact skip-mask repair may proceed in parallel, but
+neither substitutes for the CNR guide-source proof.
 
 TRUTH `3.0.349` removes stock-Lumen depth nondeterminism as a confounder. The
 bit-level mechanism is executor-parallel shared G-43 payload RMW plus a scoped
@@ -81,9 +96,8 @@ The cross-cutting current-reference `rcpss`/`rcpps` bit mapping is portable and
 exact at TRUTH `3.0.342`; implementation audits must not retain exact division
 as a parity-path waiver.
 
-No canonical profile-3 blocker remains, and no selected profile-3
-supported-input blocker is ranked. The next
-investigation-depth item is an end-to-end selected color-camera reconstruction
+The following zero-blocker statement is superseded by TRUTH `3.0.350`. The
+then-next investigation-depth item was an end-to-end selected color-camera reconstruction
 for A1/A3/A4/A5 from public RAW through the already admitted normalization,
 hot-pixel, cross-talk, demosaic, vignetting, and color boundaries. This is a
 join/coverage audit, not permission to refit or replace an admitted formula;
