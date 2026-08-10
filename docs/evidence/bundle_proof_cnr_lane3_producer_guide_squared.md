@@ -215,11 +215,25 @@ is consistent with a normalized/downsampled version of that 16-bit image (or a
 
 ## Next-step recipe (name the exact guide input)
 
-Instrument the `setWhiteBalance $_22` lambda body: at `0x34b3f0` the three
-inputs are reachable (Image<u16>, CapturedImage, Rectangle passed to the
-lambda's `operator()` up-stack). Capture each input's dims/data at the tile,
-and match the half-res guide (`task+0x60`) to a downsample of one of them by
-content (`first_row_sha256` / value correlation). Confirm the normalization
-that maps 16-bit image values into the guide's `[~0.48,1.0]`. Extend to
-four-zoom + two-body for Codex-grade closure. NOT a static sweep (the outer
+Progress this pass (all by checking Lumen, `awb_scan`/`producer_catch` probes):
+
+- The `Image<unsigned short>` in scope at the CNR body is a **10-bit** image
+  (min 45, max exactly 1023, `frac>1023 == 0`), full-sensor `4160x3120`, found
+  live on the stack — this is the setWhiteBalance input image.
+- Ruled out (measured, not assumed): guide == `image/1023` (would drive dark
+  tiles to ~0.05, but the cross-tile guide floor is ~0.48); guide as multiple
+  of `1/1023` or `1/4092` (76% of values fail); guide == per-pixel luma of the
+  CNR source tile (corr ~0.4); guide == 2x downsample of any co-located 516^2
+  tile buffer (corr < 0.61 for all, incl. sqrt/square transforms).
+- The write-watchpoint-on-reused-buffer technique caught the freed guide
+  buffer being reused by UNRELATED allocations (values 174.0, -0.003, ...), not
+  the next guide fill -- guide buffers are not reliably re-allocated at the same
+  address, so this technique cannot catch the writer.
+
+Remaining viable technique: find the REAL lambda `operator()` (dump the functor
+vtable slots -> libcp VAs; slot 4 = `0x342010` was NOT it -- args were scalars,
+not the ref set), break at it (tile entry, BEFORE the guide is filled), then arm
+the write watchpoint on the guide buffer as it is filled to capture the
+producing instruction + its source registers. Then extend four-zoom/two-body.
+NOT offline correlation (inconclusive) and NOT a static sweep (the outer
 functions' static form does not match this runtime).
