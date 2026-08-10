@@ -157,3 +157,34 @@ algebra for the transform fields"; CLM-PREFUSION-002 is OPEN/BLOCKER. The next
 measurement is to identify the non-anchor source resample worker (candidate:
 the SourceImageCache / src1 ReferenceImageCache resample path) and capture its
 per-source transform operands.
+
+## Addendum 3: ResamplerFilter=2 kernel CLOSED = Catmull-Rom (a=-0.5), 1/64 subpixel
+
+The 4x4 tap weights are read from a table at `*(rdi+0x28)`, indexed by the
+6-bit subpixel fraction (`frac & 0x3f`), captured in
+`runs/src2_resampler_operands/u2_70mm_wtab/`. Reassembling the 4 taps (stored
+SIMD-permuted across 8 vec4 slots; taps at lane0 of vec4 slots 4,1,2,7 =
+w[-1],w[0],w[+1],w[+2]) yields, for every one of the 64 fractions, EXACTLY the
+Catmull-Rom cubic (a=-0.5) with max abs error 0.0:
+
+```text
+t = (frac & 0x3f) / 64            # 1/64 subpixel quantization (x64, cvttss2si, &0x3f)
+w[-1] = 0.5*(-t + 2t^2 - t^3)
+w[ 0] = 0.5*(2 - 5t^2 + 3t^3)
+w[+1] = 0.5*(t + 4t^2 - 3t^3)
+w[+2] = 0.5*(-t^2 + t^3)
+sample = sum over 4x4 taps (separable), each tap edge-CLAMPED to [0,extent-1]
+```
+
+The earlier note that this "might match the G-38 cubic-Lagrange family" is
+corrected: the RADIUS evaluator (G-38) uses that Lagrange family; the SPATIAL
+2D resample uses standard Catmull-Rom (a=-0.5). Both are 4-point cubics but
+distinct weight sets.
+
+### Port (now fully licensed)
+
+Phoenix `undistortPlaneEnvelopeU8x4` currently BILINEAR-samples with continuous
+fraction. The proven kernel is 4x4 Catmull-Rom (a=-0.5) at 1/64-quantized
+subpixel with edge clamp. Port: replace the 2x2 bilinear with 4x4 Catmull-Rom,
+quantizing the fraction to k/64 first. Phoenix ships `engine/premerge/
+catmull_rom.h`. This is the concrete stage-A geometry-kernel port.
