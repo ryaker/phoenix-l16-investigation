@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/cnr_lane3_producer/producer_catch_probe.py
+script producer_catch_probe.reset("vtdump","/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer/vtdump.json",1)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+script producer_catch_probe.install_vtdump(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer/vt.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script producer_catch_probe.write_report(lldb.debugger)
+quit

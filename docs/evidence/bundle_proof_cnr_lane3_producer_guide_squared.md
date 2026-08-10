@@ -181,14 +181,16 @@ std::__1::__function::__func<
           lt::Rectangle<int> const&)>
 ```
 
-So the CNR body `0x34b3f0` (and thus the lane-3 `guide^2` production) runs
-**inside `lt::Internal::Pipeline::setWhiteBalance`'s per-tile lambda `$_22`**,
-whose call signature is
-`void(SoftISP::Stats&, Image<unsigned short> const&, CapturedImage const&, Rectangle<int> const&)`.
-This is a NAMED public pipeline stage. It is coherent with the CNR data space:
-the CNR input is squared *AWB'd* RGB (`p_c = s_c^2`), and this is the AWB
-(setWhiteBalance) stage itself, walking a 16-bit `Image` tile-by-tile (the
-`Rectangle`) with the `CapturedImage` and a `SoftISP::Stats` accumulator.
+So the CNR body `0x34b3f0` receives, as its `rdi` parameter, the
+**`setWhiteBalance $_22` AWB callback object** (a `std::function`). CORRECTION
+(vtable dump): the CNR is NOT executing inside that lambda's `operator()` -- all
+9 functor vtable slots are thin thunks (`0x3428e0..0x3429e0`) and none appear in
+the CNR call stack (`0x34b3f0<-0x33f480<-0x31acf0<-0x406a10<-0x3ebb80<-0x3ec960
+<-0x3d47d0`). The functor is passed DOWN as context/config, not as the executing
+frame. So the anchor is: the CNR runs with the AWB callback in hand, and that
+callback's declared inputs are `Image<unsigned short>` + `CapturedImage` + AWB
+`Stats`. Whether the guide derives from those inputs, or from the functor's
+captured state (which holds float arrays in `[0.98,1.0]`), is not yet proven.
 
 The task's own `+0x00/+0x08` object pointers did not resolve to RTTI names
 (raw buffers / non-polymorphic), so the naming anchor is the enclosing

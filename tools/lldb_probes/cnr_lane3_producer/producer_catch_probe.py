@@ -97,6 +97,43 @@ def cnr_body(frame, bp_loc, _d):
     return False
 
 
+def dump_vtable_cb(frame, bp_loc, _d):
+    """One-shot: print the functor vtable slots + CNR stack as libcp VAs."""
+    st = _s()
+    proc = frame.GetThread().GetProcess()
+    target = proc.GetTarget()
+    rdi = _u(frame, "rdi")
+    base = _libcp_base(target)
+    vt = struct.unpack("<Q", _read(proc, rdi, 8))[0]
+    slots = []
+    for i in range(9):
+        s = struct.unpack("<Q", _read(proc, vt + i * 8, 8))[0]
+        slots.append({"i": i, "addr": s,
+                      "va": hex(s - base) if base and s > base else None})
+    stackva = []
+    th = frame.GetThread()
+    for i in range(min(8, th.GetNumFrames())):
+        pc = th.GetFrameAtIndex(i).GetPC()
+        stackva.append(hex(pc - base) if base and pc > base else None)
+    st["vtable_dump"] = {"functor": hex(rdi), "vtable_va": hex(vt - base),
+                         "slots": slots, "cnr_stack_va": stackva}
+    print("VTABLE_DUMP", json.dumps(st["vtable_dump"]))
+    proc.Kill()
+    return False
+
+
+def install_vtdump(debugger):
+    st = _s()
+    target = debugger.GetSelectedTarget()
+    before = target.GetNumBreakpoints()
+    debugger.HandleCommand("breakpoint set --shlib libcp.dylib --address 0x34b3f0")
+    if target.GetNumBreakpoints() > before:
+        bp = target.GetBreakpointAtIndex(target.GetNumBreakpoints() - 1)
+        bp.SetScriptCallbackFunction("producer_catch_probe.dump_vtable_cb")
+        st["bp_ids"]["vt"] = bp.GetID()
+    print("VTDUMP_INSTALLED", st["bp_ids"])
+
+
 def install(debugger):
     st = _s()
     target = debugger.GetSelectedTarget()
