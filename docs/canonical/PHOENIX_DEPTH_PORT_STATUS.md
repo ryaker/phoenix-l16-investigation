@@ -160,3 +160,29 @@ structure) is closed. Phoenix stage 14 (CNR lane3) cannot be exactly ported
 until ColorFusionBayer's weight core (0x19C790) is reverse-engineered -- that is
 now THE remaining reverse-engineering job for depth parity. Evidence: commits
 a114eaa, b0cab04.
+
+### 2026-08-11e — CORRECTION: UNKNOWN #1 is the already-identified missing fusion pipeline (not a fresh find)
+
+Answering "did Codex already RE this?": Codex did NOT close the weight formula,
+but had ALREADY named and scoped the whole thing long before this session:
+- `colorfusion_weight_probe.py` (Codex WIP, commit e0aece2) docstring already
+  states the full chain: FusionCacheBayerC1::$_0 0x407710 -> ColorFusionBayer::
+  process 0x1aab40 -> two outputs -> 0x1bd1e0 -> u8 TileCache +0xe0, and defines
+  COLOR_FUSION_CORE = 0x19C790.
+- docs/LIBRARY_INVENTORY.md: "This is the L16 fusion pipeline you're trying to
+  rebuild. ColorFusionBayer and FusionCacheBayer ... the thing L16_PIPELINE_SPEC
+  says is missing ... require static RE (Ghidra/IDA)."
+- monofusion_source_descriptor bundle: ColorFusionBayer installed at FCB+0x120
+  (ctor 0x1aab00); the internal fusion formula (0x1b37a0) explicitly "still open".
+
+So UNKNOWN #1 == the long-identified MISSING L16 COLOR-FUSION CORE
+(ColorFusionBayer::process 0x19C790 / worker 0x1b37a0). It is a substantial
+STATIC-RE effort (Ghidra-class), deliberately deferred by Codex -- NOT a small
+runtime-probe find. This session's ONLY genuinely-new, verified increment was
+the byte codec byte=max(trunc(256f)-1,0). The multi-session runtime "producer
+hunt" largely re-confirmed Codex's existing scaffolding.
+
+Implication: CNR lane3 cannot be ported until the ColorFusionBayer fusion core
+is reverse-engineered by static analysis. That single core is the entire
+remaining unknown for depth parity; everything else on the depth path is
+proven and (per this doc) ported/confirmed-exact.
