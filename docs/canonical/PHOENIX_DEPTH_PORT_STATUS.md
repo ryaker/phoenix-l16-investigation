@@ -1,0 +1,85 @@
+# Phoenix Profile-3 Depth — Port Status (Known Spec + Unknown List)
+
+Disciplined drawdown tracker for the profile-3 DEPTH path only (Phoenix's
+scope). Each stage lists (a) the EXACT proven formula and its source claim/
+bundle — the KNOWN spec to implement — and (b) Phoenix's implementation status.
+Comparison is used ONLY as final acceptance, never to derive a formula. When a
+KNOWN stage is confirmed exactly implemented, it is marked PORTED. When an
+UNKNOWN is closed by a new proven bundle, it moves from the Unknown List into a
+stage as PORTED.
+
+Rule: a correct port takes per-camera calibration as input and therefore
+behaves identically across both bodies and all four focals. Any unit/focal-
+dependent weakness = an incorrect port (an approximation), not an input quirk.
+
+## Reconciliation: is anything truly unknown?
+
+Codex's own current docs already answer this — there is no contradiction:
+- `TRUTH.md` (3.0.351): "the earlier checklist-complete state was narrower than
+  the project exit criterion" — the earlier all-solved claim was explicitly
+  superseded.
+- `LUMEN_PARITY_SPEC.md`: "This spec is a scaffold. It is not yet complete."
+- `PARITY_BLOCKERS.md` current status: names one active formula blocker.
+
+So exactly one profile-3-depth formula is genuinely UNKNOWN (below), and it is
+Codex-tracked. Everything else on the depth path is PROVEN; the remaining work
+is porting proven formulas exactly, then acceptance.
+
+## Known Spec (proven; port target) — depth pipeline in order
+
+| # | Stage | Exact formula source (claim / bundle) | Phoenix status |
+|---|---|---|---|
+| 1 | LRI decode / raw unpack (RAW10, black/white) | CLM-INPUT-001, CLM-LRI-001 | PORTED |
+| 2 | Camera participation / firing (wide A1..A5,B1..B5; tele B1..B5,C1..C6; C6 excluded) | CLM-FIRING-001, CLM-C6-001 | PORTED |
+| 3 | Focus-dependent K (sort 2 records by focus_hall_code; lerp K{0,2,4,5} at lens_position) | CLM-WARP-003 / lldb_1f0ce0_k_source_trace | PORTED (base K) |
+| 4 | Distortion model (Brown-Conrady + 4096 cubic-Lagrange radial table) | CLM-WARP-004 | PORTED |
+| 5 | Undistort envelope box (G-38: 30 radial samples, cubic radius eval, 91/121 edge sweeps, SSE-trunc box) | G-38 bundle (0x145980) | PORTED (computeUndistortEnvelopeG38) |
+| 6 | Bayer-norm (raw-B)/(W-B); default hot-pixel; highlight-restore; cross-talk; demosaic | CLM-CORRECTION-001, CLM-DEMOSAIC-001/002, CLM-PIPELINE-001 | PARTIAL — depth guidance uses collapse2, not full ISP (see note A) |
+| 7 | Guidance collapse2 [R,0.5(G1+G2),B,1] then ConvertToYUV (sensor w=[.21555,.43231,.35214], p=1/awb, matrix, signed fast-pow 1/2.2, +[0,128,128,0], C3=1) | CLM-STEREO-001 guidance_yuv bundle | PORTED (exact constants) |
+| 7a | A2/mono source plane = [m,m,m,1], m=(r-B)/(W-B)*V*scale (EV ratio, no rel_b, no gamma, no chroma) | create_stereo_a2_public_reconstruction | PORTED (this session) |
+| 8 | Per-source EV normalization: scale=A1_energy/Ai_energy (color: *rel_b_i/rel_b_A1; mono bypasses rel_b) | a2_public_reconstruction + exposure bundles | PORTED |
+| 9 | Non-anchor color-match affine: A=chol(cov_t)*inv(chol(cov_s)), b=mean_t-A*mean_s, C3>0.95 gate | CLM-STEREO-001 component_routes | PORTED (fitStereoAffine) — verify exact |
+| 10 | src2/anchor stereo-plane resample: projective H + 4096 radial LUT + 4x4 Catmull-Rom(a=-0.5) at 1/64 subpixel, edge-clamp | CLM-RESAMPLE-001 + static_src2_resampler bundle | KERNEL PORTED (Catmull-Rom now unconditional); operand pairing to verify (note B) |
+| 11 | Plane-sweep H composition + projection: H=K_src4[R\|t](K_ref4[R\|t])^-1; P=H[u*d,v*d,d,1]+0.25; clamp [o+1,b-3]; pavgb 4x3 patch | CLM-STEREO-001 plane_sweep_correspondence | PORTED |
+| 12 | Per-level projection scale fixed (1,1); level lift full=min(step*coord+trunc(step/2),extent-1); steps 32..1 | CLM-STEREO-001 perlevel_projection bundle | PORTED |
+| 13 | G-42 cost: per-source SUM, scaled once by (1/27)/source_count, trunc-toward-zero to u16; uint16 modulo per source | index5_sgm_cost_input bundle | PORTED |
+| 14 | CNR guide lane-3 = guide^2; guide=sqrt-LUT(byte)*sqrt(cache+0xcc); CNR covariance meanA=mean(lane3) | CLM-DENOISE-002 (consumer proven) | NOT PORTED — Phoenix uses constant-1 (blocked on Unknown #1) |
+| 15 | G-43 SGM: 8 dirs [(-1,0)(-1,-1)(0,-1)(1,-1)(1,0)(1,1)(0,1)(-1,1)]; saturating-u16 per contribution; init 2000; no pedestal | 08_DETERMINISTIC_EXECUTION + sgm bundles | PORTED |
+| 16 | Argmin: ascending abs index, strict `<`, ties keep lowest | 08_DETERMINISTIC_EXECUTION selection | PORTED |
+| 17 | Range map / banded coarse-to-fine refinement (local band index per level) | CLM range/STEREO-001 | PORTED — output index is LOCAL-band (note C) |
+| 18 | Reciprocal ray-depth ramp (lookup mm); deterministic execution contract | CLM-WARP-003 ramp; 08_DETERMINISTIC_EXECUTION | PORTED |
+
+Notes:
+- A. The depth GUIDANCE path is collapse2->YUV (proven), NOT the full display
+  ISP (cross-talk/demosaic/CCM/sharpen). Those proven stages belong to the
+  COLOR output, not the depth cost inputs. Confirmed: guidance is
+  color_correction=NONE.
+- B. Catmull-Rom is now the only resample kernel. Operand check outstanding:
+  Phoenix pairs it with envfit + full per-camera radial table; the captured
+  src2 ANCHOR operands were affine 0.991346 + near-identity radial LUT. Whether
+  the per-source depth undistort uses the full radial (CLM-WARP-004, per-camera)
+  or the near-identity src2 form must be settled by exact formula, not diff.
+- C. End-to-end depth acceptance must compare in DEPTH (mm) via each side's
+  per-pixel band base, NOT raw index (Lumen index is a local-band offset 0..38;
+  Phoenix's is a wider index). Capture Lumen's range map to align.
+
+## Unknown List (genuinely unproven — the drawdown queue)
+
+1. **CNR lane-3 guide BYTE-PLANE PRODUCER** (CLM-DENOISE-002; WSJF rank 1).
+   KNOWN: consumer transform (lane3=guide^2, guide=sqrt-LUT(byte)*sqrt(+0xcc),
+   covariance meanA=mean(lane3)). UNKNOWN: where FusionCacheBayer+0xe0 (exact
+   `lt::TileCache<unsigned char>`) byte plane is PRODUCED upstream, its public
+   role, and the +0xcc scalar's public origin; route breadth; complete tile
+   replay. Resisted 14 instruments (large job). Until closed, stage 14 stays
+   NOT PORTED (Phoenix uses the disproven constant-1).
+
+Out of profile-3-depth scope (do not block depth): CLM-COMPAT-001 (profiles
+1/2 + GUI DepthEditor), CLM-DEPTH-001/002 (DepthCache/DepthEditor — inactive on
+render path). The IRAMP/prefusion src1/src2 reducer items in PARITY_BLOCKERS
+are the COLOR-merge output path (CLM-MERGE-005/006 now PROVEN), not depth.
+
+## Verification method (acceptance only)
+
+Both sides FRESH per LRI, same session, across both bodies x 4 focals (harness
+`tools/sidebyside_matrix.sh`). Compare in the correct space (depth mm, not raw
+index). A stage is accepted only when it matches on ALL of u1/u2 x 28/35/70/150.
