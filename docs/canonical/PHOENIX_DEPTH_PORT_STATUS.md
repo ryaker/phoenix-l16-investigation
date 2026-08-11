@@ -370,3 +370,25 @@ decoded AND matches Phoenix's existing mono F1. Remaining = PORT: implement the 
 plane in Phoenix's ColorFusionBayer/color-Bayer-fusion stage (analog of monofusion's F1
 second output) and wire it to CNR lane-3 (replacing meanA:=1). Templated by
 engine/merge/monofusion.cpp. No RE blocker remains.
+
+### 2026-08-11l — Port integration requirement pinned (producer DONE; remaining = multi-module gather)
+
+Producer: engine/merge/colorfusion.{h,cpp} implements the decoded f exactly + self-test
+PASSES (Phoenix commit 2e2625c). Formula/inputs 100% closed.
+
+Integration fact (from src2 source-camera identity bundle + u8_weight_writer probe):
+- ColorFusionBayer fuses N RAW Bayer modules (lt::RawImageFactory) that INTERSECT each
+  16x16 patch; N varies spatially by module geometry. Output image is anchored to ONE
+  tier camera (A1 wide / B4 tele, Active=1), but the WEIGHT f is computed over ALL
+  overlapping modules — that weight is CNR lane-3.
+- Phoenix TODAY: demosaics the anchor (A1) + MonoFusion A2 luma. It does NOT gather the
+  N overlapping color Bayer modules per patch. So colorFuseWeightPlane has no inputs yet.
+
+REMAINING WORK (engineering, no RE unknown): build the per-patch multi-module Bayer
+gather in phoenix_fuse — for each patch, select the modules whose calibrated footprint
+covers it (Phoenix already parses all modules + FactoryModuleCalibration geometry),
+DC-align/warp their raw Bayer to the anchor (Phoenix already has the undistort/flow),
+feed ref + the N module patches + per-module noiseScale (σ²_patch·arg·8, from the same
+VST/vign path MonoFusion uses for V) to colorFuseWeightPlane, then route f → applyCNR
+lane-3 (replace meanA:=1). Validate with tools/parity/verify_cnr_alpha_lane.py against
+captured Lumen lane-3. This is a real fusion-gather subsystem, not a wiring one-liner.
