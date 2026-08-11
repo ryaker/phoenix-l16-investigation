@@ -346,3 +346,27 @@ FINAL: the profile-3 depth path has NO remaining unknown and NO remaining numeri
 residual. The color weight f (CNR lane-3 producer) is fully decoded to static constants
 + decoded instructions. Same λ table (0x5d0070) as mono ⇒ this also gives Phoenix G-58
 its exact per-coefficient λ. Remaining work is PURE PORT/IMPLEMENTATION.
+
+### 2026-08-11k — CORRECTION + cross-validation (fixes my 11i/11j "bonus G-58" overclaim)
+
+CORRECTION (per "clean up outdated/incorrect info"): 11i/11j said the decode "closes
+Phoenix G-58 / gives Phoenix its exact λ." That is WRONG — I read a STALE sibling copy
+(phoenix_arm_pre_unify_20260719). The REAL phoenix/engine/merge/monofusion.h says
+"G-58 closed for the algebra AND the table" — Phoenix ALREADY has the exact Wiener +
+the 256-float 0x5D0070 table (monofusion_coeff_table.h, SHA 3eebf27f...). My decode adds
+nothing to G-58; disregard the "bonus" claim.
+
+CROSS-VALIDATION (genuinely useful): the real monofusion.h item 8 already implements the
+SECOND OUTPUT PLANE (gap F1, closed 2026-08-05):
+  q_c=(256-Σw)/256; A=Σ(1-q); B=Σq²; scalar=(c0+c1·A·c2)²+c3·B,
+  c0=alpha, c1=1-alpha, c2=1/N, c3=(1-alpha)²·C/(N²·R).
+My decoded ColorFusionBayer f = ((N+1)-Σm)²+Σm²)/(N+1)² is the SAME STRUCTURE (color
+instantiation of that general form). So the decode is independently confirmed by
+Phoenix's own proven mono F1 implementation, and Phoenix already has the code template
++ F_k table for the color port.
+
+REVISED remaining work (accurate): CNR lane-3 is NOT an RE unknown — the f formula is
+decoded AND matches Phoenix's existing mono F1. Remaining = PORT: implement the color-f
+plane in Phoenix's ColorFusionBayer/color-Bayer-fusion stage (analog of monofusion's F1
+second output) and wire it to CNR lane-3 (replacing meanA:=1). Templated by
+engine/merge/monofusion.cpp. No RE blocker remains.
