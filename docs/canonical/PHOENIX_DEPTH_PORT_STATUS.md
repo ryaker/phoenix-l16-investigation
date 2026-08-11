@@ -186,3 +186,27 @@ Implication: CNR lane3 cannot be ported until the ColorFusionBayer fusion core
 is reverse-engineered by static analysis. That single core is the entire
 remaining unknown for depth parity; everything else on the depth path is
 proven and (per this doc) ported/confirmed-exact.
+
+### 2026-08-11f — UNKNOWN #1 precisely scoped via whatknown gate (no new RE ordered)
+
+Applying tools/whatknown.sh reframed the unknown in minutes:
+- 0x1b37a0 (which I'd wrongly lumped with the open ColorFusion) is lt::MonoFusion's
+  worker -- FULLY PROVEN across ~8 monofusion bundles/probes (mode-0 exact replay,
+  wavelet formula, confidence callback, mode selector, color wrapper). Its scalar
+  weight IS proven: confidence = (256 - sum_k w_k)/256 (Wiener source-retention
+  weights, overlap-accumulated; accumulator init 256 @ 0x18da80).
+- 0x19C790 (ColorFusionBayer::process core) is a LARGE function (0x53E8=21480-byte
+  stack frame, vector-constant tables, multi-image inputs). whatknown = NO HITS in
+  any proof artifact -> genuinely unproven. Callers: 0x1aad5d (ColorFusion) and
+  0x1b9bb4.
+
+SCOPING: CNR lane3 = f = ColorFusionBayer weight = the COLOR analog of the PROVEN
+MonoFusion confidence. Same formula shape ((256-sum w)/256; the 256 also appears
+in the proven ColorFusion byte codec x256), but the retention weights w_k are
+computed over the Bayer modules by the unproven 0x19C790 core. So:
+- TEMPLATE (reuse, do NOT re-derive): MonoFusion mode-0 Wiener confidence +
+  wavelet + confidence-callback formulas already prove the weight STRUCTURE.
+- GENUINE OPEN (NO HITS): the ColorFusionBayer core 0x19C790 per-module Bayer
+  retention-weight computation. Static-RE job, guided by the MonoFusion template.
+Do NOT port an approximation; CNR lane3 stays NOT PORTED until 0x19C790 is
+reverse-engineered against the MonoFusion template.
