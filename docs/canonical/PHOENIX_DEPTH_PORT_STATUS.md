@@ -43,7 +43,7 @@ is porting proven formulas exactly, then acceptance.
 | 11 | Plane-sweep H composition + projection: H=K_src4[R\|t](K_ref4[R\|t])^-1; P=H[u*d,v*d,d,1]+0.25; clamp [o+1,b-3]; pavgb 4x3 patch | CLM-STEREO-001 plane_sweep_correspondence | PORTED |
 | 12 | Per-level projection scale fixed (1,1); level lift full=min(step*coord+trunc(step/2),extent-1); steps 32..1 | CLM-STEREO-001 perlevel_projection bundle | PORTED |
 | 13 | G-42 cost: per-source SUM, scaled once by (1/27)/source_count, trunc-toward-zero to u16; uint16 modulo per source | index5_sgm_cost_input bundle | PORTED |
-| 14 | CNR guide lane-3 = guide^2; guide=sqrt-LUT(byte)*sqrt(cache+0xcc); CNR covariance meanA=mean(lane3) | CLM-DENOISE-002 (consumer proven) | NOT PORTED — Phoenix uses constant-1 (blocked on Unknown #1) |
+| 14 | ColorFusion `f` -> quantized byte -> sqrt-LUT * sqrt(+0xcc) -> float32 square into CNR lane 3 | CLM-DENOISE-002 (formula exact; integration partial) | PORT PRESENT BUT WRONG at commit 2e2625c: scalar lanes/noise, wrong accumulator association, local unnormalized transform, not wired to CNR |
 | 15 | G-43 SGM: 8 dirs [(-1,0)(-1,-1)(0,-1)(1,-1)(1,0)(1,1)(0,1)(-1,1)]; saturating-u16 per contribution; init 2000; no pedestal | 08_DETERMINISTIC_EXECUTION + sgm bundles | PORTED |
 | 16 | Argmin: ascending abs index, strict `<`, ties keep lowest | 08_DETERMINISTIC_EXECUTION selection | PORTED |
 | 17 | Range map / banded coarse-to-fine refinement (local band index per level) | CLM range/STEREO-001 | PORTED — output index is LOCAL-band (note C) |
@@ -133,13 +133,19 @@ already-refuted setWhiteBalance::$_22-is-the-producer path.
 
 ### 2026-08-11c/d — UNKNOWN #1 traced to the bottom (byte codec CLOSED; weight formula = ColorFusionBayer, genuinely OPEN)
 
+**SUPERSEDED ARITHMETIC NOTE:** TRUTH 3.0.352 runtime replay disproves the
+`lane3=f` identity stated in this chronological section. The byte encoder is
+quantizing; the consumer reconstructs `(b+1)/256` for nonzero bytes, applies
+the profile scalar, then performs a float32 square. See section 11n and
+`PARITY_SPEC/09_COLORFUSION_CNR_GUIDE.md`.
+
 CLOSED + independently verified by disassembly:
 - Producer: FusionCacheBayer byte-tile generator 0x407710, LAZY on cache-miss
   (refutes pre-resident hypothesis). Chain: 0x406a10 -> 0x3d69b2 -> 0x407710
   -> 0x1aab40 (render float ROI) -> 0x1bd1e0 (float->u8) -> 0x3d1f90 (insert +0xe0).
 - Byte codec (0x1bd1e0, verified insn-by-insn): byte = max(trunc(f*256.0)-1, 0),
-  scale 256.0f @ 0x5a9250. Exact inverse of proven consumer guide=sqrt((b+1)/256);
-  round-trip f->b->guide^2=f closes. So CNR lane3 = f (linear weight in [0,1]).
+  scale 256.0f @ 0x5a9250. The original exact-inverse interpretation here is
+  superseded by the runtime correction above.
 - f = 2x nearest-neighbor upsample of a half-res float weight map.
 
 GENUINE RESIDUAL UNKNOWN (the real bottom): the half-res float weight `f` is the
@@ -200,7 +206,8 @@ Applying tools/whatknown.sh reframed the unknown in minutes:
   any proof artifact -> genuinely unproven. Callers: 0x1aad5d (ColorFusion) and
   0x1b9bb4.
 
-SCOPING: CNR lane3 = f = ColorFusionBayer weight = the COLOR analog of the PROVEN
+SCOPING (producer shape only; the old `lane3=f` arithmetic is superseded): CNR
+lane3 derives from the ColorFusionBayer weight, the COLOR analog of the PROVEN
 MonoFusion confidence. Same formula shape ((256-sum w)/256; the 256 also appears
 in the proven ColorFusion byte codec x256), but the retention weights w_k are
 computed over the Bayer modules by the unproven 0x19C790 core. So:
@@ -412,3 +419,97 @@ pixel-double the f plane to the CNR resolution, route to lane-3. Remaining detai
 gather: identify which N cameras (data-ptr -> module map) and confirm reference vs the N
 vector entries (decode indicates reference T is built separately; the N vector are the
 sources; +1 base term = the reference).
+
+### 2026-08-11n — Runtime bit replay + selector closure; current Phoenix port fails
+
+This supersedes the earlier claims that `m_k` is lane-independent before
+reduction, that the byte codec is an exact inverse, and that `lane3=f`.
+
+- A retained Unit-1 `28mm` packet captures three complete transformed
+  `256xvec4` source/reference/coefficient blocks, the live four-float noise
+  vector, all three `m_k`, and `A/B/A^2+B`. The repo verifier reproduces every
+  captured result bit-for-bit.
+- `0x18eb00` computes four Bayer-lane Wiener weights per coefficient, takes an
+  x86 max across the four, broadcasts that scalar, and accumulates ordered
+  `1-max(w)`. Every lane wins dozens of coefficients in the live packet.
+- The reference descriptor is separate from the N-entry source vector. The
+  installed selector is enabled, non-target, same camera group, and
+  nonnegative public Bayer override: A1 with A3/A4/A5 at wide; B4 with
+  B1/B2/B3/B5 at tele.
+- Profile 3 plus public `SENSOR_AR1335(2)` selects tuning key 2; all five
+  installed gain rows set `FusionCacheBayer+0xcc=1.0f` exactly.
+- The byte boundary is quantized. Captured patch `f=0x3e8e8cf6` encodes to
+  byte 70 and decodes/squares to lane3 `0x3e8dffff`, not raw `f`.
+- A direct replay compiled against live Phoenix commit `2e2625c` yields wrong
+  `m` words (`3f63f1c3`, `3f6ea0db`, `3f6cc4ea`) and a one-ULP combine error
+  even when fed Lumen `m`. The API must carry `256xvec4` plus four-lane noise,
+  max the lanes, preserve installed accumulator order, and reuse the
+  normalized lifting implementation already in `monofusion.cpp`.
+
+Implementation contract:
+`docs/canonical/PARITY_SPEC/09_COLORFUSION_CNR_GUIDE.md`. Parent claim remains
+PARTIAL pending a direct runtime ID-vector join, ColorFusion raw-transform
+checkpoint, complete wide/tele CNR tile replay, and two-body/four-focal
+integration.
+
+### 2026-08-11o — Direct ordered vectors + raw transform CLOSED
+
+This supersedes 11n's first two pending items and corrects 11m's unordered
+camera-set wording.
+
+- Unit-1 `28mm` direct owner fields: target A1/key `0`, sources
+  `[A5(4), A3(2), A4(3)]`.
+- Exact-focal Unit-2 `70mm` direct owner fields: target B4/key `8`, sources
+  `[B2(6), B5(9), B1(5), B3(7)]`.
+- These are the admitted RawImageFactory first-occurrence orders after target
+  and rejected records are filtered. Do not sort the source IDs.
+- Raw and post-`0x18fe00` `16x16xvec4` source buffers were retained on both
+  runs. The normalized 5/3-family clean-room replay differs at zero of 1024
+  float32 words on each body/tier packet.
+- Current Phoenix `colorfusion.cpp` is therefore directly disproven at two
+  boundaries: its scalar Bayer API loses the four-lane max, and its local
+  `0.5/0.25` lifting is not the installed normalized transform.
+
+Remaining admission gate: complete wide/tele ColorFusion-to-CNR tile replay
+and sufficient two-body/four-focal Phoenix integration. Wiring contract:
+`docs/canonical/PARITY_SPEC/09_COLORFUSION_CNR_GUIDE.md`.
+
+### 2026-08-11p — Public target-noise origin CLOSED at two bodies/two tiers
+
+The complete target-side input to the ColorFusion noise callback is now
+reproducible from public LRI fields with exact binary32 agreement on Unit-1
+`28mm` and exact-focal Unit-2 `70mm`:
+
+- RAW10 is passed through the admitted hot-pixel correction and then
+  `RestoreHighlightsBayer`; the resulting float plane is `float(u16)-42`.
+- `RestoreHighlightsBayer` does not use the reciprocal of public RAW AWB.
+  `ColorFusionBayer::initialize` passes the public AUTO neutral temperature and
+  tint through the installed Robertson interpolation and `0x350820` matrix
+  sequence. That sequence produces the exact three-channel scene-neutral gain.
+- The full-frame halo is same-CFA parity extension, not ordinary clamp or
+  reflection: negative coordinate `q -> q&1`; upper coordinate
+  `q -> n-2+(q&1)`.
+- `0x18e150` reduces each `16x16` Bayer block to fixed spatial lanes
+  `[top-right, top-left, bottom-left, bottom-right]`, with 64 samples per lane,
+  ordered pairwise accumulation, and multiplication by `1/256`.
+- The selected public `17x13` vignetting table is bilinearly expanded to the
+  `260x195` block grid. The exact mixed-precision boundary and bit order are in
+  the implementation contract.
+- The noise callback takes valid-only `2x2` means at the requested block
+  coordinate and computes, per lane,
+  `H^2 * max(1e-5, ((42 + 1/D)*a/1023)+b) * 1023^2`; the ColorFusion core then
+  multiplies this result by `8`.
+- Sensor noise coefficients are selected from the first installed public
+  `SensorGainVars` row whose gain key is at least
+  `int(float32(analog_gain*100))`, in lane order `[red,green,blue,green]`.
+
+The combined verifier checks all 12,979,200 target-plane words, all 202,800
+signal words, all 50,700 shading words, the scene-neutral gain words, and live
+noise callback outputs on both captures. Current Phoenix still requires three
+specific corrections before this boundary can match: implement the exact
+temperature/tint scene-neutral sequence, parity-pad the full frame before the
+highlight kernel, and preserve the fixed spatial four-lane signal/noise API.
+
+This closes only the target/noise origin. The source-camera half-resolution
+plane construction, sidecar/overlap policy, complete ColorFusion-to-CNR tile
+replay, and broader integration remain open under `CLM-DENOISE-002`.

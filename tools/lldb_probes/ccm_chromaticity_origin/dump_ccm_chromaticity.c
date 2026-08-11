@@ -146,6 +146,7 @@ static int run_public_case(int argc, char **argv, intptr_t slide) {
   float cct_tint[2] = {0.0f, 0.0f};
   float reconstructed[2] = {0.0f, 0.0f};
   float final_cct_tint[2] = {0.0f, 0.0f};
+  float scene_neutral[3] = {0.0f, 0.0f, 0.0f};
   const float standard_a_xy[2] = {0.4475726783275604f,
                                   0.40743985772132874f};
   const float standard_d65_xy[2] = {0.31272661685943604f,
@@ -158,6 +159,7 @@ static int run_public_case(int argc, char **argv, intptr_t slide) {
   xy_to_cct_tint(cct_tint, xy);
   temp_tint_to_xy(reconstructed, cct_tint[0], cct_tint[1]);
   xy_to_cct_tint(final_cct_tint, reconstructed);
+  cct_tint_to_neutral_rgb(scene_neutral, calibration, cct_tint);
   xy_to_cct_tint(standard_a_cct_tint, standard_a_xy);
   xy_to_cct_tint(standard_d65_cct_tint, standard_d65_xy);
   cct_tint_to_neutral_rgb(standard_a_neutral, calibration,
@@ -172,7 +174,10 @@ static int run_public_case(int argc, char **argv, intptr_t slide) {
          "reconstructed_x_bits=0x%08x reconstructed_y=%.9g "
          "reconstructed_y_bits=0x%08x final_cct=%.9g "
          "final_cct_bits=0x%08x final_tint=%.9g "
-         "final_tint_bits=0x%08x standard_a_r=%.9g standard_a_r_bits=0x%08x "
+         "final_tint_bits=0x%08x scene_neutral_r=%.9g "
+         "scene_neutral_r_bits=0x%08x scene_neutral_g=%.9g "
+         "scene_neutral_g_bits=0x%08x scene_neutral_b=%.9g "
+         "scene_neutral_b_bits=0x%08x standard_a_r=%.9g standard_a_r_bits=0x%08x "
          "standard_a_g=%.9g standard_a_g_bits=0x%08x standard_a_b=%.9g "
          "standard_a_b_bits=0x%08x standard_d65_r=%.9g "
          "standard_d65_r_bits=0x%08x standard_d65_g=%.9g "
@@ -184,7 +189,9 @@ static int run_public_case(int argc, char **argv, intptr_t slide) {
          bits(cct_tint[1]), reconstructed[0], bits(reconstructed[0]),
          reconstructed[1], bits(reconstructed[1]), final_cct_tint[0],
          bits(final_cct_tint[0]), final_cct_tint[1],
-         bits(final_cct_tint[1]), standard_a_neutral[0],
+         bits(final_cct_tint[1]), scene_neutral[0], bits(scene_neutral[0]),
+         scene_neutral[1], bits(scene_neutral[1]), scene_neutral[2],
+         bits(scene_neutral[2]), standard_a_neutral[0],
          bits(standard_a_neutral[0]), standard_a_neutral[1],
          bits(standard_a_neutral[1]), standard_a_neutral[2],
          bits(standard_a_neutral[2]), standard_d65_neutral[0],

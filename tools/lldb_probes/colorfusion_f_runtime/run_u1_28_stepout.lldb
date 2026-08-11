@@ -1,0 +1,25 @@
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks HL_NUM_THREADS=1
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+settings set -- target.run-args "/Volumes/Base Photos/Light/2018-07-23/L16_02130.lri" /tmp/cf_runtime_u1_28.hdr --profile 3 --export-fmt 3 --no-auto-lris
+breakpoint set --shlib libcp.dylib --address 0x18eb00
+run
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/colorfusion_f_runtime/probe.py
+script probe.manual_pre(lldb.frame)
+thread step-out
+script probe.manual_post(lldb.frame)
+continue
+script probe.manual_pre(lldb.frame)
+thread step-out
+script probe.manual_post(lldb.frame)
+continue
+script probe.manual_pre(lldb.frame)
+thread step-out
+script probe.manual_post(lldb.frame)
+breakpoint disable 1
+breakpoint set --one-shot true --thread-id current --address `$pc + (0x19d514 - 0x19d09b)`
+continue
+script probe.manual_numerator(lldb.frame)
+continue
+script probe.manual_output(lldb.frame)
+process kill
+quit

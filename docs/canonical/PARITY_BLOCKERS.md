@@ -23,7 +23,15 @@ Public names and diagnostic enum labels are not blockers by themselves. They
 become blockers only when the underlying operational meaning is needed to
 compute or encode the image.
 
-## Current Status (TRUTH 3.0.351)
+## Current Status (TRUTH 3.0.354)
+
+TRUTH `3.0.354` closes the target-side public RAW-to-noise chain for direct
+Unit-1 wide and Unit-2 tele cases. Exact public AUTO scene-neutral gain,
+hot-pixel and HighlightRestore output with same-CFA frame extension, fixed
+spatial reciprocal-signal reduction, public vignetting reduction, and the
+four-lane SensorGainVars provider all replay bit-for-bit. The active boundary
+is now source-camera plane construction plus complete overlap/u8/CNR tile
+replay and Phoenix integration, not target noise or HighlightRestore gain.
 
 TRUTH `3.0.351` closes the selected Unit-1 `70mm` lane representation and
 conversion. `FusionCacheBayer+0xe0` is an exact
@@ -111,7 +119,7 @@ and validation.
 
 | Active claim | Blocking unknown |
 |---|---|
-| `CLM-DENOISE-002` | Upstream producer/public role of the `FusionCacheBayer` `TileCache<unsigned char>` weight plane and public origin of scalar `+0xcc`; then focal/body route incidence and complete CNR tile replay. |
+| `CLM-DENOISE-002` | ColorFusion arithmetic, ordered source vectors, fixed reference, normalized transform, target RAW-to-noise public origin, profile-3 AR1335 `+0xcc`, and byte/LUT/square conversion are closed. Remaining: exact source-camera half-resolution planes, half-Hann overlap/u8 sidecar, complete wide/tele ColorFusion-to-CNR tile replay, and sufficient two-body/four-focal Phoenix integration. |
 
 TRUTH `3.0.338` closed the previously unstated mode-0 MonoFusion operand-
 pyramid producer without changing the then-zero selected-profile blocker count.
@@ -334,7 +342,11 @@ The consumed State/CapturedImage/CalibStage/derived-record fields and their
 downstream formulas are closed; anonymous padding, numeric labels, and fields
 without a demonstrated image consumer are excluded rather than guessed.
 
-`CLM-DENOISE-002` is removed from the blocker table at TRUTH `3.0.274`.
+Historical closure note: `CLM-DENOISE-002` was removed from the blocker table
+at TRUTH `3.0.274`, then re-opened when the previously untraced ColorFusion CNR
+guide was shown to be data-driven. TRUTH `3.0.352` narrows that re-opened
+blocker to the direct transform/tile/integration validation listed in the live
+table above.
 SHA-pinned selected-worker proof and two-body post-store replay close the
 radius-2/radius-4 formulas and callback field roles, joined to prior Unit-1
 four-focal liveness and store mechanics. This does not assign public names to

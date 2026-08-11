@@ -1,5 +1,14 @@
 # LLDB Evidence: FusionCacheBayer u8 weight-plane WRITER hunt (2026-08-11)
 
+> **Later runtime correction (TRUTH 3.0.352):** the byte encoder is proven,
+> but it is not an exact inverse of the consumer. For nonzero bytes the
+> consumer reconstructs the quantized bin edge `(b+1)/256`; byte zero is a
+> special zero. The final CNR value is the float32 square of the LUT result
+> after the profile scalar. Therefore `lane3 = f` is false in general. Use
+> `bundle_runtime_colorfusion_f_formula_selection_profile3.md` and
+> `docs/canonical/PARITY_SPEC/09_COLORFUSION_CNR_GUIDE.md` for the admitted
+> arithmetic. Historical interpretation elsewhere is investigation chronology.
+
 ## Status: INCONCLUSIVE on the headline unknown; new corroborating static proof
 
 This note attacks open item 1 of

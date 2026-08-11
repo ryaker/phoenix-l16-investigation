@@ -6,6 +6,15 @@ proven; end-to-end image-quality win measured on the canonical corpus.
 Binary of record: `libcp.dylib`
 `b38dc4b354e832024a11ad2718619c09351ca6cc0ce6ee9b2784763926e481e9`.
 
+**Supersession notice (2026-08-11):** Sections 4-7 preserve the original
+investigation sequence but are no longer the implementation boundary. Exact
+`0x350820` public gain custody and two complete full-frame replays are admitted
+in `docs/evidence/bundle_static_runtime_colorfusion_noise_public_origin_two_body.md`.
+The gain now matches at float32-bit scope, the kernel is bit-exact through the
+admitted reciprocal/rsqrt emulation, and the true-frame edge rule is proved as
+same-CFA parity extension. Follow the canonical ledger and parity spec, not the
+older `1e-6`, `trunc12`, or untouched-border wording below.
+
 ## 1. Where it sits
 
 Pipeline order (CLM-PIPELINE-001), Bayer stage index 2:
@@ -174,8 +183,8 @@ phase matches Lumen's reported phase on all six.
 
 ## 7. Caveats
 
-* A 4-pixel border is left unrestored (the kernel's taps reach ±3, and Lumen's
-  policy at the true frame border is not yet proven). 4 px of 4160x3120.
+* **SUPERSEDED:** the earlier port left a 4-pixel border unrestored. Complete
+  Unit-1/Unit-2 frame replays prove same-CFA parity extension at the true edge.
 * Lane 5 of the `r9` struct (`0.79767489`, identical across all cameras) is still
   unidentified. Lanes 14–15 are `(0.34566918, 0.35849619)` — the 28mm-proven
   Phoenix fallback `scene_xy`, i.e. a second, different white point in the same

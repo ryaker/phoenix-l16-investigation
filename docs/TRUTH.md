@@ -1,6 +1,6 @@
 # Phoenix L16 — TRUTH
 
-**Version**: 3.0.351
+**Version**: 3.0.354
 **Status**: Canonical root truth rebuilt from admitted claims only. Full clean-room investigation remains active; the earlier checklist-complete state was narrower than the project exit criterion.
 
 ## Canonical Authority
@@ -48,6 +48,64 @@ must achieve:
 The prior A-E completion checklist closed the requested merge and final-stage
 items, but it did not close the whole input-to-output implementation. It must
 not be used as an investigation exit criterion.
+
+Version `3.0.354` closes the ColorFusion target-side public RAW-to-noise
+origin on direct Unit-1 `28mm` wide and exact-focal Unit-2 `70mm` tele
+packets. The exact Bayer HighlightRestore gain is not raw reciprocal AWB:
+`ColorFusionBayer` passes public AUTO `neutral_temp/tint` plus the target
+camera's public A/D65 calibration through installed `0x350820`, whose shared
+green reciprocal and multiply sequence reproduces captured vectors
+`3f150644/3f800000/3f211fbf` and
+`3f1c02e7/3f800000/3f03c976` exactly. Public RAW10, the admitted selected
+hot-pixel worker, the admitted Bayer HighlightRestore arithmetic, and a newly
+proved same-CFA parity frame extension reproduce both complete `4160x3120`
+target planes; the Unit-2 discriminator changes `24,020` pixels with zero
+residual words. The target then reduces into a complete `260x195xvec4`
+reciprocal table in fixed spatial `[TR,TL,BL,BR]` order, independent of CFA
+phase. Public selected `17x13` vignetting produces the complete scalar shading
+table, and valid-only 2x2 provider means plus public analog gain, the installed
+RGB SensorGainVars row, `42/1023`, `1e-5`, and factor `8` reproduce both live
+four-lane noise vectors exactly. Complete signal/shading table word counts are
+exact in both cases. Source-camera plane construction, half-Hann overlap-add,
+the complete u8 sidecar, complete CNR tile replay, and sufficient four-focal
+Phoenix integration remain; `CLM-DENOISE-002` stays `PARTIAL/BLOCKER`.
+
+Version `3.0.353` closes the two residual ColorFusion input-boundary checks.
+Direct attach-mode runtime packets read target/source IDs from the owning
+ColorFusionBayer object: Unit-1 `28mm` wide is target A1/key `0` with ordered
+sources `[A5(4),A3(2),A4(3)]`; exact-focal Unit-2 `70mm` tele is target B4/key
+`8` with ordered sources `[B2(6),B5(9),B1(5),B3(7)]`. Those vectors equal the
+admitted RawImageFactory/composed-camera first-occurrence orders after the
+selector removes target/rejected records; sorting by camera ID is refuted.
+The same two packets retain a raw and transformed `16x16xvec4` source patch.
+The clean-room normalized 5/3-family transform replays all `1024` float32
+words exactly in each packet, closing the direct ColorFusion transform join
+and rejecting Phoenix commit `2e2625c`'s unnormalized local transform. Complete
+wide/tele ColorFusion-to-CNR tile replay and sufficient four-focal Phoenix
+integration remain, so `CLM-DENOISE-002` stays `PARTIAL/BLOCKER`.
+
+Version `3.0.352` closes the ColorFusion producer formula, fixed-reference
+identity, camera-selection rule, and profile-3 `FusionCacheBayer+0xcc` origin.
+For each 16x16 transformed Bayer patch and source module, Lumen computes four
+lane-specific Wiener weights using the installed `0x5d0070` coefficient and
+live four-lane noise vector, takes an x86 max over those lanes for each
+coefficient, and accumulates ordered `m_k=mean(1-max_lane(w))`. It then uses
+ordered float32 `A=1; A+=1-m_k`, `B+=m_k^2`,
+`f=(A^2+B)/(N+1)^2`. A retained Unit-1 `28mm` packet replays all three `m_k`,
+`A`, `B`, and the numerator bit-for-bit and proves the reference descriptor is
+separate from the `N=3` source vector. Installed selection keeps enabled,
+non-target, same-camera-group modules with nonnegative public
+`sensor_bayer_red_override`: A1 is the fixed wide reference with A3/A4/A5;
+B4 is the fixed tele reference with B1/B2/B3/B5. Profile 3 plus public
+`SENSOR_AR1335(2)` selects tuning key 2, whose every gain row sets exact
+`+0xcc=1.0f`. The downstream representation is still quantized:
+`b=max(trunc(256f)-1,0)`, square-root LUT, scalar multiply, then float32 square.
+It is not an identity; captured `f=0x3e8e8cf6` becomes byte `70` and lane3
+`0x3e8dffff`. Current Phoenix commit `2e2625c` fails the retained packet because
+it collapses Bayer lanes/noise to scalars and reassociates both accumulators.
+Direct camera-ID-vector runtime and the ColorFusion raw-transform checkpoint
+were still open at this version; version `3.0.353` closes both. Complete
+wide/tele CNR tile replay and sufficient four-focal integration remain.
 
 Version `3.0.351` closes the immediate representation and arithmetic of the
 selected Unit-1 `70mm` CNR fourth lane. Installed RTTI names
@@ -1382,7 +1440,7 @@ authoritative set below.
 | `CLM-MERGE-001` | `FusionCacheBayer` is not the profile-3 bridge HDR multi-camera merge entry point. | four-focal negative architecture exclusion under the exact admitted parent/IRAMP chain | alternate profiles and GUI paths excluded |
 | `CLM-ZOOM-001` | Profile-3 `35mm` bridge behavior is public internal crop plus upsample/final rasterization, not "5B + computational synthesis". | proven narrow subset of `CLM-ZOOM-003` | no GUI/export generalization |
 | `CLM-CCM-001` | Calibration Block 6 has CCM entries for 14 cameras; A2 and C6 are missing and filtered rather than given fallback records. | A2 wide-MonoFusion and C6 tele-terminal fates are proven for canonical profile 3 | alternate profiles excluded |
-| `CLM-DENOISE-002` | Selected CNR RGB/matrix math is closed; source lane 3 is the exact square of a LUT-decoded `FusionCacheBayer` `TileCache<unsigned char>` weight plane. | installed exact byte/LUT/combiner formulas; selected one-plane runtime discriminator Unit-1 `70mm`; prior CNR route/math scopes retained | upstream byte-plane producer/public role, scalar public origin, four-focal/two-body incidence, and complete tile replay remain open |
+| `CLM-DENOISE-002` | Selected CNR RGB/matrix math and ColorFusion weight production are formula-closed: separate A1/B4 reference, exact ordered selected source vectors, bit-exact normalized transform, four-lane-max Wiener retention, ordered quadratic combine, profile-3 AR1335 `+0xcc=1`, and quantized byte/LUT/square lane. | installed selector/config/body proof; one bit-exact three-module Unit-1 `28mm` formula replay; direct Unit-1 `28mm` wide and exact-focal Unit-2 `70mm` tele ordered-ID plus `0/1024` transform replays; admitted four-focal anchor/public-camera orders | complete wide/tele CNR tile replay and sufficient two-body/four-focal integration remain |
 
 Additional `CLM-PREFUSION-001` / `CLM-PREFUSION-002` addendum: four-zoom runtime proof now identifies `PipelineCache+0x8` as level-dimension metadata, not an image/composite pointer. At `28mm` and `35mm`, its five packed `(int32 width, int32 height)` entries are `(10432,7824)`, `(4160,3120)`, `(2080,1560)`, `(1040,780)`, `(520,390)`. At `70mm` and `150mm`, the entries are `(8896,6672)`, `(4160,3120)`, `(2080,1560)`, `(1040,780)`, `(520,390)`. In all four accepted bridge HDR runs, the visible `src1` and `src2` wrapper dimension fields are populated from entry `1` as `4160x3120`, and each wrapper owner stores `PipelineCache*` at owner `+0x28`. This corrects the older scratch-era temptation to read `*(PipelineCache+0x8)` as an image object; it narrows contamination around `src1` / `src2`, but it does not identify semantic `src1` / `src2` contents or close reducer math.
 

@@ -17,22 +17,44 @@ This file prioritizes the current blocker set toward the actual end goal:
 - correct framing and participation
 - stability across `28mm`, `35mm`, `70mm`, and `150mm`
 
-## Current Priority (TRUTH 3.0.351)
+## Current Priority (TRUTH 3.0.354)
 
 This section supersedes every ranking and lane recommendation below it. The
 older tables are retained only as campaign provenance.
 
-TRUTH `3.0.351` closes the immediate CNR lane representation and exact
-conversion. The source is the level-0 byte plane in
-`FusionCacheBayer+0xe0`, installed RTTI `lt::TileCache<unsigned char>`; the
-live Unit-1 `70mm` one-plane route uses the exact square-root LUT and the CNR
-square, including the byte-zero special case and binary32 rounding. WSJF rank
-1 is now its upstream producer/public role and scalar `FusionCacheBayer+0xcc`
-origin: value `9`, time criticality `9`, risk reduction `9`, job size `3`,
-score `9.0`. Trace the paired `TileStorage` producer rather than the RTTI
-`setWhiteBalance::$_22` context, then run focal/body route discriminators and
-a complete CNR tile replay. Do not port a brightness-correlated proxy or
-replace the square with `(byte+1)/256`.
+TRUTH `3.0.354` removes target preprocessing and noise generation from rank 1:
+two-body wide/tele packets now replay exact scene-neutral HighlightRestore
+gain, full target plane, fixed-spatial reciprocal-signal table, public
+vignetting table, and four-lane noise. Rank 1 is the remaining complete
+ColorFusion-to-CNR tile boundary, beginning with exact source-camera
+half-resolution plane construction and continuing through half-Hann overlap,
+u8 sidecar, lane-3 mapping, and CNR tile comparison. Value `9`, time
+criticality `9`, risk reduction `9`, job size `3`, score `9.00`. The public
+target/noise formulas in `PARITY_SPEC/09_COLORFUSION_CNR_GUIDE.md` are inputs
+to that work and must not be replaced by Phoenix's current scalar shortcuts.
+
+TRUTH `3.0.353` additionally closes direct ordered source-ID vectors and the
+raw ColorFusion transform on Unit-1 wide and exact-focal Unit-2 tele. Runtime
+orders are `[4,2,3]` wide and `[6,9,5,7]` tele, not sorted IDs; both normalized
+transform packets replay `0/1024` differing float32 words. WSJF rank 1 is now
+the narrower complete ColorFusion-to-CNR tile replay and Phoenix integration
+join across wide/tele and both bodies. Value `9`, time criticality `9`, risk
+reduction `9`, job size `3`, score `9.00`. Use
+`PARITY_SPEC/09_COLORFUSION_CNR_GUIDE.md`; no image-statistic tuning substitutes
+for the tile boundary.
+
+TRUTH `3.0.352` closes the ColorFusion formula, its distinct fixed reference,
+the deterministic wide/tele source-selection rule, profile-3 AR1335
+`FusionCacheBayer+0xcc=1`, and the quantized byte/LUT/square consequence. It
+also proves live Phoenix commit `2e2625c` is not an exact port: it collapses
+four Bayer/noise lanes to scalars and changes float32 association. WSJF rank 1
+was the bounded implementation-validation join: correct the Phoenix
+ColorFusion API/arithmetic/normalized transform, then capture and replay one
+complete ColorFusion-to-CNR tile at wide and tele and repeat on the second
+body. Value `9`, time criticality `9`, risk reduction `9`, job size `4`, score
+`6.75`. Use `PARITY_SPEC/09_COLORFUSION_CNR_GUIDE.md`; do not tune final image
+statistics before the retained transformed-patch packet and tile boundary are
+exact.
 
 The deterministic-schedule Unit-2 `70mm` level-0 Guidance/source/record/G-42/
 G-43 boundary comparison from TRUTH `3.0.349` is rank 2. The Phoenix
@@ -248,7 +270,10 @@ All rankings below this current-priority section are historical campaign
 provenance. Their old "open" wording and numeric ranks do not constitute the
 live blocker set.
 
-`CLM-DENOISE-002` is removed at TRUTH `3.0.274`: the selected radius-2 and
+Historical closure note: `CLM-DENOISE-002` was removed at TRUTH `3.0.274`, then
+re-opened for the data-driven ColorFusion CNR guide. TRUTH `3.0.352` narrows
+that current blocker to transform/tile/Phoenix integration validation. At the
+older boundary, the selected radius-2 and
 radius-4 bilateral formulas and callback roles are closed by SHA-pinned
 static proof and two-body runtime replay, joined to prior Unit-1 four-focal
 liveness/store coverage.

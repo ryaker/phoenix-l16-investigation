@@ -6,6 +6,19 @@ constants read from installed libcp.dylib __TEXT,__const. 3 parallel decode
 agents + main-thread instruction spot-check. whatknown-gated (f readout was the
 NO-HITS residual per PORT_STATUS 2026-08-11g).
 
+## Runtime correction (superseding the lane interpretation below)
+
+The later raw-operand capture and bit replay in
+`bundle_runtime_colorfusion_f_formula_selection_profile3.md` confirms the
+cross-module formula but corrects the static interpretation of `0x18eb00`.
+The helper computes four Bayer-lane weights per coefficient, reduces them with
+`shufpd/maxps/movshdup/maxss` to one scalar maximum, broadcasts that scalar,
+and accumulates `1-max_lane(w)`. It does not retain four independent lane
+confidences. The live noise input is a four-float vector. The same runtime
+proof also shows the fixed reference descriptor is separate from the N source
+descriptors and pins installed float32 evaluation order. Use the later bundle
+for implementation; this file remains the provenance of the static decode.
+
 ## Result: the color weight `f` (CNR lane-3) is PINNED to an explicit formula.
 
     f = [ ((N+1) - Σ_k m_k)^2  +  Σ_k m_k^2 ] / (N+1)^2
