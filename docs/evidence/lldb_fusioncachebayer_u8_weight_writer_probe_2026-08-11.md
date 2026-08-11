@@ -160,3 +160,77 @@ view or at raw malloc:
   `0x4078a0..0x407940`).
 - Re-analysed prior runs: `unit1_70mm_gen_introspect.json`,
   `unit1_70mm_storage_writer.json`, `unit1_70mm_bytebuf_reuse.json`.
+
+---
+
+## Session 2 addendum: the malloc-catch instrument and why it does not name the producer
+
+I built the corrected next instrument and ran it. It is
+`tools/lldb_probes/cnr_lane3_producer/u8tile_writer_catch_probe.py` +
+`unit1_70mm_u8tile_writer.lldb`. Design (deadlock-avoiding, race-free arming):
+
+1. hook `malloc`; when `rdi` is in the 522x522 u8-tile band, plant a ONE-SHOT
+   breakpoint at the caller return address `*(rsp)` (no `SBThread.StepOut`);
+2. the one-shot ret callback reads `rax` (fresh buffer) and arms a 1-byte WRITE
+   watchpoint at `buf+0x400`;
+3. on the first write, VERIFY the doubled-u8 weight signature
+   (`b[2i]==b[2i+1]` over a DENSE, non-sparse region — checked both at `buf`
+   head and in a 96-byte window around the just-written watch byte, which is
+   header- and fill-order-agnostic). Accept -> capture producer backtrace +
+   store operands; reject float/sparse -> disarm and hunt the next allocation.
+
+### Result: INCONCLUSIVE, with a decisive negative finding
+
+The instrument works and self-corrects (early false positive on a mostly-zero
+buffer was fixed by requiring density; a flat bright weight region has few
+distinct values, so distinctness must NOT be gated), but it did **not** accept
+any doubled-u8 tile. Across the guided-upsample burst it armed/verified
+**> 3200** allocations of size ~272484 and rejected **all** of them as
+float/unpaired.
+
+Decisive point: `522*522 (u8 tile) == 261*261*4 (half-res float) == 272484
+bytes`. The fusion/upsample stage allocates thousands of 261x261 **float**
+working buffers at exactly the u8-tile size; the probe correctly rejects every
+one (they fail the equal-adjacent-byte test). Yet a real 272484-byte u8 weight
+buffer provably exists (`bytebuf_reuse` seed, doubled pattern). The absence of
+**any** doubled-u8 acceptance among thousands of same-size allocations indicates
+the u8 byte tiles are **not discrete `malloc(272484)` blocks** — they are
+carved from a tile pool / arena (consistent with the arena-packed tile addresses
+seen earlier, e.g. `0x7f7c90008040`). **malloc-size filtering therefore cannot
+catch the byte-tile producer.**
+
+Secondary limitation: the arm-and-block scheme stalls if an armed candidate's
+watched byte is never written before the buffer is freed (malloc_entry ignores
+new candidates while `armed`), which is why runs freeze mid-hunt.
+
+### Corrected next instrument (pool-aware, deadlock-free)
+
+Do not hook `malloc`. Instead:
+
+1. Statically disassemble the **storage tile-get** on the read path
+   (`0x406a10 -> 0x3d2ca0` extraction) to recover the `TileStorage`/pool tile
+   record layout and the arena base+stride by which a `(level,x,y)` maps to a
+   `Tile<unsigned char>` data pointer. (Static reads/disasm are allowed; do not
+   hook the read path.)
+2. From that layout, find the sibling **tile-acquire / tile-put** (the function
+   that hands out or installs a `Tile<unsigned char>` data pointer for a
+   `(level,x,y)` into that same pool). Hook it, filtered to
+   `storage == S = *(FCB+0xf0)` captured by ONE read-only stop at `0x406a10`.
+3. On the first acquire/put of a byte tile, the caller frames are the producer:
+   RTTI-resolve and read its source descriptor + store loop. This is one hit
+   per real tile (deadlock-free) and pool-agnostic.
+
+Alternative if the pool acquire is inlined: watch the arena directly. Pass 1:
+one read-only stop at `0x406a10`, resolve the byte tile data pointer and its
+containing arena base/size. Pass 2 (fresh run is required — addresses differ):
+arm the watchpoint on the arena during the PRODUCER phase (before the CNR
+consumer) rather than after; the producer phase precedes `0x406a10`, so break on
+the first upstream fusion entry that touches `S`, then watch.
+
+### Honest status
+
+The producer function address, RTTI/public name, and exact per-byte arithmetic
+remain **UNKNOWN**. What is newly established this session is a negative
+structural fact — the byte tiles are pool-allocated at a size aliased with the
+half-res float buffers — which redirects the hunt from `malloc` to the
+`TileStorage`/pool tile-acquire path.
