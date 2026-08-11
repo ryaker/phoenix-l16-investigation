@@ -1,0 +1,4 @@
+target create --arch x86_64 /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+script print("==== 0x406a10 head (consumer / guide producer) ====")
+disassemble --start-address 0x406a10 --end-address 0x406c40
+quit

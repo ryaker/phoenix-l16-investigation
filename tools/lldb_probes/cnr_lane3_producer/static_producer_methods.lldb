@@ -1,0 +1,10 @@
+target create --arch x86_64 /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+script print("==== 0x407c20 (slot0) ====")
+disassemble --start-address 0x407c20 --end-address 0x407cd0
+script print("==== 0x407cd0 (slot1) ====")
+disassemble --start-address 0x407cd0 --end-address 0x407d90
+script print("==== 0x407d90 (slot2) ====")
+disassemble --start-address 0x407d90 --end-address 0x407e30
+script print("==== 0x407e30 (slot4) ====")
+disassemble --start-address 0x407e30 --end-address 0x407f00
+quit

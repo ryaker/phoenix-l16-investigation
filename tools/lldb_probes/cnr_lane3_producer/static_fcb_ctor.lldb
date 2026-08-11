@@ -1,0 +1,6 @@
+target create --arch x86_64 /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+script print("==== FCB ctor 0x4064c0 head ====")
+disassemble --start-address 0x4064c0 --end-address 0x4065f0
+script print("==== FCB ctor 0x4064c0 tail ====")
+disassemble --start-address 0x406680 --end-address 0x406960
+quit

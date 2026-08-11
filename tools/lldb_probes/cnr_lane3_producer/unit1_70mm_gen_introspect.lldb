@@ -1,0 +1,11 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/cnr_lane3_producer/gen_introspect_probe.py
+script gen_introspect_probe.reset("Unit-1 70mm byte-cache generator introspect","/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer/unit1_70mm_gen_introspect.json",2)
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks
+platform shell mkdir -p /Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+process handle SIGSEGV -p true -s false -n false
+script gen_introspect_probe.install(lldb.debugger)
+process launch -- "/Volumes/Base Photos/Light/2019-05-18/L16_03434.lri" "/Volumes/Dev/L16_Lumen_ReverseEngineering/runs/cnr_lane3_producer/unit1_70mm_gen_introspect.hdr" --profile 3 --export-fmt 3 --no-auto-lris
+script gen_introspect_probe.drive(lldb.debugger)
+script gen_introspect_probe.write_report(lldb.debugger)
+quit

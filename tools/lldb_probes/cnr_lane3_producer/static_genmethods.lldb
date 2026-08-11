@@ -1,0 +1,7 @@
+target create --arch x86_64 /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+script print("==== RTTI name for generator vtable 0x660188 ====")
+script import lldb
+image lookup -a 0x660188
+script print("==== slot sizes: disasm 0x4078a0..0x407960 ====")
+disassemble --start-address 0x4078a0 --end-address 0x407960
+quit

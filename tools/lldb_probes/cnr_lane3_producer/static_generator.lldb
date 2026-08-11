@@ -1,0 +1,6 @@
+target create --arch x86_64 /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+script print("==== generator functor vtable @ 0x660188 ====")
+x/12gx 0x660188
+script print("==== 0x3d2c10 (installs generator into byte cache) ====")
+disassemble --start-address 0x3d2c10 --end-address 0x3d2ca0
+quit

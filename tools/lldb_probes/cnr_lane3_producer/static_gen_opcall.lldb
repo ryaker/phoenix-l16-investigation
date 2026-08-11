@@ -1,0 +1,6 @@
+target create --arch x86_64 /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+script print("==== vtable header+slots 0x660178..0x6601e0 ====")
+x/14gx 0x660178
+script print("==== 0x407950 (candidate op()/dtor) ====")
+disassemble --start-address 0x407950 --end-address 0x407a90
+quit

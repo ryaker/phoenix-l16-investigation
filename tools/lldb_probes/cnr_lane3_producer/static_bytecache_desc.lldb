@@ -1,0 +1,9 @@
+target create --arch x86_64 /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+disassemble --start-address 0x4065f0 --end-address 0x406680
+script print("==== DESC 0x6756c0 ====")
+x/8gx 0x6756c0
+script print("==== DESC 0x66b298 ====")
+x/8gx 0x66b298
+script print("==== TILECACHE CTOR 0x3d1f80 head ====")
+disassemble --start-address 0x3d1f80 --end-address 0x3d2010
+quit

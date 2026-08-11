@@ -1,0 +1,4 @@
+target create --arch x86_64 /Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks/libcp.dylib
+script print("==== 0x3d2ca0 extract/accessor ====")
+disassemble --start-address 0x3d2ca0 --end-address 0x3d2fb0
+quit
