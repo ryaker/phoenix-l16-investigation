@@ -289,3 +289,35 @@ CORRECTION to 2026-08-11g: that entry wrongly attributed the Wiener weight/table
 the ÷(N+1)^2 normalizer / ×scale / inverse-lifting helpers; the Wiener weight is in
 0x18eb00. 0x5cedf0/0x5cee00 are int ROI masks, not the λ table; 0x5d0470 is a param
 block, not a 2nd λ table. See bundle for boundary-correct addresses.
+
+### 2026-08-11i — UNKNOWN #1 CLOSED (both confirmations resolved). Bonus: closes Phoenix G-58.
+
+CONFIRMATION 1 (0x18eb00 m_k) — CLOSED:
+- One call consumes the FULL 16x16=256-coeff patch (inner loop @0x18eb30 x16, outer
+  @0x18eb20 x16); one call per Bayer module (caller 0x19d096).
+- λ_k = coefBuf_k × noiseScale. coefBuf = per-coefficient runtime buffer [rbp-0x1030]
+  (built by 0x19d8e0). noiseScale = [rbp-0x52c0]·[rbp-0x53c0], per-patch constant
+  (r8=[rbp-0x5300], never advanced). (coefBuf's provenance from table 0x5d0070 not
+  asserted at this callsite — honest limit.)
+- m_k = (256 − Σw)/256 ∈ [0,1], w=d²/(d²+λ) broadcast to a scalar; accumulator [rsi]
+  zeroed @0x18eb05, Σ(1−w) @0x18eb70-79, ×1/256 (0x5cbfc0) @0x18ebaf, stored [rbp-0x52f0].
+  => m_k is the mono confidence (256−Σw)/256, per Bayer module. NUMERIC RANGE PINNED.
+
+CONFIRMATION 2 (0x18fe00 fwd wavelet) — CLOSED:
+- True body 0x18fe00..0x190790, returns via ret @0x190790 (disassembler falsely split
+  at interior push rbp @0x190403; regs xmm8/9/10/12/13 bound once @0x18fe02-22 confirm
+  single function). Coeffs: 1/√2 @0x5cbf80, 1/(2√2) @0x5cbf90, √2 @0x5cbfa0, 0.5 @0x5cbfb0
+  (corr: not 0x5a92a0), 1.0 @0x5cc050. Separable orthonormal-scaled lifting over 16x16x4.
+  Predict stencil = 5/3 (x_odd − ½(x_L+x_R)); normalized (√2) with update weight ≠ 5/3's ¼
+  => 5/3-FAMILY, orthonormally normalized (not bit-identical to unnormalized 5/3).
+
+=> UNKNOWN #1 (color weight f / CNR lane-3 producer) is fully DECODED end-to-end:
+   f = ((N+1)−Σ_k m_k)² + Σ_k m_k²) / (N+1)², m_k = (256−Σw_k)/256 per Bayer module,
+   w = d²/(d²+λ), λ=coefBuf×noiseScale; patch transform = normalized 5/3-family lifting;
+   half-sample Hann OLA (0x18ce50). No genuine unknown remains on the profile-3 depth path.
+
+BONUS — closes Phoenix SPEC-GAP G-58: phoenix/engine/merge/monofusion.h documents that
+"the exact Wiener combine algebra inside 0x1b37a0 is not admitted" and implements an
+APPROXIMATE difference-shrinkage Wiener. The exact algebra is now decoded (same 0x18eb00
+family): w=d²/(d²+λ), fused_c = w·T_c+(1−w)·S_c, confidence=(256−Σw)/256. G-58 can be
+closed with the exact formula. Remaining work is PORT/IMPLEMENTATION (not RE).
