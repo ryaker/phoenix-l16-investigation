@@ -321,3 +321,28 @@ BONUS — closes Phoenix SPEC-GAP G-58: phoenix/engine/merge/monofusion.h docume
 APPROXIMATE difference-shrinkage Wiener. The exact algebra is now decoded (same 0x18eb00
 family): w=d²/(d²+λ), fused_c = w·T_c+(1−w)·S_c, confidence=(256−Σw)/256. G-58 can be
 closed with the exact formula. Remaining work is PORT/IMPLEMENTATION (not RE).
+
+### 2026-08-11j — coefBuf CLOSED → UNKNOWN #1 has ZERO numeric residual (supersedes the 11i "honest limit")
+
+The 11i note "coefBuf provenance not asserted / one unclosed numeric input" is now
+RESOLVED (superseded — do not cite it as open). Found the initializer that earlier
+greps missed because it uses INDEXED stores `[rbp+rdx-0x1030]`, not the literal disp:
+
+- Prologue copy loop 0x19c860..0x19c954 (runs once): `lea rcx,[rip]→0x5cee10` @0x19c81f;
+  16 iters × 0x100 B; final store each iter `movaps [rbp+rdx-0x1030],xmm0` @0x19c93e;
+  copies the full 0x1000 B table at VA 0x5cee10 into coefBuf [rbp-0x1030,rbp-0x30).
+- 0x5cee10 = the proven mono per-coefficient λ table 0x5d0070[0..255], broadcast to 4
+  Bayer lanes (verified byte-identical: min 0.5625 max 8.65008 sum 360.238; all 4 lanes equal).
+  (0x5cedf0=(0,0,16,16) and 0x5cee00=(16,16,16,-1) are the int ROI masks of the same
+  descriptor block; 0x5cee10 is its float λ payload. Reconciles the 11h correction.)
+
+=> coefBuf_k = 0x5d0070[k].  λ_k = 0x5d0070[k] × noiseScale.
+   noiseScale = σ²_sample(patch) × (arg × 8.0)  [σ² via virtual getter @0x19cd2e →
+   [rbp-0x52c0]; arg×8 const 0x5a9b0c → [rbp-0x53c0]; product @0x19d069].
+   w_k = d²/(d²+λ_k) @0x18eb4d ; m_k = (256−Σw_k)/256 (×1/256 const 0x5cbfc0) ;
+   f = ((N+1)−Σ_k m_k)² + Σ_k m_k²) / (N+1)².
+
+FINAL: the profile-3 depth path has NO remaining unknown and NO remaining numeric
+residual. The color weight f (CNR lane-3 producer) is fully decoded to static constants
++ decoded instructions. Same λ table (0x5d0070) as mono ⇒ this also gives Phoenix G-58
+its exact per-coefficient λ. Remaining work is PURE PORT/IMPLEMENTATION.
