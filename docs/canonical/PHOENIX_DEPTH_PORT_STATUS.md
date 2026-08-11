@@ -83,3 +83,33 @@ are the COLOR-merge output path (CLM-MERGE-005/006 now PROVEN), not depth.
 Both sides FRESH per LRI, same session, across both bodies x 4 focals (harness
 `tools/sidebyside_matrix.sh`). Compare in the correct space (depth mm, not raw
 index). A stage is accepted only when it matches on ALL of u1/u2 x 28/35/70/150.
+
+## Drawdown log
+
+### 2026-08-11 (parallel: porting-gap track + unknown track)
+
+PORTING GAPS (exact-formula audit, no comparison):
+- GAP: calibration selected by camera_id field-match instead of position
+  [camera_key]. REAL gap (decode confirms field-1 camera_id is a hardware id
+  != key: key0->12 U1, ->4 U2). This is the per-BODY divergence behind the
+  Unit-2 weakness. FIXED -> positional indexing. Phoenix commit c72a102.
+  Stages 3-8 calibration inputs now select the correct per-body entry.
+- Non-anchor color-match affine (stage 9): audited, CONFIRMED EXACT (chol
+  formula, C3>0.95, <100->identity, on YUV floats pre-pack). No change.
+- Per-camera vignetting selection/interp (stages 5-8 input): audited,
+  CONFIRMED EXACT (single model fixed cams; mirror_position interp movable).
+
+UNKNOWN #1 (CNR byte-plane producer) — ADVANCED, not closed:
+- Producer NAMED: `lt::FusionCacheBayer` ctor `$_1` per-tile fill hook
+  (generator functor at byte_view+0x70), signature
+  void(shared_ptr<Tile<unsigned char>> const&). Owning ctor public inputs:
+  `RawImageFactory` + `RendererProfileConfig`. Byte-plane public role =
+  SoftISP/AWB per-tile product. `+0xcc` = live 1.0f from RendererProfileConfig
+  (public). Evidence: bundle_runtime_cnr_lane3_byteplane_generator_rtti_
+  unit1_70mm.md (commit 8af3967).
+- STILL OPEN: the exact byte arithmetic (the numeric fill). Proposed next
+  instrument was to break setWhiteBalance::$_22 -- BUT prior work already
+  corrected an overclaim that `setWhiteBalance::$_22` is CONTEXT, not the
+  executing producer frame. RECONCILE before acting: confirm whether the
+  numeric write is in $_1, in the $_22 callback, or elsewhere, without
+  re-treading the refuted context path.
