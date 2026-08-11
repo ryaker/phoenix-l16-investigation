@@ -113,3 +113,20 @@ UNKNOWN #1 (CNR byte-plane producer) — ADVANCED, not closed:
   executing producer frame. RECONCILE before acting: confirm whether the
   numeric write is in $_1, in the $_22 callback, or elsewhere, without
   re-treading the refuted context path.
+
+### 2026-08-11 CORRECTION (unknown track was over-claimed)
+
+The "producer NAMED / ADVANCED" note above is RETRACTED as an advance.
+FusionCacheBayer is already documented in 16 evidence bundles, including its
+byte plane (+0xe0 TileCache<unsigned char>), its input RawImageFactory (+0x8),
+its flag machinery (fusioncachebayer_flag_origin_static/_four_zoom), the +0xcc
+scalar, and the entire CONSUMER chain (byte -> sqrt-LUT -> guide -> guide^2).
+The subagent re-confirmed known naming; it did NOT extract the one open thing.
+
+PRECISE residual unknown (restated): the exact per-byte ARITHMETIC that FILLS
+the +0xe0 byte plane -- the numeric formula mapping the SoftISP/AWB raw input to
+each byte weight. That single function's math is the whole unknown; everything
+structural around it is proven. Stop re-naming FusionCacheBayer; the only
+instrument that counts is one that captures the byte WRITE (input operands ->
+output byte) for a tile and yields the formula, WITHOUT re-treading the
+already-refuted setWhiteBalance::$_22-is-the-producer path.
