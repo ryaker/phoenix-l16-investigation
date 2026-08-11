@@ -328,7 +328,75 @@ and its role as the FusionCacheBayer byte-weight encoder are new here.
 
 ### Remaining (smaller) open point
 
-The float source semantics behind `FCB+0x120` (`TileCache<float>`) fed to
-`0x1aab40` — i.e. the public name of the float weight map that `f` is sampled
-from — is not yet assigned; that is the one input still to label, but the byte
-WRITER and its arithmetic are now closed.
+The float source semantics behind `FCB+0x120` fed to `0x1aab40` — resolved in
+session 4 below.
+
+---
+
+## Session 4: the float weight `f` = `lt::ColorFusionBayer` (source named; formula bottoms out in the L16 color-fusion core)
+
+### `FCB+0x120` RTTI (runtime, `fcb120_probe.py`, break at `0x407710`, `fcb=*(rdi+8)`)
+
+```
+FusionCacheBayer+0x120  ->  lt::ColorFusionBayer   (RTTI N2lt16ColorFusionBayerE, vtable libcp 0x657aa0)
+  ColorFusionBayer+0x60  = __func< lt::ColorFusionBayer::initialize(bool const*, lt::Vec2<float> const&)::$_1 >
+                           signature  (lt::Rectangle<int> const&) -> lt::vec4x32f     (per-tile float producer)
+  ColorFusionBayer+0x120 = shared_ptr<lt::RawImageFactory>        (the raw Bayer input)
+  ColorFusionBayer+0x90/0xc0/0xf0/0x1f8 = heap float image planes (the fused module data)
+```
+
+`0x1aab40` is therefore `lt::ColorFusionBayer::process` (its `this` = `FCB+0x120`
+= the ColorFusionBayer object). It maps the full-res tile ROI to half-res source
+coords (integer `>>1` at `0x1aac60..0x1aac74`; base dims at `this+0x80/0x84`
+doubled at `0x1aab9c`), i.e. a **half-res -> full-res 2x** expansion. The output
+byte tile's exact pair duplication (`255,255,254,254,...`) is empirically
+**nearest-neighbour** replication (interpolation would yield intermediate
+values); a `this+0x60` virtual sampler is invoked but not fully disassembled.
+
+### What `f` is (for Phoenix)
+
+`f` (= CNR lane3 = guide^2) is the **second output of `lt::ColorFusionBayer`** —
+a per-pixel Bayer color-fusion **blending weight/confidence in `[0,1]`**, computed
+from the `lt::RawImageFactory` (the raw per-module Bayer input) and sampled at
+half resolution, 2x-expanded, then quantised `byte = max(trunc(256 f) - 1, 0)`.
+`ColorFusionBayer` is exactly the class `docs/LIBRARY_INVENTORY.md` calls "the L16
+fusion pipeline you're trying to rebuild." Its per-pixel float formula lives in
+`ColorFusionBayer::process` / its compute core `0x19C790` (const in the prior
+`colorfusion_weight_probe.py`).
+
+### Honest scope boundary + anti-repeat
+
+- **Not new naming**: `tools/lldb_probes/cnr_lane3_producer/colorfusion_weight_probe.py`
+  (a prior session) already states in its docstring that `0x407710` (`$_0`) asks
+  `ColorFusionBayer::process (0x1aab40)` for two outputs and the second is
+  quantised by `0x1bd1e0` into the `+0xe0` u8 cache. That topology + the
+  `ColorFusionBayer` name were already known there, but were **never promoted to
+  an evidence bundle**, and the main CNR bundle still lists the producer as open.
+  What sessions 3-4 add and *prove*: the exact byte arithmetic
+  `max(trunc(256 f) - 1, 0)` (scale `256.0f` @`0x5a9250`), the runtime RTTI
+  confirmation `FCB+0x120 = lt::ColorFusionBayer`, and its `RawImageFactory`
+  input + `initialize::$_1` per-tile callable.
+- **Deep unknown (stop here, precisely)**: the per-pixel float value produced by
+  `ColorFusionBayer::process` (core `0x19C790`) is the L16 **color-fusion
+  blending-weight** computation over the raw Bayer modules. Deriving its exact
+  formula is the core multi-module fusion RE — a separate, large effort, NOT a
+  simple AWB/SoftISP scalar. It is not derived here. For Phoenix: lane3 must be
+  ColorFusionBayer's weight output; until that fusion core is reproduced, lane3
+  cannot be computed from a closed public formula — but it is definitively NOT
+  the disproven constant `1.0`, and the byte<->float encode/decode around it is
+  fully closed.
+
+### `0x407710` `$_0` vs `$_1` clarification
+
+Runtime RTTI at `0x407710` entry is the FusionCacheBayer float generator
+`$_0` (over `Tile<float>`), not `$_1`. `0x407710` is the shared generator body:
+it obtains the ColorFusionBayer outputs, stores the `Tile<float>` (cache `+0x128`)
+**and** emits the quantised u8 sidecar (`0x1bd1e0`) into the byte cache `+0xe0`.
+Session 3's "byte-tile generator" identification of `0x407710` stands; the
+`$_0`/`$_1` label is corrected here.
+
+### Artifacts (session 4)
+
+- `tools/lldb_probes/cnr_lane3_producer/fcb120_probe.py` +
+  `unit1_70mm_fcb120.lldb`; run `runs/cnr_lane3_producer/unit1_70mm_fcb120.json`
+- static disasm `0x1aab40` (ColorFusionBayer::process; half-res->full-res 2x).
