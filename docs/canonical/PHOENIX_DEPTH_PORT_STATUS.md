@@ -210,3 +210,47 @@ computed over the Bayer modules by the unproven 0x19C790 core. So:
   retention-weight computation. Static-RE job, guided by the MonoFusion template.
 Do NOT port an approximation; CNR lane3 stays NOT PORTED until 0x19C790 is
 reverse-engineered against the MonoFusion template.
+
+### 2026-08-11g — UNKNOWN #1 DRAWDOWN via static structural map (evidence-first, whatknown-gated, boundary-verified)
+
+Disciplined static read of 0x19C790 against the PROVEN MonoFusion template
+(no new runtime RE; whatknown already confirmed NO-HITS = investigation justified).
+
+BOUNDARY (verified, to avoid overclaim): 0x19C790 prologue `sub rsp,0x53e8` @
+0x19c79d; epilogue `add rsp,0x53e8` @ 0x19d6dc. TRUE body = 0x19c790..0x19d6dc
+(~0xf40 bytes of code; the 21480-byte frame is local patch buffers). The
+0x5d0070-table + Hann-loop code at 0x19f8xx is a SEPARATE callee, not this func.
+
+WHAT THE TRUE BODY PROVABLY SHARES WITH THE MONO TEMPLATE (portable, do NOT re-derive):
+- Half-sample Hann overlap-add window: 0x19C790 calls helper **0x18ce50** (same
+  helper MonoFusion uses; 0x18ce50 = C1 - C1*trig((i+C1)*2pi/N), the proven
+  half-sample Hann). 114 sites reference it library-wide.
+- 16x16 coefficient-weight Wiener table: 0x19C790 references descriptor
+  **0x5cedf0** (@0x19c803) -- the SAME descriptor that fronts the proven table
+  **0x5d0070** (mono template bundle, line 259: "installed at 0x5d0070 behind
+  descriptor 0x5cedf0"). Its Wiener callee (~0x19f4xx) loads 0x5d0070 directly and
+  rebuilds the 16-tap Hann via 0x18ce50 (edi=0..15, esi=0x10).
+=> The coefficient-domain Wiener blend (w_k = d2/(d2+lambda); S_k = w_k*T_k +
+   (1-w_k)*S_k) and the retention/confidence aggregation shape
+   (confidence = (256 - sum_k w_k)/256) are the PROVEN mono formulas, now shown
+   to execute in the color core too. The color weight `f` (CNR lane3) is the
+   per-pixel color analog of the proven mono confidence scalar.
+
+RESIDUAL GENUINE UNKNOWN (now narrowed from "entire core" to two front-end pieces):
+1. Color/Bayer patch marshaling: how per-module Bayer inputs become the 16x16
+   patches. Owned by color-specific callees 0x18e770 / 0x18eb00 / 0x18ebc0 /
+   0x18f690 / 0x18fe00 / 0x19d820 / 0x19d8e0 / 0x19dc30 / 0x19e7d0 / 0x19eb60 /
+   0x19f470, and vector-const tables 0x64f2e8 / 0x64f320 / 0x64f398 / 0x64f3c8
+   (+ 0x5a8920). These are NOT in the mono template.
+2. Per-pixel retention-weight readout that becomes `f`: whether it is literally
+   (256 - sum w_k)/256 per pixel (mono-identical) or a color-plane-weighted
+   combination. Mono inits its accumulator to 256 @ 0x18da80; 0x19C790 does NOT
+   call 0x18da80 (accumulator handled inline / in a callee) -> the exact readout
+   is the one formula still to pin.
+
+NET: the unknown is no longer "the whole ColorFusionBayer core is a black box."
+The transform + Wiener blend + window are the proven mono template (shared table
+0x5d0070 + shared window 0x18ce50). The real open static-RE surface is (a) the
+color patch assembly (11 named callees + 5 const tables) and (b) the exact `f`
+readout. That is a bounded job, not an open-ended one. CNR lane3 stays NOT PORTED
+until (a)+(b) are pinned; no approximation to be committed.
