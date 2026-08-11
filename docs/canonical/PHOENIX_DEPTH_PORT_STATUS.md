@@ -130,3 +130,33 @@ structural around it is proven. Stop re-naming FusionCacheBayer; the only
 instrument that counts is one that captures the byte WRITE (input operands ->
 output byte) for a tile and yields the formula, WITHOUT re-treading the
 already-refuted setWhiteBalance::$_22-is-the-producer path.
+
+### 2026-08-11c/d — UNKNOWN #1 traced to the bottom (byte codec CLOSED; weight formula = ColorFusionBayer, genuinely OPEN)
+
+CLOSED + independently verified by disassembly:
+- Producer: FusionCacheBayer byte-tile generator 0x407710, LAZY on cache-miss
+  (refutes pre-resident hypothesis). Chain: 0x406a10 -> 0x3d69b2 -> 0x407710
+  -> 0x1aab40 (render float ROI) -> 0x1bd1e0 (float->u8) -> 0x3d1f90 (insert +0xe0).
+- Byte codec (0x1bd1e0, verified insn-by-insn): byte = max(trunc(f*256.0)-1, 0),
+  scale 256.0f @ 0x5a9250. Exact inverse of proven consumer guide=sqrt((b+1)/256);
+  round-trip f->b->guide^2=f closes. So CNR lane3 = f (linear weight in [0,1]).
+- f = 2x nearest-neighbor upsample of a half-res float weight map.
+
+GENUINE RESIDUAL UNKNOWN (the real bottom): the half-res float weight `f` is the
+per-pixel blending-weight OUTPUT of `lt::ColorFusionBayer` (RTTI-proven at
+FCB+0x120; render 0x1aab40 = ColorFusionBayer::process; input = RawImageFactory
+raw Bayer). Its per-pixel FORMULA lives in the ColorFusionBayer fusion CORE
+0x19C790 -- the L16 multi-module COLOR-fusion weight computation. This is:
+- NOT a proven claim (no CLM-COLORFUSION in the ledger; ColorFusionBayer appears
+  in only 1 evidence bundle, tangentially);
+- distinct from the PROVEN MonoFusion (mono A1/A2) path -- this is the COLOR/Bayer
+  fusion sibling;
+- a substantial subsystem (the "L16 fusion pipeline"), i.e. the true reason this
+  item was always "large job-size".
+
+So the one unknown, fully traced, IS the ColorFusionBayer color-fusion weight
+formula. Everything wrapping it (byte codec, guide LUT, CNR consumer, cache
+structure) is closed. Phoenix stage 14 (CNR lane3) cannot be exactly ported
+until ColorFusionBayer's weight core (0x19C790) is reverse-engineered -- that is
+now THE remaining reverse-engineering job for depth parity. Evidence: commits
+a114eaa, b0cab04.
