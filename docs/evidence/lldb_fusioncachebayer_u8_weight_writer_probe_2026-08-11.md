@@ -230,7 +230,105 @@ the first upstream fusion entry that touches `S`, then watch.
 ### Honest status
 
 The producer function address, RTTI/public name, and exact per-byte arithmetic
-remain **UNKNOWN**. What is newly established this session is a negative
-structural fact — the byte tiles are pool-allocated at a size aliased with the
-half-res float buffers — which redirects the hunt from `malloc` to the
-`TileStorage`/pool tile-acquire path.
+remain **UNKNOWN** as of session 2 — resolved in session 3 below.
+
+---
+
+## Session 3: PRODUCER NAMED + exact per-byte arithmetic (RESOLVED)
+
+The malloc/pool framing was a dead end because the premise ("byte tiles are
+pre-resident, produced upstream") was **wrong**. Runtime backtrace capture at the
+`lt::Tile<unsigned char>` constructor proves the byte tiles are generated
+**lazily, on cache-miss, by FusionCacheBayer itself**, during the CNR consumer
+descent.
+
+### How it was found
+
+RTTI string scan of `libcp.dylib` surfaced `__shared_ptr_emplace<lt::Tile<h>>`
+(name `0x605450`, vtable `0x66ab48`) and `lt::TileCache<unsigned char>::renderROI<h>`.
+A `__text` scan for RIP-relative `leaq` to `0x66ab48` gave the make_shared sites;
+the `Tile<h>` constructor common to them is `0x3d7710`. Breaking on `0x3d7710`
+(probe `tile_h_factory_probe.py`) captured a stable producer backtrace. A full
+profile-3 HDR render of `L16_03434` runs in ~30 s at full speed (the earlier
+malloc hook, not the render, was the bottleneck).
+
+### The producer chain (runtime-proven)
+
+```
+0x406a10  FusionCacheBayer CNR consumer (setWhiteBalance path)
+  -> 0x406afa
+  -> 0x3d1ac6 / task dispatch (0x55a2,0x3873,0x5d97)
+  -> 0x3d69b2  TileCache<h> generate-on-miss dispatch
+  -> 0x407710  FusionCacheBayer BYTE-TILE GENERATOR  <=== the producer
+       -> 0x3d16d0            compute tile ROI in source coords
+       -> [FCB+0x120] 0x1aab40   render float ROI from the float TileCache<float>
+                                  (half-res source -> 2x "doubling"; const-float scaled)
+       -> 0x1bd1e0            float -> u8 encode (the per-byte arithmetic)
+       -> 0x3d1f90            insert the u8 tile into byte cache [FCB+0xe0]
+  -> 0x3d2610 / 0x3d7710  make_shared<Tile<h>> + Tile<h> ctor (fill from source)
+```
+
+`0x407710`: `r12 = *(rdi+8) = FusionCacheBayer` (confirmed: it uses `FCB+0xe0`
+byte cache and `FCB+0x128` float cache, the exact ctor offsets). It uses the
+float `TileCache<float>` at `FCB+0x128` (via `0x3d16d0`) for ROI/coordinate
+mapping, renders the tile's float ROI via `0x1aab40` on the float-source member
+`[FCB+0x120]`, encodes float->u8 via `0x1bd1e0`, and inserts via `0x3d1f90` into
+the byte cache `FCB+0xe0`. (Exact field semantics of `FCB+0x120` vs `+0x128` are
+not fully assigned; the WRITER and its arithmetic below do not depend on it.)
+
+### Exact per-byte arithmetic (`0x1bd1e0`, static disasm)
+
+```
+scale = 256.0f            ; float32 const at libcp VA 0x5a9250
+for y in 0..h-1:          ; h = dst[+0x14]
+  for x in 0..w-1:        ; w = dst[+0x10]
+    f    = src_f32[y*src_stride + x]         ; src floats at src[+0x20], stride src[+0x18]
+    t    = (int) trunc(f * scale)            ; mulss ; cvttss2si
+    byte = t - 1                             ; decl
+    if byte < 0: byte = 0                    ; jns / xor  (clamp >= 0)
+    dst_u8[y*dst_stride + x] = (unsigned char) byte
+```
+
+i.e. **`byte = max( (int)trunc(f * 256.0f) - 1, 0 )`**, dst bytes at `dst[+0x20]`.
+
+This is the exact inverse of the proven consumer LUT `guide = sqrt((b+1)/256)`:
+the plane stores a linear weight `f in [0,1]` as `b = trunc(256 f) - 1` (clamped),
+and the consumer recovers `sqrt((b+1)/256) ~= sqrt(f)`, then squares back to `f`
+in CNR lane 3. The loop closes exactly. The "spatial doubling"
+(`255,255,254,254,...`) is the half-res float source rendered into a full-res
+tile ROI by `0x1aab40` (the ROI scale const applied in `0x407710`).
+
+### Corrections to prior sessions / docs
+
+- **Refuted**: "byte tiles are pre-resident; producer is upstream of
+  FusionCacheBayer." They are generated **by** FusionCacheBayer on demand.
+- **Refuted**: "$_1 generator is a no-op." Session-1 examined only the `__func`
+  *management* thunks (`0x4078a0..0x407940`, trivial clone/destroy/target). The
+  actual per-tile generator body is `0x407710` and does real work.
+- `storage_writer`'s "0 completions" was a wrong completion hook (`0x3D00F0`),
+  not evidence of pre-residency.
+
+### Anti-repeat
+
+Grepped the FusionCacheBayer bundles and evidence dir: `0x407710`, `0x1aab40`,
+`0x3d1f90`, and the `byte = max(trunc(256 f) - 1, 0)` arithmetic are **not**
+documented anywhere. `0x1bd1e0` appears once (`bundle_proof_src1_source_image_producer_topology.md`)
+only as an unexplained call target (`0x1be5f3 calls 0x1bd1e0`); its arithmetic
+and its role as the FusionCacheBayer byte-weight encoder are new here.
+
+### Artifacts (session 3)
+
+- `tools/lldb_probes/cnr_lane3_producer/tile_h_factory_probe.py` +
+  `unit1_70mm_tile_h_factory.lldb` (runtime backtrace catch at `0x3d7710`)
+- run: `runs/cnr_lane3_producer/unit1_70mm_tile_h_factory.json`
+- `renderroi_h_probe.py` (+driver) — proved `renderROI<h>` generation is NOT the
+  path (0 hits), i.e. the byte cache is filled via `0x407710`, not `renderROI`.
+- static disasm: producer `0x407710`, encoder `0x1bd1e0`, scale const `0x5a9250`
+  = `256.0f`.
+
+### Remaining (smaller) open point
+
+The float source semantics behind `FCB+0x120` (`TileCache<float>`) fed to
+`0x1aab40` — i.e. the public name of the float weight map that `f` is sampled
+from — is not yet assigned; that is the one input still to label, but the byte
+WRITER and its arithmetic are now closed.
