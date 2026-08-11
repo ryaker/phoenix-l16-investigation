@@ -254,3 +254,38 @@ The transform + Wiener blend + window are the proven mono template (shared table
 color patch assembly (11 named callees + 5 const tables) and (b) the exact `f`
 readout. That is a bounded job, not an open-ended one. CNR lane3 stays NOT PORTED
 until (a)+(b) are pinned; no approximation to be committed.
+
+### 2026-08-11h — UNKNOWN #1: the `f` readout is PINNED from disassembly (was the last NO-HITS residual)
+
+Three parallel STATIC-DECODE agents (read-only; no runtime/no pixel compare) +
+main-thread instruction spot-check decoded the CNR lane-3 weight `f` end-to-end.
+Full evidence: docs/evidence/bundle_static_colorfusionbayer_f_readout_2026-08-11.md
+
+PINNED FORMULA (read from 0x19C790 + 0x18eb00 instructions, addresses in bundle):
+  f = [ ((N+1) - Σ_k m_k)^2 + Σ_k m_k^2 ] / (N+1)^2
+  N = # Bayer modules intersecting the 16x16 patch; +1 = base/reference term.
+  m_k = per-module retention from 0x18eb00 = PROVEN mono Wiener retention
+        (w=d^2/(d^2+λ) @0x18eb4d; retention (1-w)×1/256 @0x18ebaf) = the color
+        analog of mono confidence (256-Σw)/256, computed per Bayer module.
+
+What this means for parity:
+- PROVEN-SHARED (no re-derivation): the Wiener weight + blend + retention shape
+  (0x18eb00), 16x16/step-8 geometry, half-sample Hann OLA (0x18ce50), patch-noise H
+  (mono-identical). These are the mono template, now shown executing in the color core.
+- GENUINELY-NEW color, now DECODED (was the unknown): the cross-module quadratic
+  combine f=(A^2+B)/(N+1)^2 (A=(N+1)-Σm, B=Σm^2), two outputs (image ÷(N+1),
+  weight ÷(N+1)^2), dual-plane separable-windowed marshaling (0x18ebc0/0x18f690),
+  √2-normalized lifting (0x18fe00/0x19eb60).
+
+STATUS: the one genuine depth-parity unknown is no longer unknown — it is a decoded
+explicit formula, ready to PORT, pending 2 small bounded confirmations before commit
+to Phoenix: (1) m_k lane/λ accounting inside 0x18eb00 (numeric range only, not the
+combine); (2) 0x18fe00 fwd-wavelet epilogue boundary (coeffs already known).
+CNR lane-3 stays NOT-PORTED (no approximation) until those 2 close, then it is a
+direct port of the pinned formula above.
+
+CORRECTION to 2026-08-11g: that entry wrongly attributed the Wiener weight/table to
+0x19dc30/0x19e7d0/0x19eb60 (a boundary-crossing signature scan). Corrected: those are
+the ÷(N+1)^2 normalizer / ×scale / inverse-lifting helpers; the Wiener weight is in
+0x18eb00. 0x5cedf0/0x5cee00 are int ROI masks, not the λ table; 0x5d0470 is a param
+block, not a 2nd λ table. See bundle for boundary-correct addresses.
