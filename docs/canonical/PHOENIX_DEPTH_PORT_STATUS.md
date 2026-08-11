@@ -392,3 +392,23 @@ feed ref + the N module patches + per-module noiseScale (σ²_patch·arg·8, fro
 VST/vign path MonoFusion uses for V) to colorFuseWeightPlane, then route f → applyCNR
 lane-3 (replace meanA:=1). Validate with tools/parity/verify_cnr_alpha_lane.py against
 captured Lumen lane-3. This is a real fusion-gather subsystem, not a wiring one-liner.
+
+### 2026-08-11m — PROBE: N is small + FIXED per tier (de-risks the gather)
+
+Runtime probe (lldb break @0x19c790, read arg4=module vector size, --profile 3, HL_NUM_THREADS=1;
+tools/lldb_probes/colorfusion_N/, runs/colorfusion_N/):
+- WIDE u1_28 (2018-07-23/L16_02130): N = 3 for ALL 48 tile invocations (N_hist {3:48}).
+- TELE u2_70 (2017-12-01/L16_00010): N = 4 for ALL 44 tile invocations (N_hist {4:44}).
+- 0x19C790 is called PER OUTPUT TILE (~46/frame), not per patch; the 16x16/8-step patch
+  loop is INSIDE it. Each of the N module descriptors (0x30 B) carries dims ~2080x1560
+  (= HALF-RES) + a data pointer. So ColorFusionBayer fuses N HALF-RES planes; the f/guide
+  plane is half-res (matches the "guide is half-res, pixel-doubled" note).
+
+CONSEQUENCE (re-sizes the port): the gather is NOT a general per-patch geometric overlap.
+It is a FIXED small-N fuse: 3 half-res module planes at wide, 4 at tele, per output tile.
+So colorFuseWeightPlane runs at half-res (2080x1560) over a fixed module set. The build is
+bounded: produce the N half-res module planes (DC-aligned) + reference, run the producer,
+pixel-double the f plane to the CNR resolution, route to lane-3. Remaining detail for the
+gather: identify which N cameras (data-ptr -> module map) and confirm reference vs the N
+vector entries (decode indicates reference T is built separately; the N vector are the
+sources; +1 base term = the reference).

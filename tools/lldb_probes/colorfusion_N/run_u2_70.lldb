@@ -1,0 +1,9 @@
+command script import /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lldb_probes/colorfusion_N/probe.py
+settings set target.env-vars DYLD_FRAMEWORK_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks DYLD_LIBRARY_PATH=/Users/ryaker/Documents/Light_Work/Lumen/Lumen.app/Contents/Frameworks HL_NUM_THREADS=1
+target create /Volumes/Dev/L16_Lumen_ReverseEngineering/tools/lri_process
+settings set -- target.run-args "/Volumes/Base Photos/Light/2017-12-01/L16_00010.lri" /tmp/cfN_u2_70.hdr --profile 3 --export-fmt 3 --no-auto-lris
+breakpoint set --shlib libcp.dylib --address 0x19c790
+breakpoint command add -F probe.on_cfb
+run
+script probe.summarize("/tmp/cfN_u2_70.json")
+quit
