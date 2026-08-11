@@ -513,3 +513,35 @@ highlight kernel, and preserve the fixed spatial four-lane signal/noise API.
 This closes only the target/noise origin. The source-camera half-resolution
 plane construction, sidecar/overlap policy, complete ColorFusion-to-CNR tile
 replay, and broader integration remain open under `CLM-DENOISE-002`.
+
+### 2026-08-11q — Phoenix ColorFusion port: arithmetic core + signal/shading DONE (bit-exact)
+
+Shipped + pushed to phoenix-l16-build (commits 5a68d54..bef35e2), each validated
+against Lumen ground truth (no synthetic-only tests, no tuning):
+
+- Producer (spec 09 changes 1-4): colorfusion.{h,cpp} — 256xvec4 Wiener, per-coef
+  4-lane x86 MAX, installed-order combine A=1;A+=1-m, normalized 5/3 lifting.
+  BIT-EXACT vs verify_colorfusion_f_runtime u1_28 (m=3f40e9fe/3f58699a/3f51ea60,
+  A^2+B=408e8cf6, f=3e8e8cf6). FMA off (project-global -ffp-contract=off).
+- Selection (change 6a): colorfusion_select.h — enabled && !=target && same group
+  && Bayer override x|y>=0, first-occurrence order. Validated on real LRIs:
+  u1_28 A1->[A5,A3,A4]; u2_70 B4->[B2,B5,B1,B3].
+- Byte/CNR codec (change 7 conversion): colorFusionByte + cnrLane3FromByte.
+  Checkpoint f=3e8e8cf6->byte 70->lane3 3e8dffff + byte-zero case. Exact.
+- reduce_signal (change 5 signal table): colorfusion_noise.cpp — x86_rcpps(max(0.1,
+  tgt)); 8x8 parity-subset sums *1/256; lanes [TR,TL,BL,BR]. BIT-EXACT 0/202800 vs
+  captured u1_28 target->signal.
+- public_shading_plane (change 5 shading table): 17x13 profile -> 195x260. BIT-EXACT
+  0/50700 by equivalence to the Lumen-proven verifier oracle.
+
+REMAINING (rank 1), a coherent target-plane build (reuses Phoenix hotpixel/highlight/
+AWB/CCM kernels), then integration:
+- Target RAW plane: RAW10 -> selected hot-pixel -> RestoreHighlightsBayer -> scene-
+  neutral gain (Robertson/0x350820, checkpoints 3f150644.../3f1c02e7...) -> parity
+  halo -> float(u16)-42. Oracle: verify_colorfusion_noise_public_origin.py.
+- Noise provider (H,D,SensorGainVars -> core_noise=noise*8). Oracle: same verifier
+  (captured core_noise, e.g. u1_28 noise_product 6372.87/11981.97/7209.00/12217.11).
+- Source half-res Bayer planes for the ordered vectors (change 6b; source-plane
+  construction is the one still-open RE item).
+- 2x pixel-double + CNR lane-3 wiring (replace meanA:=1); full wide/tele + two-body
+  tile replay (gate 6, the promotion gate for CLM-DENOISE-002).
