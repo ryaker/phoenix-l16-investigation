@@ -114,3 +114,12 @@ arch -x86_64 lldb -s /path/to/script.lldb \
   `docs/evidence/` proof doc. Hypotheses carry no ledger status.
 - Zones: `docs/evidence/` = proven/citable; `docs/hypotheses/` = unproven sister facts/not citable;
   `docs/quarantine/` = superseded/contradictions/reference-only.
+
+## MANDATORY: evidence-first research gate
+
+Before ordering or doing ANY reverse-engineering / LLDB investigation of an
+address (0x..), an lt::Type, or a topic, you MUST first run `tools/whatknown.sh
+<target>` and act on its verdict. DOCUMENTED -> read/connect, do NOT investigate
+(that is a porting gap, port the proven formula). NO HITS -> genuine unknown,
+investigation justified. Every investigation subagent must run whatknown FIRST
+and report the verdict. See docs/canonical/RESEARCH_PROTOCOL.md.
