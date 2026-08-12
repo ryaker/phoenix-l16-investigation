@@ -719,3 +719,52 @@ rendering that differs sub-ULP from colorShadingPlane@4160; (2) the source-plane
 crop origin (2079x1559) + Bayer-phase lane mapping. A capture of the shaded
 reference/source plane BEFORE the f16 pack (one 4160x3120 float dump) would pin
 (1) in a single shot; the source crop needs the per-source descriptor origin.
+
+### 2026-08-12d — ColorFusion ANCHOR plane bit-exact (12,978,628/12,979,200); truncation f16 pack found
+
+Closed the reference/anchor half-res plane from ground truth (no tuning), Phoenix
+commit 2e723e5 (engine/merge/colorfusion_source.{h,cpp} colorFusionAnchorPlane).
+Each element's ground-truth source:
+
+- route = post-hot-pixel u16 - 42. Source: bundle
+  create_stereo_color_normalization_vignetting_two_body.md §"Default Bayer
+  Normalization" (stage-1 hot-pixel 0x341770, stage-3 normalize 0x340a30; input is
+  the post-hot-pixel u16 payload, NO highlight restore). Confirmed: raw-only is
+  worse (10468 vs 572); hot-pixel fixes exactly the 9896 pixels it changes.
+- norm = f32(f32(f32(raw)-42) * f32(1/981)). Reciprocal is an EXACT divss
+  (disassembly 0x1ab47e, `divss %xmm1,%xmm0`), NOT rcpss. span=white-black=981.
+- vign profile = the tier-master calibration entry camera_id 12 (= protobuf-order
+  index 0 / RE decode_modules order[0]; Phoenix sorts module_calibration by id so
+  colorFusionAnchorPlane selects by id). colorShadingPlane/monoVignettingPlane of
+  cam12 == captured coarse shading bit-exact (0/50700).
+- vign worker = per-full-res-Bayer-pixel factor, half-res spacing 130, steps 1-5
+  (binary32 row-interp + x-slope, binary64 x mult/add). VALIDATED bit-exact vs the
+  installed vec4x32f worker's OWN captured input->output:
+  runs/create_stereo_color_public_reconstruction/unit1_28mm_a1/ stage_12_before ->
+  stage_15_before slot 0x70 (vec4 f32; mapped_rect [1536,1024,2048,1536] float;
+  x=mapped_left*0.5+c). f32(pre*factor)==post across the entire mapped region (only
+  the 6-col halo, factor:=1, differs). Per-full-res-Bayer-pixel proven by the vign
+  x-gradient (mean(fTR-fTL)=-1.28e-3 == the gradient); per-vec4 is 5.37M worse.
+- pack = f16 ROUND-TOWARD-ZERO (truncation), read from the captured plane: RNE
+  gave a uniform +1-ULP-high (mine always >= cap) on 6.49M words; truncation
+  removed it (6.49M -> 572). lanes [TR,TL,BL,BR].
+
+RESULT: anchor reference plane (u1_28 A1) = 12,978,628 / 12,979,200 f16 words
+EXACT (99.9956%). C++ colorFusionAnchorPlane reproduces the analysis bit-for-bit.
+
+REMAINING 572 (0.0044%): +-1 f16 ULP, evenly across all 4 lanes, NOT hot-pixel
+(persist on the post-hot-pixel route), NOT cell-boundary (29/572), NOT shaping
+(m=1 changes 0 nodes). They are a 1-f32-ULP vignette factor in profile cells
+0-4/10-15 that the single unit1_28mm_a1 oracle tile (cells ~5-9, integer x) cannot
+exercise. TO CLOSE: validate the factor in those cells against additional
+create_stereo_color_* tiles (other cameras/positions) or a full-plane
+shaded-plane-before-pack f32 dump. This is a validation-coverage tail, not a
+fudge.
+
+SOURCE planes: my from-scratch route*vign is anti-correlated (corr -0.67) with the
+captured source_vec4_f16_00 and ~100% words differ under a naive top-left crop, so
+the source planes carry an additional per-camera REGISTRATION/warp to the anchor
+frame (the 2079x1559 crop is not top-left; the stored source content samples a
+shifted region). That registration is the remaining source-plane piece; the
+per-source FLOW resample onto the anchor patches is already closed and bit-exact
+(2026-08-12b, source_before 0/1024).
