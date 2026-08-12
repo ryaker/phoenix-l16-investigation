@@ -768,3 +768,49 @@ frame (the 2079x1559 crop is not top-left; the stored source content samples a
 shifted region). That registration is the remaining source-plane piece; the
 per-source FLOW resample onto the anchor patches is already closed and bit-exact
 (2026-08-12b, source_before 0/1024).
+
+### 2026-08-12e — ColorFusion anchor plane across all 7 configs: 3 bit-exact tails; tele master = cam2 (NOT order[0]); real gaps found
+
+Ran the EXACT committed anchor formula (2e723e5) on all 7 captured configs (no
+tuning). Words-differ vs each config's reference_vec4_f16.bin (12,979,200 words):
+
+| config  | tier    | target | tier-master profile | words differ | pct      | class |
+|---------|---------|--------|---------------------|--------------|----------|-------|
+| u1_28   | wide28  | 0      | cam12 (order[0])    | 572          | 0.0044%  | 1-ULP TAIL (validated) |
+| u2_28   | wide28  | 0      | cam4  (order[0])    | 1,335        | 0.0103%  | 1-ULP TAIL (validated) |
+| u1_150  | tele150 | 8      | cam2                | 567          | 0.0044%  | 1-ULP TAIL (validated) |
+| u1_70   | tele70  | 8      | cam2                | 96,490       | 0.7434%  | correct profile, secondary residual |
+| u1_35   | wide35  | 0      | cam12 (order[0])    | 437,287      | 3.3691%  | correct profile, secondary residual |
+| u2_70   | tele70  | 8      | cam2 (best)         | 12,646,750   | 97.44%   | STRUCTURAL (all profiles fail) |
+| u2_35   | wide35  | 0      | cam12 (best)        | 12,931,484   | 99.63%   | STRUCTURAL (all profiles fail) |
+
+PROFILE SELECTION does NOT generalize as calibration order[0]:
+- Wide anchor (A1, target 0): master = order[0] = cam12 (unit 1) / cam4 (unit 2).
+- Tele anchor (B4, target 8): master = **cam2** (order[0]=cam12/cam4 gives ~99.97%
+  off; cam2 gives u1_150 567 exact tail and u1_70 0.74%). Read from ground truth
+  by matching the captured plane, not assumed. The tele B4 anchor's implied vign
+  corner is ~1.78 (a gentler profile), matching cam2's 1.784 -- NOT cam12's 3.708.
+So the anchor vign profile is tier-specific; colorFusionAnchorPlane takes the
+profile camera id as a parameter (caller must pass cam12/cam4 for wide, cam2 for
+tele). A single order[0] rule is WRONG for tele.
+
+VALIDATED (1-ULP tail, same 572-class coverage residual as u1_28): u1_28, u2_28,
+u1_150 -- three independent bodies/tiers reproduce the exact formula to the 1-ULP
+tail with the correct tier-master profile. This confirms the port (post-hotpixel
+route, f32(1/981) normalize, half-res-130 per-Bayer-pixel vign steps 1-5,
+truncation f16 pack) generalizes across unit and tier.
+
+REAL GAPS (not 1-ULP tails, to read+fix -- not tune):
+- u1_70 (0.74%) and u1_35 (3.37%): correct tier-master profile, but a secondary
+  residual larger than the 1-ULP tail. Candidate cause: per-record black/white !=
+  42/1023 (bundle says black/white are per-CapturedImage, I hardcoded 42/1023), or
+  a small focal-dependent mapped-rect. Needs the per-record levels / mapped-rect.
+- u2_35 (99.63%) and u2_70 (97.44%): STRUCTURAL -- no tested calibration profile
+  brings them near a tail. Unit-2 35mm/70mm reveal a further gap (different
+  master/route/geometry for those captures); to be read from their
+  selection/calibration, not swept.
+
+Net: the anchor formula is bit-exact-modulo-coverage on 3 configs across both
+tiers and both bodies; the tele profile master is cam2; two u2 configs and the
+per-record-levels/secondary residual on u1_35/u1_70 are the identified remaining
+port gaps.
