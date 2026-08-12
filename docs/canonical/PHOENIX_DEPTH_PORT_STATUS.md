@@ -598,11 +598,20 @@ plane-origin, so even the extraction coordinate is unknown. Therefore:
   1. Source-plane spot-validation vs source_before_vec4 CANNOT be computed
      bit-exact (missing flow field + missing patch origin). Words-differ is
      undefined, not zero — reporting a number here would be fabrication.
-  2. No captured full ColorFusion f/byte plane and no captured CNR source tile
-     exist anywhere under runs/ (confirmed; the spec's own gate 6 / "Known
-     exclusions" says whole-tile ColorFusion + CNR tile output remain validation
-     work). So the pixel-doubled lane-3 -> CNR meanA replacement cannot be
-     validated end-to-end either.
+  2. Downstream lane-3/guide OUTPUT captures DO exist -- runs/cnr_lane3_producer/
+     guide_seq1_524x520_str532.f32 / guide_seq2_522x522_str522.f32 are captured
+     CNR guide planes (unit1 70mm tele; values 0.586..1.0, pairwise-duplicated =
+     pixel-doubled from half-res) plus byte-cache/byte-tile producer probes. But
+     they are NOT a replayable oracle for us: (a) no matching INPUT byte plane is
+     dumped as a paired file (the byte plane is FusionCacheBayer+0xe0, only its
+     cache structure/allocation was probed, no .bin), and (b) reaching guide_seq
+     requires first producing the flow-aligned f->byte plane, which is blocked by
+     (1). The byte->guide->lane3 LUT itself is already proven exhaustively
+     (0..255, gate 5); what is missing is the ability to PRODUCE the byte plane.
+     No captured full ColorFusion f/byte plane exists, and the spec's own gate 6 /
+     "Known exclusions" states whole-tile ColorFusion + CNR tile output remain
+     validation work. So the pixel-doubled lane-3 -> CNR meanA replacement cannot
+     be validated end-to-end either.
 
 TO CLOSE GATE 6 (capture work, not code): run the colorfusion_source_planes probe
 to dump the reference/ordered-source/flow descriptors for u1_28 (wide) and u2_70
