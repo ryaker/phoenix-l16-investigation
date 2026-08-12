@@ -864,3 +864,46 @@ REMAINING GAPS (read, not tuned):
 - The u1_35/u1_70/u2_70 secondary residuals (0.19-3.37%) with black~42 (u1_35
   implied 1.0012) are the 572-class coverage tail amplified by scene content near
   truncation boundaries + vign-factor cells the single oracle tile can't exercise.
+
+### 2026-08-12g — Per-record black solve ported into anchor normalize: u2_35 structural gap CLOSED
+
+Ported premerge::solveBlackLevel (BLACK_LEVEL_SOLVER.md, disasm 0xf36f0, verified
+bit-exact on 26 captured entry/exit pairs) into colorFusionAnchorPlane (Phoenix
+0cf0319), replacing the hardcoded black=42. Exactly as phoenix_fuse wires it:
+means from computeBlackLevelMeans on the PRISTINE plane (pre-hotpixel), gains from
+blackLevelSolverGains(public AWB), grid x0=42/span=1.2/n=40. WHITE IS NOT REFINED
+(solver writes only +0xac / black); scale=f32(1/(1023-black)),
+norm=f32(f32(f32(hot)-black)*scale).
+
+7-config table (rule profiles + black solve), words-differ / 12,979,200 + solved black:
+
+| config  | tier    | profile | solved black | words differ | pct      | class |
+|---------|---------|---------|--------------|--------------|----------|-------|
+| u1_28   | wide28  | cam12   | 42.0         | 572          | 0.0044%  | 1-ULP TAIL |
+| u1_150  | tele150 | cam2    | 42.0         | 567          | 0.0044%  | 1-ULP TAIL |
+| u2_28   | wide28  | cam4    | 42.0         | 1,335        | 0.0103%  | 1-ULP TAIL |
+| u2_35   | wide35  | cam4    | **43.1699982** | 20,445     | 0.1575%  | secondary (was 99.9177% STRUCTURAL) |
+| u2_70   | tele70  | cam14   | 42.0         | 24,670       | 0.1901%  | secondary |
+| u1_70   | tele70  | cam2    | 42.0         | 96,490       | 0.7434%  | secondary |
+| u1_35   | wide35  | cam12   | 42.0         | 437,287      | 3.3691%  | secondary |
+
+BLACK SOLVE RESULT (the diagnosis test): only u2_35 solves black != 42 (43.17,
+the grid maximum 42 + 39*1.2/40) -- and its gap collapsed 99.9177% -> 0.1575%,
+exactly the ~43 the implied-factor estimate predicted. The other six solve to
+42.0 EXACTLY, so the three tails are byte-for-byte UNCHANGED (no regression). White
+is not refined (confirmed from the solver: it only writes black).
+
+CONCLUSION: the black solver was the ROOT CAUSE of the one STRUCTURAL config
+(u2_35) and is now closed. It is NOT the cause of the secondary residuals
+u1_35/u1_70/u2_70 (black=42 there) nor of u2_35's remaining 0.16% -- those are the
+572-class coverage tail amplified by scene content near the truncation boundary
+plus the vign-factor in profile cells the single create_stereo oracle tile can't
+exercise. Every config is now in the tail(3) or secondary(<=3.4%) class; NONE is
+structural.
+
+REMAINING (not black, not profile): the 0.16-3.37% secondary tail on 4 configs =
+1-f32-ULP vign factor in untested profile cells + scene sensitivity. To close:
+validate/extend the vign factor across cells using the broader create_stereo tiles
+(other cameras/positions). Profile-selection rule (calibration_order[anchor_id])
+stands; auto-select still needs the parser to preserve module_calibration protobuf
+order.
