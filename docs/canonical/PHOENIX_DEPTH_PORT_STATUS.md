@@ -669,3 +669,53 @@ GATE 6 still open on CAPTURE: no full ColorFusion f/byte plane and no CNR source
 tile were captured (only source_planes were run this pass; runs/cnr_lane3_producer
 holds only downstream guide output with no paired input-byte plane). Those remain
 the promotion-gate captures for CLM-DENOISE-002.
+
+### 2026-08-12c — Vignette profile + formula SOLVED; reference plane 1-ULP residual (NOT yet bit-exact)
+
+Closed the vignette SOURCE and FORMULA from the captured planes; the from-scratch
+reference plane is now correct to within 1 f16 ULP but is NOT yet bit-exact.
+Honest detail below (no closure claim).
+
+SOLVED (bit-exact where an oracle exists):
+- Vignette profile SOURCE: the plane shading uses `selected_profile(lri,
+  runtime_key, lens_position)` = VIGNETTING.decode_modules(lri)[calibration_order
+  [runtime_key]], NOT the camera's own vignetting_bytes. For the reference
+  (target A1) runtime_key=0 -> calibration_order[0] = **camera 12** (a
+  calibration-slot id, not a physical camera). cam12 profile corner = 3.7081125
+  == captured coarse-shading corner exactly.
+- Interpolation FORMULA + profile: colorShadingPlane(cam12 profile, 17x13 ->
+  260x195) reproduces the captured coarse shading (u1_28_transform/
+  shading_plane_f32.bin) BIT-EXACT, 0/50700 words. So the shading kernel and the
+  cam12 profile are both correct.
+- Plane formula structure: reference/source plane =
+  f16( f32(route * f32(1/981)) * vignette_gain ), lanes [TR,TL,BL,BR], where
+  route = the validated pre-vignette (u16-42) plane and 981 = white-black. This
+  matches the mono sibling verify_create_stereo_mono_public_reconstruction.py
+  (normalize by 1/(white-black), then * shading).
+
+NOT YET BIT-EXACT (honest residual):
+- Reference plane (cam0), vignette = colorShadingPlane(cam12)@4160x3120 per-lane:
+  6,486,223 / 12,979,200 words differ (50.0%), EVERY diff exactly +1 f16 ULP
+  (max abs 0.0009766). The f16 ULP delta is always {0 or +1}, never -1: my
+  full-res gain is systematically ~0.06% HIGH. A single scalar ~0.99967 cuts it
+  to 1.1M (so ~0.03% is scalar-like) but a spatial residual remains, so it is
+  not a clean global factor.
+  Shortlist tried (all ~6.486M, none 0): colorShadingPlane vs premerge bilinear
+  sampleProfile; op orders (normalize-first / mul-first / f64-throughout);
+  X-interp float vs double; half-res (2080) per-vec4 (worse, 7.39M); nearest /
+  block upsample of the coarse (worse, 11.98M); pixel-center +/-0.5 offsets
+  (worse); scale sweep (min 1.1M at s*981=0.99967, not 0).
+- Source plane (cam4): captured source_vec4_f16_00 is 2079x1559 (cropped by 1 in
+  each axis vs the 2080x1560 reference); a naive top-left overlap of my 2080x1560
+  plane is ~100% off for every candidate profile, so sources carry an additional
+  crop-origin + per-source Bayer-phase (lane [TR,TL,BL,BR] assignment) alignment
+  that is not yet resolved.
+
+REMAINING to reach bit-exact (the exact first divergence): (1) the ~0.06% high
+full-res gain bias on the reference -- most likely a per-camera exposure/relative-
+brightness scalar (the mono sibling applies a CAPTURED exposure `scale`; no
+ColorFusion exposure scalar is captured for L16_02130), or a full-res gain
+rendering that differs sub-ULP from colorShadingPlane@4160; (2) the source-plane
+crop origin (2079x1559) + Bayer-phase lane mapping. A capture of the shaded
+reference/source plane BEFORE the f16 pack (one 4160x3120 float dump) would pin
+(1) in a single shot; the source crop needs the per-source descriptor origin.
