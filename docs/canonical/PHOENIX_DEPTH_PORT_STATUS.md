@@ -619,3 +619,53 @@ to dump the reference/ordered-source/flow descriptors for u1_28 (wide) and u2_70
 CNR source lane-3 tile; then replay on a second physical body. Until those exist,
 `CLM-DENOISE-002` stays PARTIAL/BLOCKER and the PHX_CFLANE3 path stays armed-but-
 inert by design.
+
+### 2026-08-12b — Flow field captured -> source resample CLOSED (bit-exact); vignette is the last plane step
+
+The coordinator ran the colorfusion_source_planes probe on both bodies, so
+runs/colorfusion_source_planes/{u1_28,u2_70}/ now hold the reference/ordered-
+source vec4 f16 planes AND the per-source flow_vec2_f32 fields. With those, the
+source DC-alignment that was the gate-6 blocker is now SOLVED and validated
+bit-exact.
+
+CLOSED (bit-exact, verify_colorfusion_source_flow_resample.py = 0/1024):
+- Flow layout: flow is PER-PATCH on the 259x194 grid (= 16x16 step-8 patches on
+  2080x1560: (2080-16)/8+1=259, (1560-16)/8+1=194), vec2 f32. Valid flows are
+  sub-pixel (dx in [-0.23,0.53]); rejected patches carry -FLT_MAX / NaN.
+- Resampler (no interpolation): the transform's DC-aligned source patch is an
+  INTEGER read of the f16 source plane, scaled by 981:
+      source_before[j,i,l] = f32( 981.0f * plane_f16[oy+j, ox+i, l] )
+      (ox,oy) = ( floor(px*8+dx), floor(py*8+dy) ),  (dx,dy) = flow[py,px]
+      scale 981 = white(1023) - black(42).
+  u1_28 cam4: flow cell (7,91)=(-0.1136,-0.0607) -> origin (55,727); 0/1024 words
+  differ vs captured source_before_vec4. The earlier "1019/1024 non-f16-
+  representable" red herring is fully explained by the *981 scale, NOT a Catmull-
+  Rom/bilinear kernel -- there is none.
+- Pack normalization: the plane stores f16(route_out / 981). f16(source_before/981)
+  == captured source_vec4_f16 plane, 0/1024.
+
+WIRED: colorFuseLane3Plane now consumes per-source flow fields and applies
+origin=floor(px*8+dx,py*8+dy) with *981; colorFusionHalfResPack stores
+f16(quad/981). phoenix_merge builds clean.
+
+*** REMAINING for a FROM-SCRATCH plane: per-pixel VIGNETTE gain (formula gap, NOT
+a missing capture) ***
+Building the plane from L16_02130 via colorFusionSourcePlane does NOT yet equal
+the captured plane: captured_plane*981 / my_route is a smooth SCALAR radial field
+= 1.0 (center) -> ~3.8 (corners), identical across all four Bayer lanes = a lens
+vignette the route omits (the route is pre-vignette, itself bit-exact vs
+target_pre_vignette). That field matches the coarse shading table block-for-block
+(colorShadingPlane / captured shading_plane_f32): 3.708/2.476/0.999/3.768 at
+(0,0)/(0,95)/(130,97)/(259,194). So the plane build is:
+    route(4160x3120) * vignette_gain(17x13 profile -> full res)  ->  /981  ->
+    2x2 f16 pack [TR,TL,BL,BR].
+All pieces exist in Phoenix (premerge/vignetting.h parseVignetting/interpolateHall/
+shapeProfile + colorShadingPlane); closing it is a formula-SELECTION pass (m/q
+shaping flags, sample origin/spacing, colorShadingPlane vs premerge bilinear)
+validated against the now-captured plane. This is the exact first divergence for
+from-scratch construction and needs NO new capture.
+
+GATE 6 still open on CAPTURE: no full ColorFusion f/byte plane and no CNR source
+tile were captured (only source_planes were run this pass; runs/cnr_lane3_producer
+holds only downstream guide output with no paired input-byte plane). Those remain
+the promotion-gate captures for CLM-DENOISE-002.
