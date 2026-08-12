@@ -907,3 +907,157 @@ validate/extend the vign factor across cells using the broader create_stereo til
 (other cameras/positions). Profile-selection rule (calibration_order[anchor_id])
 stands; auto-select still needs the parser to preserve module_calibration protobuf
 order.
+
+
+### 2026-08-12h — ColorFusion anchor: the u1_35/u1_70 secondary residual was MISSING HIGHLIGHT RESTORE (ported, Phoenix 3f232b1)
+
+Task A (per coordinator): histogram the f16 ULP delta of u1_35 (3.37%) and u1_70
+(0.74%) to decide ±1-ULP tail vs real gap. Result: REAL gap.
+- u1_35: 430,853/437,287 (98.5%) have |delta|>=2, max |delta|=849.
+- u1_70:  89,360/96,490  (92.6%) have |delta|>=2, max |delta|=901.
+Not the coverage tail. Diagnosis (read, not tuned): the |delta|>=2 words are the
+BRIGHT pixels — 26% of plane pixels >1.0 differ (u1_35) / 59% (u1_70) vs 0.009%
+of dim pixels; oracle value at diff pixels median ~1.5-1.8, and they sit in a
+CENTRAL low-vign region where (raw-42)/981 <= 1.0 times a ~1.0-1.5 vign CANNOT
+reach 2.5. So the raw is clipped/saturated and RECONSTRUCTED above white. Control:
+u1_28 has 88k bright pixels and ALL match (0 diff) — its scene simply has no
+clipped region, which is why "route = post-hot-pixel, NO highlight restore" was
+(wrongly) concluded from u1_28 alone.
+
+ROOT CAUSE: the anchor route skipped the Bayer highlight-restore stage
+(CLM-PIPELINE-001: hot-pixel 0x341770 -> HIGHLIGHT RESTORE 0x343e10 -> normalize),
+which colorFusionRoutePlane (target path) already applies and which is PROVEN
+bit-exact (depth::highlightRestore, kernel family 0x30b9f0). FIX: insert
+highlightRestore(hot, c) with c = colorFusionSceneNeutralGain(anchor_key),
+black=42/white=1023/gate=1007, before the per-record black normalize.
+
+7-config before/after (words differ / 12,979,200; same canonical LRI set that
+reproduces the committed baselines; no tuning):
+
+| config  | pre-HR    | post-HR | note |
+|---------|-----------|---------|------|
+| u1_28   | 572       | 572     | no clipped region -> byte-identical |
+| u1_150  | 567       | 567     | no clipped region -> byte-identical |
+| u1_35   | 437,287   | 20,338  | 3.37% -> 0.157% |
+| u1_70   | 96,490    | 15,636  | 0.74% -> 0.121% |
+| u2_28   | 1,335     | 166     | 0.010% -> 0.0013% |
+| u2_35   | 20,445    | 15,099  | 0.157% -> 0.116% |
+| u2_70   | 24,670    | 1,088   | 0.190% -> 0.0084% |
+
+Every config improves or is byte-identical; NONE regresses. The two 1-ULP tails
+are untouched (gate=1007 restore is a no-op with no clipped pixels). LRI note:
+u2_70's canonical LRI is runs/raw_sensor_layout/input_unit2_70mm.lri (cam8,
+prof14); unit2_70mm_b4/camera_8.lri is a DIFFERENT scene (gave 99.98% — not a
+regression, a wrong-input). Vign profile is a SINGLE model (hall_code 0,
+mirror_pos 0) for every anchor/tier — the hall-interpolation / mirror-position
+hypothesis is refuted (probe: all 4 tail/gap pairs share a byte-identical
+profile).
+
+REMAINING (post-HR, ~0.008-0.157%): 98-99% at bright (>1.0) reconstructed-highlight
+pixels, max |delta| now 11 (u1_35) / 106 (u1_70) vs 849/901 before — a smaller
+secondary precision effect INSIDE the reconstructed-highlight region (HR's 4-px
+untouched border contributes <=4%), plus the base 572-class coverage tail. Not the
+border, not black, not profile.
+
+
+### 2026-08-12i — ColorFusion SOURCE plane: the flow is sub-pixel DC; the plane is PRE-REGISTERED (warp is the open port)
+
+Task B (per coordinator): does the producer need a separately-constructed source
+PLANE, or only the per-patch flow-resampled patches (already bit-exact)? Read from
+ground truth (u1_28 capture.json flow descriptors + source_before oracle). Answer:
+it NEEDS the registered plane; the flow does NOT bridge camera->anchor.
+
+Evidence:
+- The per-source flow field (259x194 vec2, FLT_MAX sentinels on invalid cells) is
+  SUB-PIXEL only. src0 (cam4): every real cell |flow| <= 0.635 px (100% < 1 px).
+  src1/src2 mostly < 1 px (82.7% / 93.7%). So anchor patch (px,py) maps to source
+  plane location ~= (px*8, py*8) + a fraction-of-a-pixel DC nudge.
+- Closure check (verify_colorfusion_source_flow_resample): with the CAPTURED
+  source plane, 981*plane[oy:oy+16, ox:ox+16] == source_before -> 0/1024. With MY
+  route+vign(+HR) cam4-frame plane at the same (ox,oy)=(55,727) -> 1023/1024
+  (maxabs 300). Patch MEANS match (mine 731.7 vs captured 726.0) but per-pixel
+  content is misaligned.
+- The misalignment is a spatially-varying WARP, not a global shift: best-match
+  local offsets of my plane vs the captured plane range (-22,+22),(+42,-24),
+  (+57,+15),(+51,-51),(+42,-51) across the field, corr 0.4-0.8. Top-left crop
+  corr is 0.59 (was -0.67 pre-HR; HR raised it but it is still a warp).
+- Descriptor sizes corroborate: source0 (cam4) is 2079x1559, sources 1/2
+  (cam2/cam3) 2080x1560 -- a warp's clamped valid region, not a raw crop.
+
+CONCLUSION: the captured source plane is stored ALREADY REGISTERED to the anchor
+frame; registration is baked into the plane by a per-camera geometric warp, and
+the flow only does the residual sub-pixel DC alignment. Therefore the source path
+is NOT closable as "route+vign plane + flow." The producer consumes the REGISTERED
+plane as the flow-resample input, and building it is the remaining open port:
+per-source projective H + radial distortion -> resample cam's route+vign(+HR)
+plane into anchor coords. Phoenix already has the pieces (merge/resampler.h
+64-phase Catmull-Rom CLOSED; premerge/undistort.cpp radial; PORT_STATUS row 10
+CLM-RESAMPLE-001 stage-10 src2/anchor resample KERNEL-PORTED) but they are not
+wired into source-plane construction and the per-source H/radial params are not
+yet sourced/validated. The DOWNSTREAM per-patch flow resample is already closed
+and bit-exact (source_before 0/1024). No code committed for B (warp unvalidated).
+
+
+### 2026-08-12j — ccm_scene_xy ported to the readable-op floor; scene-neutral gain drives the anchor highlight residual to the tail (Phoenix e1ab26a)
+
+The Bayer highlight-restore gain c = colorFusionSceneNeutralGain is the CCM
+scene-chromaticity solver (CLM-CCM-002, libcp 0xab160 / 0xab2e0 / 0x350570 /
+0x350820 / 0xab720). Ported five div-vs-mul / ordering divergences from the
+installed body, read instruction-by-instruction (no tuning):
+
+1. normalize2 (0xab160/0xab2e0): inv = 1/len ONCE then multiply both components
+   -- was two divisions x/len, y/len.
+2. xy_to_cct (0xab2e0): inv_d = 1/d once; u=(2x)*inv_d, v=(3y)*inv_d -- was 2x/d.
+3. cct_to_xy (0xab160): offset = tint * const[0x5aae68] (rounded -1/3000, a mulss)
+   -- was -tint/3000; x=(1.5u)*inv_d, y=v*inv_d, inv_d=1/d once -- was divisions.
+4. solve (0x350570): s accumulates the third row sequentially into (z0+z1) and
+   xy_next = z*(1/s) (reciprocal) -- was a grouped z2 term and z/s division.
+5. gain (0x350820): cct/tint/alpha come from tt (the xy_solved CCT that the gain
+   blends M and reconstructs xy from) -- was a spurious extra xy_to_cct(xy_recon)
+   re-derivation shifting alpha ~1 ULP.
+
+VERIFIED BIT-EXACT AGAINST rodata (libcp.dylib): (a) the illuminant-5 seed
+(0xa9910 -> 0xa91e0 jump table = xy 3eb0fb8d / 3eb78cd0, = the hardcoded
+literals); (b) the 31-row Robertson isotherm table (kTableBits SHA-256 =
+a82b3a43e3e19947839db421b880770a0590ee4eefa088ff7a3914a5ef081ada, the attested
+rodata at 0x66d410); (c) the A/D65 endpoint CCTs (0xab4c0 xy_to_cct of the enum
+2=A / 7=D65 chromaticities at 0x5ab720/0x5ab760 = 45327a1e / 45cb30a8 =
+kT_A / kT_D65). Every scalar op matches the disassembly.
+
+GAIN CHECKPOINTS (got vs want):
+- A1 28mm (u1_28): 3f150641 3f800000 3f211fbe  (want 3f150644 _ 3f211fbf).
+  xy_recon.y now BIT-EXACT (3eb4bbff); x is 1 ULP low (3eb160af vs 3eb160b0).
+- B4 70mm (u2_70): 3f1c02e7 3f800000 3f03c972  (want ...3f03c976). c0 BIT-EXACT;
+  c2 is -4 ULP (xy round-trip is identity, so this residual is xy-INDEPENDENT).
+
+RESIDUAL (readable, deferred): the remaining 1-4 ULP is a scalar-vs-SIMD
+horizontal-reduction-order artifact in the Robertson solve -- the installed body
+reduces z/s with packed movsldup/mulps/addps lane-pair adds, whose exact add
+order differs 1 ULP from scalar C even under -ffp-contract=off. It is READABLE
+(replicate the exact lane add order to close) but quantizes away downstream at the
+8-bit byte stage, so it does not affect lane-3. Not the seed, table, endpoints, or
+any scalar op (all verified bit-exact). Deferred.
+
+7-CONFIG ANCHOR PLANE (words differ / 12,979,200; HR + ccm; same canonical LRIs):
+
+| config  | HR-only | +ccm   | class |
+|---------|---------|--------|-------|
+| u1_28   | 572     | 572    | tail (no clipped region) |
+| u1_150  | 567     | 567    | tail (no clipped region) |
+| u1_35   | 20,338  | 533    | tail (below u1_28) |
+| u1_70   | 15,636  | 2,003  | near-tail |
+| u2_28   | 166     | 12     | tail |
+| u2_70   | 1,088   | 751    | near-tail |
+| u2_35   | 15,099  | 16,925 | secondary (+1,826) |
+
+6/7 configs improve ~97% from the HR-only baseline (u1_35 20,338 -> 533, below the
+u1_28 tail). u2_35 rises +1,826: its solved black 43.17 (the only non-42 config)
+interacts with the residual gain ULP; it will close when the SIMD-reduction order
+is ported (u1_35, same wide-35 tier, went the other way to 533).
+
+SHARED KERNEL: no CCM/AWB unit test exists; phoenix_merge_tests and
+phoenix_edit_tests (both exercise the CCM path via colorFusionSceneNeutralGain /
+ccmBlendFor) PASS, as do phoenix_lri/premerge. The pre-existing full-build failure
+is a libpng link gap in phoenix_depth_tool, unrelated. Committed Phoenix e1ab26a
+(pushed github master 0cf0319..e1ab26a; delivery bundle _phx_inbox/ccm_scenexy.bundle).
+This closes the anchor-plane porting to the readable-op floor.
