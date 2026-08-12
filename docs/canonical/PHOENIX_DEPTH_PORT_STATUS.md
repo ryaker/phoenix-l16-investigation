@@ -1061,3 +1061,121 @@ ccmBlendFor) PASS, as do phoenix_lri/premerge. The pre-existing full-build failu
 is a libpng link gap in phoenix_depth_tool, unrelated. Committed Phoenix e1ab26a
 (pushed github master 0cf0319..e1ab26a; delivery bundle _phx_inbox/ccm_scenexy.bundle).
 This closes the anchor-plane porting to the readable-op floor.
+
+
+### 2026-08-12k -- Source-plane registration DECODED: integer active-window crop, NO warp (blocker cleared)
+
+Ran a runtime operand capture inside ColorFusionBayer::initialize (probe
+tools/lldb_probes/colorfusion_source_planes/operand_probe.py) at the source
+loop: 0x1ab813 (rect intersection), 0x1aba80 (0x1ad390), 0x1aba8f (0x19bd20).
+Result (u1_28, target A1/0, sources 4,2,3):
+
+- Source planes are built by the SAME chain as the (bit-exact) reference:
+  0x1ac010 native construct -> 0x1ad390 normalize+compact COPY (out=window*scale,
+  tight stride, NO interpolation) -> 0x19bd20 PackBayerImageProtoType half-res
+  f16-truncation pack, lane [TR,TL,BL,BR].
+- The ONLY registration is an INTEGER crop = anchor_rect intersect source_rect:
+    cam4 -> origin (1,1) size 4158x3118  (halves to 2079x1559 = 25,929,288 B)
+    cam2/cam3 -> origin (0,0) size 4160x3120 (halves to 2080x1560 = 25,958,400 B)
+- NO projective H, NO radial LUT, NO sub-pixel warp. ImageWarpClamped 0x3ed2e0
+  is the DEPTH processLevel1 src2 path, not ColorFusion; the reference plane is
+  bit-exact without it -> proof it is off this path.
+
+Earlier "spatially-varying warp / no global affine aligns cam4 to anchor" was
+comparing DIFFERENT cameras' scene content (parallax); ColorFusion does not
+geometrically register at the plane level -- the producer's per-patch FLOW
+handles sub-pixel; the integer crop handles the <=1-quad active-area offset.
+
+Evidence: docs/evidence/bundle_runtime_colorfusion_source_plane_registration_integer_crop.md.
+Oracle exists for all 7 configs:
+runs/colorfusion_source_planes/{u1_28,u1_35,u1_70,u1_150,u2_28,u2_35,u2_70}/source_vec4_f16_00.bin.
+
+REMAINING (wiring, not research): generalize Phoenix colorFusionAnchorPlane to
+build each source camera k (own calib_index / solved black / scene-neutral gain
+c_k from shared temp/tint + cam k ColorCalibration) + integer anchor-source crop
+before the half-res pack; validate bit-exact vs source_vec4_f16_00 across 2u/4f;
+commit only if bit-exact. Per-camera scale (~1/(white-black), 980.6-981) pinned
+from solveBlackLevel during validation (single runtime read of cam4 was unstable
+981.00/979.83).
+
+### 2026-08-12l — Source-plane black-refinement MEMBERSHIP decoded + wired (captured input); source planes CLOSED to the readable-op floor given membership; two non-black residuals remain
+
+The "981 vs 979.83 cam4 scale instability" (12k) is RESOLVED: it is unsolved-
+black-42.0 (981=1/(1023-42)) vs over-refined-43.17 (979.83). The runtime refines
+black (solveBlackLevel) only for a SUBSET of source modules. Mechanism, fully
+traced: ColorFusion 0x1ac010 calls the keyed cache helper 0x1bdc80 once per
+source (edx = source module index, rsi = [ctx+0x118] RawImageFactory record map);
+0x1bdc80 walks a std::map at [([ctx+0x118])+0x60] keyed by module index and its
+internal solveBlackLevel at 0x1bdd86 fires only when the module is seen FRESH
+(gate 0x1bdd19; 0xe78e0 count is always 1, lazy builder 0x1be270 zero-hit, per
+docs/evidence/lldb_src1_keyed_helper_and_builder_boundary_four_zoom.md). So a
+module is refined iff ColorFusion is the FIRST stage to request its key; the
+pre-CF flow/reference/depth passes (other 0x1bdc80 callers 0x1b1ea4/0x1b1ef5/
+0x1b2213/0x3e2ffe...) pre-empt the rest, which keep the installed 42.0. This is
+emergent runtime request-order state, NOT an LRI constant.
+
+Ground truth (solve.json + operands.json at390 scale): my in-process
+solveBlackLevel reproduces every SOLVED entry BIT-EXACTLY (means+gains+result):
+u1_28 solved {cam2->42.39, cam3->42.36}, cam4 kept 42.0; u1_70 solved {cam9->
+42.63, cam5->43.17}, cam6/cam7 kept 42.0.
+
+WIRED (Phoenix b21f573): colorFusionSourcePlaneRegistered takes refined_black as
+a validated captured input (>=0 verbatim, <0 auto-solve = always-refined
+anchor/target). Provenance: engine/merge/colorfusion_black_membership.md. Anchor
+regression intact (5/7 configs 0 words, u2_70=4, u2_35=16396). u1_28 cam4 pre-pack
+with black=42.0 -> 1-ULP floor (maxULP 3) vs bd20_input_src0.
+
+STILL OPEN (POST-PACK bit-exactness of source_vec4_f16, both NON-black):
+1. Highlight-restore CLIPPED-kernel bright-region scatter: u1_28 cam2 0.14% /
+   cam3 0.075% post-pack; same root as the u2_35 ANCHOR 16396. Needs the CFA-
+   phase clipped kernels 0x30b9f0/0x30dcc0/0x30ff60/0x3121f0 ported line-by-line.
+2. Cropped ODD-Bayer-phase source (u1_28 cam4, red_override (0,1)): un-packing
+   source_vec4_00 to native shows even-column channel ~1.05x but odd-column
+   channel ~1.33x vs the monochrome bd20 packer-input -- a phase-dependent
+   per-channel step in the final plane absent from bd20. cam2/cam3 (red_override
+   (1,0), crop (0,0)) do not show it. The "pack = plain 2x2 truncation of the
+   cropped native, proven vs source_vec4_00" holds for even-phase uncropped
+   sources but NOT for the odd-phase cropped cam4.
+
+FOLLOW-UPS: (a) 0x1bdc80 pre-CF request-order derivation to compute membership
+in-process; (b) the two residuals above; (c) parser preservation of the vignette
+field-13 calibration_order + relative_brightness (still passed as manual args).
+
+### 2026-08-12m — HighlightRestore CLIPPED kernel: Phoenix matches the readable math bit-for-bit; u2_35 anchor 16,396 is the rcpss-seed last-ULP floor (capture task, not static)
+
+Target = u2_35 anchor (16,396 words, the clean HR isolation config: 24,020 HR-
+changed pixels, no membership/crop/scalar confounders; cam4 is confirmed CLOSED).
+
+Clipped kernel fully readable and already transcribed: dispatcher lt::Restore-
+HighlightsBayer 0x30b770 selects one of four CFA-phase kernels 0x30b9f0 (RGGB) /
+0x30dcc0 (GRBG) / 0x30ff60 (GBRG) / 0x3121f0 (BGGR); each has inner loop A
+(0x30be60..0x30cce1) and loop B (0x30cda0..0x30dc70). Full instruction-level math
+in L16_Phoenix/_parity_run/STAGE9B_HRB_KERNEL_MATH.md: §3.2 centre green (HA),
+§3.3 SIMD diagonal greens, §3.4 chroma-guided diagonal estimate (rcpps weights),
+§3.6 the CLIPPED restore cascade (saturation ramp s=clamp((t-0.85/v)*(20/3*v)),
+S=Σs, M=U*rcp(3.00001-S), t'=t+s*(M-t), res=t+min(S,1)*max(t'-t,0), then the
+kdir/dot desaturation res2 and the max-channel push res3), §3.7 out=res*((b-a)*v)
++a via cvttss2si, §7.3 the green-centre (loop B) cardinal-chroma + green
+truncation.
+
+DIFF: Phoenix engine/depth/highlight_restore.cpp (core/wsum/haGreen/finish)
+matches §3.2-§3.7 line-for-line -- saturation ramp, S/U/M, min(S,1) brighten,
+kdir dot (rsqrt), C1/C2 terms, denorm+cvttss2si truncation, the c0_c1/c2_c1
+reciprocal-of-reciprocal ratios, the ((v0+v2)+(v1+v3)) hsum order. No readable
+divergence found.
+
+RESIDUAL characterization: 16,396/12,979,200, median 1 ULP, max 7, 99.6% <=4 ULP.
+R/B lanes (diagonal chroma) carry most (small) diffs; the >4-ULP tail (67 words)
+is in the green lanes. All last-ULP class -- sub-ULP float accumulation flipping
+the terminal cvttss2si u16 on the most sensitive clipped pixels.
+
+RULED OUT: FP flush environment (GAP-9B-3d.7b). Setting FTZ+DAZ changes nothing
+(16,396 -> 16,396); the 5 bit-exact anchors and u2_70=4 are unaffected either way.
+
+SOURCE (remaining): the rcpss 12-bit reciprocal SEED in the chroma weights
+(x86Rcp, common/x86_rcp.h). rsqrt is all-input-exact (verified over all 2^32),
+but rcpss is only SAMPLED-verified (~6.24M cases, GAP-9B-3d.6) and its exact
+per-input result is MICROARCHITECTURE-specific. Closing u2_35 to 0 needs the
+target Mac's actual rcpss output captured for the chroma inputs the kernel hits
+-- a runtime capture task, NOT a static read. STOP per the "unreadable step ->
+report + stop" rule. No code change; no regression. b21f573 (membership) stands.
