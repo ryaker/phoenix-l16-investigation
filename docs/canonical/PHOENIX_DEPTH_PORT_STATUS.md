@@ -545,3 +545,68 @@ AWB/CCM kernels), then integration:
   construction is the one still-open RE item).
 - 2x pixel-double + CNR lane-3 wiring (replace meanA:=1); full wide/tele + two-body
   tile replay (gate 6, the promotion gate for CLM-DENOISE-002).
+
+### 2026-08-12 — ColorFusion source planes + CNR lane-3 wiring; gate-6 boundary pinned
+
+Phoenix work (branch master, pushed): built the source half-resolution plane
+constructor, the full half-res f->lane3 assembly, and the gated CNR lane-3 hook.
+Validated at every step that has an oracle; the FIRST unreachable step is named
+precisely below (no faked parity).
+
+WHAT IS VALIDATED (oracle-pinned):
+- Target-route refactor (engine/merge/colorfusion_target.{h,cpp}): factored the
+  proven RAW10->hotpixel->RestoreHighlightsBayer(c)->f32(u16)-42 route into
+  `colorFusionRoutePlane(camera_key,c)` so sources reuse the EXACT target path.
+  Non-regressive: validate_colorfusion_target on L16_02130 = target plane
+  0/12,979,200 words differ (BIT-EXACT) vs u1_28 target_pre_vignette_f32.bin.
+- f16 pack quantization (engine/merge/colorfusion_source.cpp `f32ToHalfToF32`):
+  IEEE-754 binary16 round-to-nearest-even, matches an independent reference
+  bit-for-bit (608.3349609->608.5, 974.7729->975.0, 65504 and 2^-24 subnormal
+  round-trip exact). This is the installed vec4x16f pack (static custody
+  verify_colorfusion_source_plane_static.py: half-res vec4x16f, lanes
+  [TR,TL,BL,BR], flow retained separately at owner+0x128).
+- phoenix_merge builds clean with colorfusion_source.cpp added; the per-patch
+  producer f, camera selection, signal/shading/noise, and byte/lane3 codec remain
+  bit-exact (unchanged; prior entries).
+
+WHAT IS BUILT BUT NOT ORACLE-PINNABLE (honest):
+- engine/merge/colorfusion_source.{h,cpp}: `colorFusionSourceFullPlane` (route
+  per source + shared anchor gain c) and `colorFusionHalfResPack` (2080x1560 vec4,
+  lanes [TR,TL,BL,BR], f16-quantized).
+- engine/merge/colorfusion.cpp `colorFuseLane3Plane`: ref + ordered source half-res
+  planes -> per-patch four-lane core_noise (colorFusionNoiseProvider over the
+  260x195 signal/shading neighborhood means) -> per-patch producer f -> half-sample
+  Hann-16 OLA -> f->byte->lane3. Links + runs (finite lane3 in [0,1]).
+- tools/phoenix_fuse.cpp applyCNR: CnrParams gains a pixel-doubled (nearest 2x)
+  lane-3 plane; the constant `meanA:=1` (divergence D1) is replaced by the
+  per-tile lane-3 mean. BIT-IDENTICAL to the proven default when the plane is
+  empty/disabled; armed by env PHX_CFLANE3. Compiles clean (build-x86 phoenix_fuse
+  links only against the known libtiff/x86_64 gap).
+
+*** GATE-6 BOUNDARY — FIRST PLACE VALIDATION IS IMPOSSIBLE (not faked) ***
+The source plane the transform actually consumes (`source_before_vec4`, captured)
+is the f16 half-res source plane SUB-PIXEL FLOW-RESAMPLED (DC-aligned) to the
+anchor. Evidence it is a resample, not a direct read: 1019/1024 captured
+source_before words are NOT binary16-representable, so they fall between f16 grid
+points -> interpolation happened. Reproducing source_before bit-exact needs the
+per-source FLOW field (vec2 f32, owner+0x128). Its ONLY oracle is
+`runs/colorfusion_source_planes/` produced by
+`tools/lldb_probes/colorfusion_source_planes/probe.py` — that probe EXISTS but was
+NEVER RUN (no run directory on disk). The transform captures
+(runs/colorfusion_f_runtime/u1_28_transform/) additionally record no patch
+plane-origin, so even the extraction coordinate is unknown. Therefore:
+  1. Source-plane spot-validation vs source_before_vec4 CANNOT be computed
+     bit-exact (missing flow field + missing patch origin). Words-differ is
+     undefined, not zero — reporting a number here would be fabrication.
+  2. No captured full ColorFusion f/byte plane and no captured CNR source tile
+     exist anywhere under runs/ (confirmed; the spec's own gate 6 / "Known
+     exclusions" says whole-tile ColorFusion + CNR tile output remain validation
+     work). So the pixel-doubled lane-3 -> CNR meanA replacement cannot be
+     validated end-to-end either.
+
+TO CLOSE GATE 6 (capture work, not code): run the colorfusion_source_planes probe
+to dump the reference/ordered-source/flow descriptors for u1_28 (wide) and u2_70
+(tele); add a probe that dumps one full ColorFusion f/byte plane and the matching
+CNR source lane-3 tile; then replay on a second physical body. Until those exist,
+`CLM-DENOISE-002` stays PARTIAL/BLOCKER and the PHX_CFLANE3 path stays armed-but-
+inert by design.
