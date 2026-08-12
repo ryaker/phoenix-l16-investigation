@@ -814,3 +814,53 @@ Net: the anchor formula is bit-exact-modulo-coverage on 3 configs across both
 tiers and both bodies; the tele profile master is cam2; two u2 configs and the
 per-record-levels/secondary residual on u1_35/u1_70 are the identified remaining
 port gaps.
+
+### 2026-08-12f — Anchor plane profile-selection RULE found; per-record black is runtime solveBlackLevel
+
+Read the profile-selection rule and re-ran all 7 configs with it (no sweeps).
+
+PROFILE-SELECTION RULE (read from calibration order + validated): the anchor
+vignette profile camera = **calibration_order[anchor_camera_id]**, where
+calibration_order is the LRI module_calibration PROTOBUF first-appearance order
+(RE decode_modules order) and anchor_camera_id = 0 (wide A1) / 8 (tele B4):
+  unit1: order[0]=cam12 (wide), order[8]=cam2  (tele)
+  unit2: order[0]=cam4  (wide), order[8]=cam14 (tele)
+This is why wide uses cam12/cam4 and tele uses cam2/cam14 -- not a fixed master.
+Phoenix's LRI parser reassigns FactoryModuleCalibration.vector_index = camera_id
+(sorted) and DISCARDS the protobuf order, so auto-selection needs a parser change;
+colorFusionAnchorPlane takes the profile camera id as a param and the caller
+supplies the rule's value (Phoenix commit 155729c documents the rule).
+
+7-config table (committed anchor formula, rule profiles, words-differ / 12,979,200):
+
+| config  | tier    | tgt | rule profile        | words differ | pct      | class |
+|---------|---------|-----|---------------------|--------------|----------|-------|
+| u1_28   | wide28  | 0   | cam12 (order[0])    | 572          | 0.0044%  | 1-ULP TAIL |
+| u1_150  | tele150 | 8   | cam2  (order[8])    | 567          | 0.0044%  | 1-ULP TAIL |
+| u2_28   | wide28  | 0   | cam4  (order[0])    | 1,335        | 0.0103%  | 1-ULP TAIL |
+| u2_70   | tele70  | 8   | cam14 (order[8])    | 24,670       | 0.1901%  | secondary |
+| u1_70   | tele70  | 8   | cam2  (order[8])    | 96,490       | 0.7434%  | secondary |
+| u1_35   | wide35  | 0   | cam12 (order[0])    | 437,287      | 3.3691%  | secondary |
+| u2_35   | wide35  | 0   | cam4  (order[0])    | 12,968,515   | 99.9177% | STRUCTURAL |
+
+The rule FIXED u2_70 (99.99% with cam2 -> 0.19% with cam14). 3 configs are the
+1-ULP tail across both tiers AND both bodies (validates the port: post-hotpixel
+route, f32(1/981) normalize, half-res-130 per-Bayer-pixel vign steps 1-5,
+truncation f16 pack).
+
+BLACK/WHITE (read): statically 42/1023 for EVERY module (VST installed table,
+captured_image.cpp + the bundle's 3 captures), NOT per-record in the LRI. The true
+per-record black is the RUNTIME solveBlackLevel refinement. Diagnostic: the
+implied vign center factor (cap*981/route at the plane center, where vign~1) is
+1.0012 on u1_35 (black ~42, fine) but 0.9876 on u2_35 -> u2_35's solved black is
+~43, a ~1.2% normalize shift = ~25 f16 ULP = 99.9% words differ. So u2_35's
+STRUCTURAL failure is the runtime black solver, not the profile.
+
+REMAINING GAPS (read, not tuned):
+- solveBlackLevel port: per-record runtime black != 42 explains u2_35 (99.9%) and
+  contributes to the secondary tails; the 3 pass configs have solved black ~42.
+- Parser: preserve module_calibration protobuf order so colorFusionAnchorPlane can
+  auto-select profile = calibration_order[anchor_id] instead of a supplied id.
+- The u1_35/u1_70/u2_70 secondary residuals (0.19-3.37%) with black~42 (u1_35
+  implied 1.0012) are the 572-class coverage tail amplified by scene content near
+  truncation boundaries + vign-factor cells the single oracle tile can't exercise.
